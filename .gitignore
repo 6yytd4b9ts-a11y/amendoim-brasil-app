@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+.netlify/
+public/img/logo.png
+public/icons/icon-512.png
