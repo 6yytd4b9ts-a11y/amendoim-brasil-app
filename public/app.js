@@ -253,8 +253,8 @@ function telaCotacoes() {
   <section class="cartao">
     <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
     <div class="chips" role="group" aria-label="Período">
-      ${['3M', '6M', '1A'].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${p}</button>`).join('')}
-      <a class="chip" href="#/mercado/consultoria" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}5 anos</a>
+      ${['3M', '6M'].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${p}</button>`).join('')}
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
     </div>
     <div class="grafico" id="grafico">${graficoPreco()}</div>
     ${h.fonte ? `<span class="mini">Fonte: ${linkSeguro(h.link) ? `<a class="link-mini" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
