@@ -23,13 +23,35 @@ function itensHoje(D, h) {
 }
 
 // ---------- HOME ----------
+// Resumo do dia em 4 quadros (o preço já está no destaque verde). Toque leva à aba Mercado.
+const DESTINO = { dolar: '#/mercado/hoje', exportacao: '#/mercado/exportacao', demanda: '#/mercado/oferta', oferta: '#/mercado/oferta' };
 export function blocoMercadoHoje(D, h) {
   const { esc } = h;
   const m = D.mercado;
   if (!m) return '';
-  const itens = itensHoje(D, h);
+  const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico').slice(0, 4);
   return `<section class="cartao hoje">
     <div class="cartao-cab"><span class="rotulo">Mercado hoje</span><span class="mini">Atualizado ${esc(m.atualizado)}</span></div>
+    <div class="hoje-grade">${itens.map((x) => `
+      <a class="hoje-quadro ${x.efeito}" href="${DESTINO[x.id] || '#/mercado/hoje'}">
+        <span class="hoje-rot">${esc(x.rotulo)}</span>
+        <span class="hoje-valor">${seta(h, x.efeito)}<b class="num">${esc(x.valor)}</b></span>
+        <span class="hoje-nota">${esc(x.nota)}</span>
+      </a>`).join('')}
+    </div>
+    ${m.fato ? `<a class="fato-linha" href="#/mercado/hoje"><span class="fato-tag">Fato do dia</span><span>${esc(m.fato.titulo)}</span></a>` : ''}
+    ${h.patrocinio ? h.patrocinio('mercado-hoje') : ''}
+  </section>`;
+}
+
+// Versão completa, com a explicação de cada item (aba Mercado).
+export function blocoMercadoHojeDetalhe(D, h) {
+  const { esc } = h;
+  const m = D.mercado;
+  if (!m) return '';
+  const itens = itensHoje(D, h);
+  return `<section class="cartao" id="sec-hoje">
+    <div class="cartao-cab"><span class="rotulo">Mercado hoje · o que mudou</span><span class="mini">${esc(m.atualizado)}</span></div>
     <div class="hoje-lista">${itens.map((x) => `
       <details class="hoje-item">
         <summary>
@@ -42,7 +64,6 @@ export function blocoMercadoHoje(D, h) {
     </div>
     ${m.fato ? `<div class="fato"><span class="fato-tag">Fato do dia</span><b>${esc(m.fato.titulo)}</b><span>${esc(m.fato.texto)}</span></div>` : ''}
     <span class="mini legenda-ef">${seta(h, 'alta')} sustenta o preço · ${seta(h, 'baixa')} pressiona · toque para ver o porquê</span>
-    ${h.patrocinio ? h.patrocinio('mercado-hoje') : ''}
   </section>`;
 }
 
@@ -103,30 +124,6 @@ export function telaAlertas(D, h) {
 }
 
 // ---------- MERCADO ----------
-export function blocoIndicativo(D, h) {
-  const { esc, brl, numBr, wa } = h;
-  const ind = D.mercado?.indicativo;
-  if (!ind) return '';
-  const refs = (D.cotacoes.referencias || []).filter((r) => r.praca !== 'Presidente Prudente');
-  const vals = [ind.min, ind.max, ...refs.map((r) => r.preco)];
-  const lo = Math.floor(Math.min(...vals) - 3), hi = Math.ceil(Math.max(...vals) + 3);
-  const pos = (v) => ((v - lo) / (hi - lo)) * 100;
-  const zap = wa('Olá Helder, vi o indicativo Amendoim Brasil no app e quero conversar sobre um negócio.');
-  return `<section class="cartao indicativo">
-    <div class="cartao-cab"><span class="rotulo">Indicativo Amendoim Brasil</span>${ind.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</div>
-    <div class="num" style="display:flex;align-items:baseline;gap:8px"><span class="preco-ind">R$ ${numBr(ind.min)} a ${numBr(ind.max)}</span><span class="mini">/ saca 25 kg</span></div>
-    <span class="mini">${esc(ind.data)} · ${esc(ind.condicao)}</span>
-    <div class="escala">
-      <div class="escala-faixa" style="left:${pos(ind.min)}%;width:${pos(ind.max) - pos(ind.min)}%"></div>
-      ${refs.map((r) => `<span class="escala-ponto" style="left:${pos(r.preco)}%" title="${esc(r.fonte)} ${esc(r.praca)}"></span>`).join('')}
-      <span class="escala-ext" style="left:0">${numBr(lo)}</span><span class="escala-ext" style="right:0">${numBr(hi)}</span>
-    </div>
-    <div class="escala-legenda"><span><i class="faixa"></i>Mercado físico</span>${refs.map((r) => `<span><i class="ponto"></i>${esc(r.fonte)} ${esc(r.praca === 'Média do estado de SP' ? 'SP' : r.praca)} ${brl(r.preco)}</span>`).join('')}</div>
-    <p class="aviso-ind">Não é cotação oficial. É a leitura da Amendoim Brasil sobre os negócios fechados no mercado físico.</p>
-    ${zap ? `<a class="link-mini" href="${zap}" target="_blank" rel="noopener">Quer negociar nessa faixa? Fale com o Helder</a>` : ''}
-  </section>`;
-}
-
 export function blocoOfertaDemanda(D, h) {
   const { esc } = h;
   const od = D.mercado?.ofertaDemanda || [];

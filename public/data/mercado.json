@@ -47,13 +47,6 @@
     "titulo": "Conab divulga o 1º levantamento da safra 26/27 em 15/10",
     "texto": "O mercado espera a confirmação oficial de área menor. Se vier abaixo de 25%, reforça a firmeza do preço."
   },
-  "indicativo": {
-    "min": 78,
-    "max": 82,
-    "data": "semana de 05 a 09/10/2026",
-    "condicao": "Casca seca e limpa, posta na beneficiadora · Alta Paulista e Oeste Paulista",
-    "exemplo": true
-  },
   "ofertaDemanda": [
     {
       "nome": "Oferta de casca",
