@@ -1,6 +1,6 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
 import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio, alternarPrevisao } from '/clima.js';
-import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoIndicativo, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores } from '/painel.js';
+import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoMercadoHojeDetalhe, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores } from '/painel.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
@@ -123,8 +123,6 @@ function telaInicio() {
     </a>
   </div>
 
-  ${blocoOportunidades(D, H())}
-
   ${b ? `
   <a class="boletim" href="${hrefBoletim(b)}" ${!b.secoes && linkSeguro(b.link) ? 'target="_blank" rel="noopener"' : ''}>
     <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}${esc(cfg.boletim.rotulo)}</span><span class="mini" style="color:#5C3A06">${esc(b.data)}</span></div>
@@ -135,6 +133,8 @@ function telaInicio() {
   ${H().patrocinio('boletim')}` : ''}
 
   ${blocoNoticias()}
+
+  ${blocoOportunidades(D, H())}
 
   ${blocoPanoramaCompacto(D, H())}
 
@@ -222,7 +222,7 @@ function telaCotacoes() {
     <p class="mini" style="margin:0;padding:10px 0 12px">Toque na linha para conferir na fonte. Conab: preço em R$/kg convertido para saca de 25 kg.</p>
   </section>` : ''}
 
-  ${blocoIndicativo(D, H())}
+  ${blocoMercadoHojeDetalhe(D, H())}
 
   ${temProprias ? `
   <section class="cartao" style="gap:0;padding:4px 16px">
