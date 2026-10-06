@@ -1,0 +1,122 @@
+{
+  "atualizado": "06/10/2026",
+  "hoje": [
+    {
+      "id": "fisico",
+      "rotulo": "Preço da casca",
+      "valor": "R$ 77,00",
+      "nota": "IEA · Tupã · 05/10",
+      "efeito": "neutro",
+      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP). A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
+      "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
+    },
+    {
+      "id": "dolar",
+      "rotulo": "Dólar",
+      "valor": "R$ 4,98",
+      "nota": "−0,5% hoje",
+      "efeito": "baixa",
+      "detalhe": "Dólar mais baixo reduz quanto a exportação paga em reais. Pesa contra o preço da casca, mas o preço lá fora subindo compensa por enquanto."
+    },
+    {
+      "id": "exportacao",
+      "rotulo": "Exportação",
+      "valor": "Forte",
+      "nota": "+16% no ano · setembro mais fraco",
+      "efeito": "alta",
+      "detalhe": "De janeiro a setembro o Brasil exportou 240.833 t de amendoim em grão, 16% a mais que em 2025 (Comex Stat). Setembro, porém, ficou 14% abaixo do mesmo mês do ano passado: o ritmo desacelerou na entressafra."
+    },
+    {
+      "id": "demanda",
+      "rotulo": "Demanda das indústrias",
+      "valor": "Fraca",
+      "nota": "compras só para o curto prazo",
+      "efeito": "baixa",
+      "detalhe": "As indústrias de doce e torrado compram o mínimo, esperando o preço ceder. É o principal freio do mercado agora."
+    },
+    {
+      "id": "oferta",
+      "rotulo": "Oferta de produto",
+      "valor": "Média",
+      "nota": "entressafra, com produto disponível",
+      "efeito": "neutro",
+      "detalhe": "Ainda há amendoim da safra passada nas mãos de produtores e beneficiadoras, mas sem excesso. A área menor na safra 26/27 deve apertar a oferta mais à frente."
+    }
+  ],
+  "fato": {
+    "titulo": "Conab divulga o 1º levantamento da safra 26/27 em 15/10",
+    "texto": "O mercado espera a confirmação oficial de área menor. Se vier abaixo de 25%, reforça a firmeza do preço."
+  },
+  "ofertaDemanda": [
+    {
+      "nome": "Oferta de casca",
+      "escala": ["Baixa", "Média", "Alta"],
+      "nivel": 1,
+      "efeito": "neutro",
+      "detalhe": "Oferta equilibrada na entressafra: tem produto, mas sem pressão de venda."
+    },
+    {
+      "nome": "Demanda industrial",
+      "escala": ["Fraca", "Normal", "Forte"],
+      "nivel": 0,
+      "efeito": "baixa",
+      "detalhe": "Indústrias comprando só o necessário para as próximas semanas, esperando o preço ceder."
+    },
+    {
+      "nome": "Exportação",
+      "escala": ["Fraca", "Normal", "Forte"],
+      "nivel": 2,
+      "efeito": "alta",
+      "detalhe": "Embarques 16% acima de 2025 no acumulado até setembro, apesar de setembro mais fraco."
+    },
+    {
+      "nome": "Disponibilidade de produto",
+      "escala": ["Baixa", "Média", "Alta"],
+      "nivel": 1,
+      "efeito": "neutro",
+      "detalhe": "Lotes disponíveis em volume médio; produto de boa qualidade ainda consegue prêmio."
+    }
+  ],
+  "exportacao": {
+    "titulo": "Exportações 16% acima de 2025",
+    "leitura": "Fator positivo para o mercado: a exportação absorve produto e segura o preço da casca mesmo com a indústria comprando pouco. Ponto de atenção: setembro veio 14% abaixo do ano passado.",
+    "periodo": "jan a set/2026",
+    "fonte": "Comex Stat/MDIC · NCM 1202.42 (grão) e 1508 (óleo) · atualizado em 06/10/2026",
+    "fonteLink": "https://comexstat.mdic.gov.br/pt/geral",
+    "itens": [
+      {
+        "nome": "Grão",
+        "toneladas": 240833,
+        "variacao": 15.6
+      },
+      {
+        "nome": "Óleo",
+        "toneladas": 94916,
+        "variacao": -21.6
+      }
+    ],
+    "precoMedio": {
+      "atual": 1164,
+      "anterior": 1219,
+      "variacao": -4.5
+    },
+    "ritmo": "O primeiro semestre e julho puxaram o acumulado; agosto e setembro vieram abaixo de 2025, típico da entressafra.",
+    "mensal": {
+      "exemplo": false,
+      "meses": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set"],
+      "atual": [24184, 17741, 18882, 23370, 30733, 39657, 34262, 26460, 25544],
+      "anterior": [21356, 13005, 15091, 23620, 23544, 20094, 32317, 29580, 29640]
+    },
+    "destinos": {
+      "exemplo": false,
+      "lista": [
+        ["Rússia", 28.6],
+        ["Argélia", 17.8],
+        ["África do Sul", 9.1],
+        ["Holanda", 7.3],
+        ["Egito", 5.2],
+        ["Outros", 32.0]
+      ]
+    }
+  }
+}

@@ -99,7 +99,7 @@ export async function carregarClima(local = municipioAtual()) {
   const janela = difDias(inicio, ontem); // dias desde o início da safra
   const tz = encodeURIComponent(TZ);
 
-  const qPrev = `latitude=${local.lat}&longitude=${local.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min&past_days=92&forecast_days=7&timezone=${tz}`;
+  const qPrev = `latitude=${local.lat}&longitude=${local.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min&past_days=92&forecast_days=16&timezone=${tz}`;
   const qHist = `latitude=${local.lat}&longitude=${local.lon}&daily=precipitation_sum&start_date=${anoIni - 10}-09-01&end_date=${corte}&timezone=${tz}`;
   const qReg = `latitude=${MUNICIPIOS.map((m) => m.lat).join(',')}&longitude=${MUNICIPIOS.map((m) => m.lon).join(',')}&daily=precipitation_sum&past_days=45&forecast_days=1&timezone=${tz}`;
 
@@ -110,7 +110,7 @@ export async function carregarClima(local = municipioAtual()) {
   ]);
 
   const out = {
-    municipio: local, atualizado: new Date(), dias: [], total7: null, semChuva: null, chuva7passados: null,
+    municipio: local, atualizado: new Date(), dias: [], total7: null, total15: null, semChuva: null, chuva5passados: null, chuva7passados: null, chuva30passados: null,
     chuvaSafra: null, chuvaSafraPassada: null, mediaSafra: null, anosMedia: 0, alertas: [],
     inicioSafra: inicio, inicioPassada: `${anoIni - 1}-09-01`, fimPassada: somaDias(`${anoIni - 1}-09-01`, janela), ate: ontem, erro: null
   };
@@ -119,7 +119,7 @@ export async function carregarClima(local = municipioAtual()) {
     const d = prev.value.daily;
     const iHoje = d.time.indexOf(hoje);
     const nomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    for (let i = iHoje; i < d.time.length && out.dias.length < 7; i++) {
+    for (let i = iHoje; i < d.time.length && out.dias.length < 15; i++) {
       out.dias.push({
         data: d.time[i],
         dia: i === iHoje ? 'Hoje' : nomes[new Date(d.time[i] + 'T12:00:00Z').getUTCDay()],
@@ -129,7 +129,10 @@ export async function carregarClima(local = municipioAtual()) {
         tmin: d.temperature_2m_min?.[i]
       });
     }
-    out.total7 = out.dias.reduce((s, x) => s + (x.mm || 0), 0);
+    out.total7 = out.dias.slice(0, 7).reduce((s, x) => s + (x.mm || 0), 0);
+    out.total15 = out.dias.reduce((s, x) => s + (x.mm || 0), 0);
+    out.chuva5passados = somaJanela(d, somaDias(hoje, -5), ontem);
+    out.chuva30passados = somaJanela(d, somaDias(hoje, -30), ontem);
     out.semChuva = diasSemChuva(d.precipitation_sum, iHoje - 1);
     out.chuva7passados = somaJanela(d, somaDias(hoje, -7), ontem);
 
@@ -164,54 +167,79 @@ export async function carregarClima(local = municipioAtual()) {
   return out;
 }
 
-// Recomendação de plantio a partir da previsão (regras simples; o texto do Helder em clima.json tem prioridade).
-export function recomendacaoPlantio(a) {
-  if (!a || !a.dias.length) return null;
+// Orientação da semana conforme a fase da safra e a previsão (regras simples; o texto do Helder em clima.json tem prioridade).
+export function recomendacaoPlantio(a, fase = 'Plantio') {
+  if (!a || !a.dias?.length) return null;
   const prox3 = a.dias.slice(0, 3).reduce((s, d) => s + (d.mm || 0), 0);
   const maxDia = Math.max(...a.dias.slice(0, 3).map((d) => d.mm || 0));
+  const forte = maxDia >= 30 || prox3 >= 40;
   const umido = (a.chuva7passados || 0) >= 20;
-  const itens = [];
-  let titulo;
-  if (maxDia >= 30 || prox3 >= 40) {
-    titulo = 'Chuva forte nos próximos dias: segure o plantio';
-    itens.push(`Previsão de ${Math.round(prox3)} mm em 3 dias. Evite plantar logo antes do temporal, principalmente em solo arenoso: a chuva forte pode arrastar semente e formar crosta, atrapalhando a emergência.`);
-    itens.push('Se já plantou, acompanhe a emergência nos pontos mais baixos e nas linhas expostas.');
-  } else if (umido) {
-    titulo = 'Solo com umidade: boa janela para plantar';
-    itens.push(`Choveu ${Math.round(a.chuva7passados)} mm nos últimos 7 dias. Aproveite a umidade e plante sem atraso.`);
-    itens.push('Profundidade entre 4 e 6 cm, com a semente em contato com o solo úmido. Em solo arenoso, pode ir um pouco mais fundo.');
-  } else if ((a.semChuva || 0) >= 7 && a.total7 < 15) {
-    titulo = 'Solo secando e pouca chuva prevista';
-    itens.push(`São ${a.semChuva} dias sem chuva e só ${Math.round(a.total7)} mm previstos na semana. O ideal é esperar uma chuva de pelo menos 15 a 20 mm antes de plantar.`);
-    itens.push('Não aprofunde demais a semente para buscar umidade: plantar fundo atrasa e enfraquece a emergência.');
-  } else {
-    titulo = 'Plante com o solo úmido';
-    itens.push(`Previsão de ${Math.round(a.total7)} mm na semana. Plante quando houver umidade no solo e evite os dias de chuva forte.`);
-    itens.push('Profundidade entre 4 e 6 cm, com boa regulagem da plantadeira para não danificar a semente.');
+  const seco = (a.semChuva || 0) >= 7 && (a.total7 || 0) < 15;
+  const r = (titulo, itens, dica) => ({ titulo, itens, dica });
+  const f = (fase || '').toLowerCase();
+
+  if (f.startsWith('emerg')) {
+    if (forte) return r('Chuva forte na emergência: atenção à crosta', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Chuva pesada logo após o plantio pode formar crosta e segurar a emergência, principalmente em solo arenoso.`], 'Depois da chuva, ande nas linhas mais baixas e veja se a planta está rompendo o solo.');
+    if (seco) return r('Solo secando na emergência', [`São ${a.semChuva} dias sem chuva. Emergência irregular deixa estande falhado e lavoura desuniforme.`], 'Conte plantas por metro em vários pontos e compare com a população planejada antes de pensar em replantio.');
+    return r('Boa condição para emergência', [`Choveu ${Math.round(a.chuva7passados || 0)} mm nos últimos 7 dias e a previsão é de ${Math.round(a.total7)} mm na semana.`], 'Avalie o estande entre 10 e 15 dias após o plantio: é o momento de decidir se precisa de algum ajuste.');
   }
-  itens.push('Confira o zoneamento agrícola (ZARC) do seu município: ele vale para crédito e seguro.');
-  return { titulo, itens };
+  if (f.startsWith('flor')) {
+    if (seco) return r('Florada com pouca chuva', [`São ${a.semChuva} dias sem chuva e só ${Math.round(a.total7)} mm previstos. Falta de água na florada reduz o pegamento e a formação de vagens.`], 'É a fase em que a falta de chuva mais pesa na produtividade. Acompanhe o radar e a previsão de 15 dias.');
+    if (umido) return r('Umidade alta na florada: olho nas doenças', [`Choveu ${Math.round(a.chuva7passados)} mm nos últimos 7 dias. Tempo úmido favorece mancha e ferrugem.`], 'Mantenha o calendário de fungicida em dia e não deixe o intervalo esticar com a chuva.');
+    return r('Florada em andamento', [`Previsão de ${Math.round(a.total7)} mm na semana.`], 'Chuva regular nesta fase é o que garante vagem. Acompanhe a previsão de 15 dias.');
+  }
+  if (f.startsWith('ench')) {
+    if (seco) return r('Seca no enchimento: risco para o grão', [`São ${a.semChuva} dias sem chuva. Falta de água no enchimento deixa grão miúdo e aumenta o risco de aflatoxina.`], 'Se a seca continuar, antecipe a conversa sobre a comercialização: a qualidade pode cair.');
+    return r('Enchimento com boa umidade', [`Previsão de ${Math.round(a.total7)} mm na semana.`], 'Monitore a maturação (raspagem de vagens) para planejar o arranquio com antecedência.');
+  }
+  if (f.startsWith('arranq') || f.startsWith('colh')) {
+    if (forte || prox3 >= 15) return r('Chuva prevista: cuidado ao arrancar', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Amendoim arrancado que toma chuva na leira perde qualidade.`], 'Procure uma janela de 3 a 4 dias secos para arrancar e recolher.');
+    return r('Janela seca para o arranquio', [`Pouca chuva prevista nos próximos dias (${Math.round(prox3)} mm em 3 dias).`], 'Aproveite para arrancar e recolher com o produto secando bem na leira.');
+  }
+  // Plantio (padrão)
+  if (forte) return r('Chuva forte nos próximos dias: segure o plantio', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Evite plantar logo antes do temporal, principalmente em solo arenoso: a chuva forte pode arrastar semente e formar crosta, atrapalhando a emergência.`], 'Se já plantou, acompanhe a emergência nos pontos mais baixos e nas linhas expostas.');
+  if (umido) return r('Solo com umidade: boa janela para plantar', [`Choveu ${Math.round(a.chuva7passados)} mm nos últimos 7 dias. Aproveite a umidade e plante sem atraso.`], 'Profundidade entre 4 e 6 cm, com a semente em contato com o solo úmido. Em solo arenoso, pode ir um pouco mais fundo.');
+  if (seco) return r('Solo secando e pouca chuva prevista', [`São ${a.semChuva} dias sem chuva e só ${Math.round(a.total7)} mm previstos na semana. O ideal é esperar uma chuva de pelo menos 15 a 20 mm antes de plantar.`], 'Não aprofunde demais a semente para buscar umidade: plantar fundo atrasa e enfraquece a emergência.');
+  return r('Plante com o solo úmido', [`Previsão de ${Math.round(a.total7)} mm na semana. Plante quando houver umidade no solo e evite os dias de chuva forte.`], 'Profundidade entre 4 e 6 cm, com boa regulagem da plantadeira para não danificar a semente.');
 }
 
-// Tela de Clima. h = utilitários do app (esc, ic, I, numBr); D = dados do app.
+let periodoPrev = 7;
+export function alternarPrevisao(n) { periodoPrev = n === 15 ? 15 : 7; }
+
+const dataCurta = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
+
+// Tela de Clima. h = utilitários do app (esc, ic, I, numBr, patrocinio); D = dados do app.
 export function telaClima(D, h) {
   const { esc, ic, I, numBr } = h;
   const c = D.clima;
   const a = D.climaAuto;
   const atual = municipioAtual();
   const carregando = !a;
-  const dias = a?.dias || [];
-  const maior = a ? Math.max(a.chuvaSafra || 0, a.chuvaSafraPassada || 0, 1) : 1;
-  const larg = (v) => (v == null ? 0 : Math.max(3, Math.round((v / maior) * 100)));
-  const dif = a && a.chuvaSafra != null && a.chuvaSafraPassada != null ? Math.round(a.chuvaSafra - a.chuvaSafraPassada) : null;
+  const dias = (a?.dias || []).slice(0, periodoPrev);
+  const maxMm = Math.max(10, ...dias.map((d) => d.mm || 0));
+  const fase = D.config.faseSafra || 'Plantio';
   const opcoes = MUNICIPIOS.map((m) => `<option value="${esc(m.nome)}" ${!atual.gps && m.nome === atual.nome ? 'selected' : ''}>${esc(m.nome)}/${esc(m.uf)}</option>`).join('');
   const minhaLocal = atual.gps ? `<option value="__gps" selected>Sua localização${atual.perto ? ' (perto de ' + esc(atual.perto) + ')' : ''}</option>` : '';
-  const rec = (c.recomendacao && !c.recomendacao.startsWith('[')) ? { titulo: 'Recomendação da semana', itens: [c.recomendacao] } : recomendacaoPlantio(a);
-  const anoA = a ? a.inicioSafra.slice(2, 4) : '';
-  const anoP = a ? a.inicioPassada.slice(2, 4) : '';
+  const rec = (c.recomendacao && !c.recomendacao.startsWith('[')) ? { titulo: 'Recomendação da semana', itens: [c.recomendacao], dica: '' } : recomendacaoPlantio(a, fase);
+  const mm = (v) => (v == null ? '—' : numBr(v) + ' mm');
+  const tile = (rot, val, sub = '', cls = '') => `<div class="clima-tile ${cls}"><span>${rot}</span><b class="num">${val}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+
+  // Comparação da safra em frase clara
+  let frase = '';
+  if (a && a.chuvaSafra != null && a.chuvaSafraPassada != null) {
+    const dif = Math.round(a.chuvaSafra - a.chuvaSafraPassada);
+    frase = Math.abs(dif) < 5 ? 'Choveu praticamente o mesmo que na safra passada.' : `Choveu <b>${numBr(Math.abs(dif))} mm ${dif > 0 ? 'a mais' : 'a menos'}</b> que na safra passada no mesmo período.`;
+    if (a.mediaSafra != null) {
+      const dm = Math.round(a.chuvaSafra - a.mediaSafra);
+      frase += ` Está <b>${numBr(Math.abs(dm))} mm ${dm >= 0 ? 'acima' : 'abaixo'}</b> da média de ${a.anosMedia} safras (${numBr(a.mediaSafra)} mm).`;
+    }
+  }
+  const maior = a ? Math.max(a.chuvaSafra || 0, a.chuvaSafraPassada || 0, a.mediaSafra || 0, 1) : 1;
+  const barra = (v, cor) => `<div class="barra"><span style="width:${v == null ? 0 : Math.max(3, Math.round((v / maior) * 100))}%;background:${cor}"></span></div>`;
+  const anoA = a ? +a.inicioSafra.slice(0, 4) : 0;
 
   return `<header class="topo">
-    <div><h1>Clima</h1><div class="sub">Chuva, alertas e plantio na sua região</div></div>
+    <div><h1>Clima</h1><div class="sub">Chuva e decisões da lavoura na sua região</div></div>
     <div class="campo" style="gap:6px">
       <label for="sel-municipio">Local da lavoura</label>
       <div style="display:flex;gap:8px">
@@ -221,32 +249,49 @@ export function telaClima(D, h) {
     </div>
   </header>
 
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Previsão · 7 dias</span><b class="num" style="font-size:13px">${a?.total7 != null ? numBr(a.total7) + ' mm no total' : (carregando ? 'carregando…' : '— mm')}</b></div>
-    ${a?.erro ? `<span class="mini">${esc(a.erro)}</span>` : ''}
-    <div class="dias">${(dias.length ? dias : Array.from({ length: 7 }, () => null)).map((d) => d
-      ? `<div class="dia">${esc(d.dia)}${ic(d.mm >= SECO ? I.chuva : I.sol, `style="width:22px;height:22px;stroke:${d.mm >= SECO ? '#2F6FA3' : '#D58A16'}"`)}<small class="num">${numBr(d.mm)}mm</small><small class="num" style="color:var(--texto-3);font-weight:500">${d.prob != null ? d.prob + '%' : ''}</small></div>`
-      : `<div class="dia" style="opacity:.5">…${ic(I.chuva, 'style="width:22px;height:22px;stroke:#CFC8B8"')}<small>—</small></div>`).join('')}</div>
-    ${dias.length ? `<div class="mini">Máx/mín hoje: <b class="num">${numBr(dias[0].tmax)}° / ${numBr(dias[0].tmin)}°</b> · % = chance de chuva</div>` : ''}
+  ${a?.erro ? `<div class="vazio">${esc(a.erro)}</div>` : ''}
+
+  <section class="clima-resumo">
+    ${tile('Últimos 5 dias', carregando ? '…' : mm(a.chuva5passados), 'choveu')}
+    ${tile('Últimos 7 dias', carregando ? '…' : mm(a.chuva7passados), 'choveu')}
+    ${tile('Próximos 7 dias', carregando ? '…' : mm(a.total7), 'previsto', 'prev')}
+    ${tile('Sem chuva', carregando ? '…' : numBr(a.semChuva) + (a.semChuva === 1 ? ' dia' : ' dias'), 'seguidos até ontem', a && a.semChuva >= 10 ? 'alerta' : '')}
   </section>
 
-  ${rec ? `<section class="cartao" style="border-color:#C2E2CC;background:var(--verde-fundo)">
-    <span class="rotulo" style="color:var(--verde-escuro)">Planejamento de plantio</span>
+  ${rec ? `<section class="cartao fase-cartao">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Lavoura · fase de ${esc(fase.toLowerCase())}</span><span class="pilula pilula-verde">${esc(D.config.safraAtual || '')}</span></div>
+    <div class="fases-linha">${(D.config.fases || []).map((x) => `<span class="${x === fase ? 'atual' : ''}">${esc(x)}</span>`).join('')}</div>
     <b style="font-size:17px;line-height:1.3">${esc(rec.titulo)}</b>
     ${rec.itens.map((t) => `<p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(t)}</p>`).join('')}
-    <span class="mini">Orientação automática pela previsão. Na dúvida, fale com seu agrônomo.</span>
+    ${rec.dica ? `<div class="dica"><span class="fato-tag">Dica da semana</span><span>${esc(rec.dica)}</span></div>` : ''}
+    <span class="mini">Orientação automática pela previsão e pela fase da safra. Na dúvida, fale com seu agrônomo.</span>
   </section>` : ''}
 
-  <section class="cartao" style="gap:14px">
-    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · esta safra vs passada</span>${dif != null ? `<span class="pilula ${dif >= 0 ? 'pilula-azul' : 'pilula-amendoim'}">${dif >= 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm</span>` : ''}</div>
-    <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><b>Safra ${anoA}/${a ? +anoA + 1 : ''} · até ${a ? dataBr(a.ate).slice(0, 5) : '—'}</b><b class="num">${a?.chuvaSafra != null ? numBr(a.chuvaSafra) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${larg(a?.chuvaSafra)}%;background:var(--azul)"></span></div></div>
-    <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><span style="font-weight:600;color:var(--texto-3)">Safra ${anoP}/${a ? +anoP + 1 : ''} · até ${a ? dataBr(a.fimPassada).slice(0, 5) : '—'}</span><b class="num">${a?.chuvaSafraPassada != null ? numBr(a.chuvaSafraPassada) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${larg(a?.chuvaSafraPassada)}%;background:#9CC3E3"></span></div></div>
-    ${a?.mediaSafra != null ? `<span class="mini">Média de ${a.anosMedia} safras no mesmo período: <b class="num">${numBr(a.mediaSafra)} mm</b></span>` : ''}
+  <section class="cartao">
+    <div class="cartao-cab"><span class="rotulo">Previsão de chuva</span>
+      <div class="alterna" role="group" aria-label="Período da previsão"><button data-prev="7" aria-pressed="${periodoPrev === 7}">7 dias</button><button data-prev="15" aria-pressed="${periodoPrev === 15}">15 dias</button></div>
+    </div>
+    <div class="mini" style="margin-top:-4px">${a ? `<b class="num">${mm(periodoPrev === 7 ? a.total7 : a.total15)}</b> previstos em ${periodoPrev} dias` : 'carregando…'}</div>
+    <div class="prev-lista ${periodoPrev === 15 ? 'longa' : ''}">${(dias.length ? dias : Array.from({ length: 7 }, () => null)).map((d) => d
+      ? `<div class="prev-dia ${d.mm >= 30 ? 'forte' : ''}">
+          <span class="prev-nome">${esc(d.dia)}</span><span class="prev-data">${dataCurta(d.data)}</span>
+          ${ic(d.mm >= SECO ? I.chuva : I.sol, `style="width:20px;height:20px;stroke:${d.mm >= SECO ? '#2F6FA3' : '#D58A16'}"`)}
+          <span class="prev-barra"><i style="height:${Math.round(((d.mm || 0) / maxMm) * 100)}%"></i></span>
+          <b class="num">${numBr(d.mm)}<small> mm</small></b><small class="num">${d.prob != null ? d.prob + '%' : ''}</small>
+        </div>`
+      : `<div class="prev-dia" style="opacity:.5"><span class="prev-nome">…</span></div>`).join('')}</div>
+    ${dias.length ? `<div class="mini">% = chance de chuva · Máx/mín hoje <b class="num">${numBr(dias[0].tmax)}° / ${numBr(dias[0].tmin)}°</b>${periodoPrev === 15 ? ' · depois de 7 dias a previsão é menos precisa' : ''}</div>` : ''}
+    ${h.patrocinio ? h.patrocinio('clima') : ''}
   </section>
 
-  <section class="cartao ${a && a.semChuva >= 10 ? 'alerta' : ''}">
-    <div class="cartao-cab"><span class="rotulo">Dias seguidos sem chuva</span><b class="grande num">${a?.semChuva != null ? a.semChuva : '—'}</b></div>
-    <span class="mini">${a?.semChuva != null ? (a.semChuva >= 10 ? 'Atenção: veranico na sua região.' : 'Contagem até ontem (dias com menos de 1 mm).') : ''}</span>
+  <section class="cartao" style="gap:12px">
+    <div><span class="rotulo" style="display:block">Chuva acumulada desde 01/09</span>${a ? `<span class="mini">Lavoura ${esc(nomeLocal(a.municipio))}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? '' : `<span class="mini">${carregando ? 'carregando…' : 'Sem dados do histórico agora.'}</span>`}
+    ${a && a.chuvaSafra != null ? `
+    <div class="comp-linha"><div class="cartao-cab"><b>Esta safra · 01/09 a ${dataCurta(a.ate)}/${anoA}</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
+    <div class="comp-linha"><div class="cartao-cab"><span>Safra passada · 01/09 a ${dataCurta(a.fimPassada)}/${anoA - 1}</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
+    ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras · mesmo período</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}
+    <p class="frase-safra">${frase} Nos últimos 30 dias choveu <b class="num">${mm(a.chuva30passados)}</b>.</p>` : ''}
   </section>
 
   <section class="cartao alerta">
@@ -256,16 +301,9 @@ export function telaClima(D, h) {
 
   <section class="cartao">
     <div class="cartao-cab"><span class="rotulo">Radar de chuva ao vivo</span><span class="pilula pilula-verde">IPMet</span></div>
-    <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Veja onde está chovendo agora, pelos radares de Bauru e Presidente Prudente.</span>
+    <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Radar GIS local do IPMet, com os radares de Bauru e Presidente Prudente. Dentro do radar dá para escolher PPI, chuva da última hora e acumulado de 24 horas.</span>
     <a class="btn btn-verde" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener">Abrir radar</a>
     ${c.radarAlternativo ? `<span class="mini">O site do IPMet às vezes fica fora do ar. Se não abrir, <a class="link-mini" href="${esc(c.radarAlternativo)}" target="_blank" rel="noopener">veja as nuvens pelo satélite</a>.</span>` : ''}
-  </section>
-
-  <section class="cartao">
-    <span class="rotulo">Momento da safra · ${esc(D.config.safraAtual)}</span>
-    ${(D.config.fases || []).map((f) => f === D.config.faseSafra
-      ? `<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:11px;background:var(--verde);border:4px solid var(--verde-claro)"></span><b class="cresce" style="font-size:15px">${esc(f)}</b><span class="pilula pilula-verde">Agora</span></div>`
-      : `<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:11px;border:2px solid #CFC8B8"></span><span class="cresce" style="font-size:15px;color:var(--texto-3)">${esc(f)}</span></div>`).join('')}
   </section>
 
   <section class="cartao">

@@ -9,7 +9,7 @@ const SECAGEM_PROPRIA = 2.0; // R$/saca, média estimada com gás e lenha
 // Campo: [id, rótulo, tipo (int|brl|dec), unidade, conversão ao trocar alqueire/hectare (area|porArea|''), placeholder]
 const FERR = {
   custo: {
-    nome: 'Custo e lucro', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
+    nome: 'Lucratividade', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
     campos: [
       ['prod', 'Produtividade', 'int', 'sc/{u}', 'porArea'],
       ['custo', 'Custo total', 'brl', 'R$/{u}', 'porArea'],
@@ -51,6 +51,34 @@ const FERR = {
     ],
     padrao: {}
   },
+  avista: {
+    nome: 'À vista ou a prazo', desc: 'Qual proposta paga mais de verdade',
+    campos: [
+      ['avista', 'Preço à vista', 'brl', 'R$/sc', ''],
+      ['aprazo', 'Preço a prazo', 'brl', 'R$/sc', ''],
+      ['dias', 'Prazo de pagamento', 'int', 'dias', ''],
+      ['juros', 'Custo do dinheiro', 'dec', '% ao mês', ''],
+      ['sacas', 'Quantidade · opcional', 'int', 'sacas', '']
+    ],
+    padrao: { avista: '76,00', aprazo: '80,00', dias: '60', juros: '1,2' }
+  },
+  frete: {
+    nome: 'Frete', desc: 'Quanto o frete tira do seu preço',
+    campos: [
+      ['valor', 'Valor do frete', 'brl', 'R$/carga', '', 'ex.: 2.500,00'],
+      ['carga', 'Tamanho da carga', 'dec', 'toneladas', '', 'ex.: 15'],
+      ['preco', 'Preço oferecido · opcional', 'brl', 'R$/sc', '']
+    ],
+    padrao: {}
+  },
+  dolar: {
+    nome: 'Dólar → R$/saca', desc: 'Converte preço em US$/t para R$ por saca',
+    campos: [
+      ['usd', 'Preço em dólar', 'brl', 'US$/t', '', 'ex.: 1.164,00'],
+      ['cambio', 'Dólar', 'brl', 'R$/US$', '']
+    ],
+    padrao: { cambio: '4,98' }
+  },
   arrendamento: {
     nome: 'Arrendamento', desc: 'O valor da terra em sacas',
     campos: [
@@ -61,6 +89,9 @@ const FERR = {
     padrao: {}
   }
 };
+
+// Ordem em que as ferramentas aparecem.
+const ORDEM = ['custo', 'avista', 'armazenar', 'barter', 'frete', 'dolar', 'rendimento', 'arrendamento'];
 
 // ---------- estado salvo ----------
 let st = carregar();
@@ -134,7 +165,7 @@ export function telaFerramentas(qual, h) {
     </div>`;
   };
   return `<header class="topo"><div><h1>Ferramentas</h1><div class="sub">Faça a conta da sua lavoura</div></div>
-    <div class="chips" role="tablist">${Object.entries(FERR).map(([id, x]) => `<a class="chip" href="#/ferramentas/${id}" aria-pressed="${id === k}" style="text-decoration:none">${esc(x.nome)}</a>`).join('')}</div>
+    <div class="chips" role="tablist">${ORDEM.map((id) => [id, FERR[id]]).map(([id, x]) => `<a class="chip" href="#/ferramentas/${id}" aria-pressed="${id === k}" style="text-decoration:none">${esc(x.nome)}</a>`).join('')}</div>
   </header>
   <section class="cartao" style="gap:14px" id="ferr" data-ferr-k="${k}">
     <div class="cartao-cab" style="align-items:flex-start;gap:12px">
@@ -145,6 +176,7 @@ export function telaFerramentas(qual, h) {
     <div class="campos-2">${f.campos.map(campo).join('')}</div>
     ${k === 'armazenar' ? `<label class="marcar"><input type="checkbox" id="sec-propria" ${st.secPropria ? 'checked' : ''}><span>Secagem própria <small>(usamos uma média estimada de ${h.brl(SECAGEM_PROPRIA)}/saca com gás e lenha)</small></span></label>` : ''}
     <div id="ferr-resultado">${resultado(k, h)}</div>
+    ${h.patrocinio ? h.patrocinio('ferramentas') : ''}
   </section>
   <p class="mini" style="text-align:center;margin:0 8px">${temArea ? '1 alqueire paulista = 2,42 ha · ' : ''}Seus números ficam salvos só neste aparelho.</p>`;
 }
@@ -238,6 +270,49 @@ function resultado(k, h) {
     const kg = v.sacas * 25 * (v.rend / 100);
     return `<div class="placares">${bloco('Grão obtido', numBr(kg) + ' kg')}${bloco('Em sacas de grão', numBr(kg / 25) + ' sc')}</div>
       <div class="resultado">${linha('Em toneladas', numBr(kg / 1000, 2) + ' t')}${linha('Casca total', numBr(v.sacas * 25) + ' kg')}${linha('Casca + resíduo', numBr(v.sacas * 25 - kg) + ' kg')}</div>`;
+  }
+
+  if (k === 'avista') {
+    if (!v.avista || !v.aprazo || !v.dias) return vazio();
+    const j = (v.juros || 0) / 100;
+    const vp = v.aprazo / Math.pow(1 + j, v.dias / 30);
+    const dif = vp - v.avista;
+    const implicita = (Math.pow(v.aprazo / v.avista, 30 / v.dias) - 1) * 100;
+    return `<div class="placares">
+        ${bloco('A prazo vale hoje', brl(vp))}
+        ${bloco(dif >= 0 ? 'A prazo compensa' : 'À vista compensa', (dif >= 0 ? '+' : '') + brl(dif) + '<small>/sc</small>', dif >= 0 ? 'pos' : 'neg')}
+      </div>
+      <div class="resultado">
+        ${linha('Juros que o comprador está pagando', numBr(implicita, 2) + '% ao mês')}
+        ${linha('Seu custo do dinheiro', numBr(v.juros || 0, 2) + '% ao mês')}
+        ${v.sacas ? '<hr>' + linha('Diferença no total', brl(dif * v.sacas), sinal(dif)) : ''}
+      </div>
+      <span class="mini">${dif >= 0 ? 'O prêmio do prazo paga mais que o seu custo do dinheiro.' : 'O prêmio do prazo não cobre o seu custo do dinheiro: melhor receber à vista.'} Lembre também do risco de receber.</span>`;
+  }
+
+  if (k === 'frete') {
+    if (!v.valor || !v.carga) return vazio();
+    const sacas = (v.carga * 1000) / 25;
+    const porSc = v.valor / sacas;
+    return `<div class="placares">
+        ${bloco('Frete por saca', brl(porSc))}
+        ${bloco('Preço líquido', v.preco ? brl(v.preco - porSc) : '—')}
+      </div>
+      <div class="resultado">
+        ${linha('Frete por tonelada', brl(v.valor / v.carga))}
+        ${linha('Sacas na carga', numBr(sacas) + ' sc')}
+        ${v.preco ? linha('Peso do frete no preço', numBr((porSc / v.preco) * 100, 1) + '%') : ''}
+      </div>`;
+  }
+
+  if (k === 'dolar') {
+    if (!v.usd || !v.cambio) return vazio();
+    const porT = v.usd * v.cambio;
+    return `<div class="placares">
+        ${bloco('Por saca de 25 kg', brl(porT / 40))}
+        ${bloco('Por tonelada', brl(porT))}
+      </div>
+      <span class="mini">Conversão direta do mesmo produto (1 t = 40 sacas de 25 kg). Para comparar grão exportado com casca, é preciso descontar rendimento, beneficiamento e frete até o porto.</span>`;
   }
 
   if (k === 'arrendamento') {
