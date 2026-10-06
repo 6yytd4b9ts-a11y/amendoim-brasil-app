@@ -67,14 +67,13 @@ export function localDoAparelho(tempo = 10000) {
   });
 }
 
-// No primeiro acesso usa a localização da pessoa; depois, o que ela escolheu.
-// Se não conseguir, mostra Presidente Prudente sem salvar (tenta de novo na próxima visita).
+// No primeiro acesso tenta a localização da pessoa e devolve o novo local (ou null).
+// Se já existe um local escolhido, ou se não conseguir, devolve null e fica o que está na tela.
 export async function localInicial() {
-  const salvo = municipioSalvo();
-  if (salvo) return salvo;
+  if (municipioSalvo()) return null;
   const gps = await localDoAparelho();
-  if (gps) { definirMunicipio(gps); return gps; }
-  return MUNICIPIOS[0];
+  if (gps) definirMunicipio(gps);
+  return gps;
 }
 
 // Início da safra das águas: 1º de setembro (antes de setembro, vale a safra anterior).
@@ -204,7 +203,7 @@ export function telaClima(D, h) {
   const dias = a?.dias || [];
   const maior = a ? Math.max(a.chuvaSafra || 0, a.chuvaSafraPassada || 0, 1) : 1;
   const larg = (v) => (v == null ? 0 : Math.max(3, Math.round((v / maior) * 100)));
-  const dif = a && a.chuvaSafra != null && a.chuvaSafraPassada ? Math.round(((a.chuvaSafra / a.chuvaSafraPassada) - 1) * 100) : null;
+  const dif = a && a.chuvaSafra != null && a.chuvaSafraPassada != null ? Math.round(a.chuvaSafra - a.chuvaSafraPassada) : null;
   const opcoes = MUNICIPIOS.map((m) => `<option value="${esc(m.nome)}" ${!atual.gps && m.nome === atual.nome ? 'selected' : ''}>${esc(m.nome)}/${esc(m.uf)}</option>`).join('');
   const minhaLocal = atual.gps ? `<option value="__gps" selected>Sua localização${atual.perto ? ' (perto de ' + esc(atual.perto) + ')' : ''}</option>` : '';
   const rec = (c.recomendacao && !c.recomendacao.startsWith('[')) ? { titulo: 'Recomendação da semana', itens: [c.recomendacao] } : recomendacaoPlantio(a);
@@ -239,7 +238,7 @@ export function telaClima(D, h) {
   </section>` : ''}
 
   <section class="cartao" style="gap:14px">
-    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · esta safra vs passada</span>${dif != null ? `<span class="pilula ${dif >= 0 ? 'pilula-azul' : 'pilula-amendoim'}">${dif >= 0 ? '+' : ''}${dif}%</span>` : ''}</div>
+    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · esta safra vs passada</span>${dif != null ? `<span class="pilula ${dif >= 0 ? 'pilula-azul' : 'pilula-amendoim'}">${dif >= 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm</span>` : ''}</div>
     <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><b>Safra ${anoA}/${a ? +anoA + 1 : ''} · até ${a ? dataBr(a.ate).slice(0, 5) : '—'}</b><b class="num">${a?.chuvaSafra != null ? numBr(a.chuvaSafra) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${larg(a?.chuvaSafra)}%;background:var(--azul)"></span></div></div>
     <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><span style="font-weight:600;color:var(--texto-3)">Safra ${anoP}/${a ? +anoP + 1 : ''} · até ${a ? dataBr(a.fimPassada).slice(0, 5) : '—'}</span><b class="num">${a?.chuvaSafraPassada != null ? numBr(a.chuvaSafraPassada) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${larg(a?.chuvaSafraPassada)}%;background:#9CC3E3"></span></div></div>
     ${a?.mediaSafra != null ? `<span class="mini">Média de ${a.anosMedia} safras no mesmo período: <b class="num">${numBr(a.mediaSafra)} mm</b></span>` : ''}
