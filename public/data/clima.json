@@ -1,0 +1,14 @@
+{
+  "fonteConectada": false,
+  "municipio": "Seu município",
+  "previsao7dias": [
+    { "dia": "Ter", "mm": null }, { "dia": "Qua", "mm": null }, { "dia": "Qui", "mm": null },
+    { "dia": "Sex", "mm": null }, { "dia": "Sáb", "mm": null }, { "dia": "Dom", "mm": null },
+    { "dia": "Seg", "mm": null }
+  ],
+  "chuvaSafraMm": null,
+  "mediaHistoricaMm": null,
+  "semChuva10dias": [],
+  "recomendacao": "[Orientação para esta fase: umidade do solo, janela de plantio e cuidados com a previsão.]",
+  "enso": "[Status do El Niño / La Niña e impacto na safra]"
+}

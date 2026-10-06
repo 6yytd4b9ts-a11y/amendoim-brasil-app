@@ -1,0 +1,26 @@
+[
+  {
+    "tipo": "video",
+    "fonte": "YouTube · [Canal]",
+    "titulo": "[Título do vídeo ou entrevista]",
+    "link": "",
+    "capa": "",
+    "patrocinado": false
+  },
+  {
+    "tipo": "noticia",
+    "fonte": "[Portal]",
+    "titulo": "[Título da notícia sobre o mercado de amendoim]",
+    "link": "",
+    "capa": "",
+    "patrocinado": false
+  },
+  {
+    "tipo": "noticia",
+    "fonte": "[Portal]",
+    "titulo": "[Título da notícia sobre a safra]",
+    "link": "",
+    "capa": "",
+    "patrocinado": false
+  }
+]

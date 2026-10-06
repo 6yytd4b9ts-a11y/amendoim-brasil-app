@@ -1,0 +1,7 @@
+[
+  { "sigla": "BR", "pais": "Brasil", "fase": "Plantio" },
+  { "sigla": "AR", "pais": "Argentina", "fase": "Plantio" },
+  { "sigla": "US", "pais": "Estados Unidos", "fase": "Colheita" },
+  { "sigla": "IN", "pais": "Índia", "fase": "Colheita" },
+  { "sigla": "CN", "pais": "China", "fase": "Colheita" }
+]

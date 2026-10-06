@@ -1,0 +1,5 @@
+[
+  { "lado": "Venda", "categoria": "Casca", "produto": "Amendoim em casca", "detalhe": "[Cultivar] · [umidade / classificação]", "volume": "[000] sc", "preco": "R$ 00,00", "entrega": "[Imediata]", "regiao": "Oeste Paulista" },
+  { "lado": "Compra", "categoria": "Debulhado", "produto": "Amendoim debulhado", "detalhe": "[Tipo / peneira] · [com ou sem controle]", "volume": "[00] t", "preco": "A combinar", "entrega": "[Prazo]", "regiao": "Alta Paulista" },
+  { "lado": "Venda", "categoria": "Semente", "produto": "Semente certificada", "detalhe": "[Cultivar] · [germinação]", "volume": "[00.000] kg", "preco": "R$ 00,00", "entrega": "[Prazo]", "regiao": "Mato Grosso do Sul" }
+]

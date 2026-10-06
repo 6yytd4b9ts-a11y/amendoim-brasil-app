@@ -1,0 +1,20 @@
+{
+  "nomeApp": "Amendoim Brasil",
+  "whatsappHelder": "",
+  "regiaoPadrao": "Oeste Paulista",
+  "safraAtual": "26/27 águas",
+  "faseSafra": "Plantio",
+  "fases": ["Plantio", "Emergência", "Florada", "Enchimento", "Arranquio"],
+  "boletim": {
+    "rotulo": "Boletim da semana",
+    "frequencia": "semanal"
+  },
+  "termometro": {
+    "status": "Estável",
+    "resumo": "[Resumo da semana em três linhas: o que mudou no preço, quem está comprando e o que esperar para os próximos dias.]"
+  },
+  "exportacao": {
+    "status": "Estável"
+  },
+  "produtosEmBreve": ["Debulhado", "Blancheado"]
+}

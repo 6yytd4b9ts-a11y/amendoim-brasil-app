@@ -1,0 +1,29 @@
+{
+  "produto": "Amendoim em casca",
+  "unidade": "R$/saca 25 kg",
+  "semana": "",
+  "destaque": { "regiao": "Oeste Paulista", "preco": null, "variacao": null },
+  "regioes": [
+    { "nome": "Oeste Paulista", "preco": null, "variacao": null },
+    { "nome": "Alta Paulista", "preco": null, "variacao": null },
+    { "nome": "Alta Mogiana", "preco": null, "variacao": null },
+    { "nome": "Mato Grosso do Sul", "preco": null, "variacao": null },
+    { "nome": "Minas Gerais", "preco": null, "variacao": null }
+  ],
+  "referencias": [
+    { "fonte": "IEA-SP", "praca": "Presidente Prudente", "preco": 80.00, "data": "05/10/2026" },
+    { "fonte": "IEA-SP", "praca": "Tupã", "preco": 77.00, "data": "05/10/2026" }
+  ],
+  "historico": {
+    "exemplo": true,
+    "pontos": [
+      { "data": "2025-10", "preco": 74 }, { "data": "2025-11", "preco": 76 },
+      { "data": "2025-12", "preco": 79 }, { "data": "2026-01", "preco": 83 },
+      { "data": "2026-02", "preco": 86 }, { "data": "2026-03", "preco": 82 },
+      { "data": "2026-04", "preco": 78 }, { "data": "2026-05", "preco": 75 },
+      { "data": "2026-06", "preco": 74 }, { "data": "2026-07", "preco": 76 },
+      { "data": "2026-08", "preco": 78 }, { "data": "2026-09", "preco": 79 },
+      { "data": "2026-10", "preco": 80 }
+    ]
+  }
+}

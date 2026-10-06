@@ -1,0 +1,26 @@
+[
+  {
+    "tipo": "Boletim semanal",
+    "titulo": "[Título do boletim da semana]",
+    "data": "[dd/mm/aaaa]",
+    "resumo": "[Primeiras linhas do boletim: o ponto principal do mercado nesta semana, em linguagem direta para o produtor.]",
+    "link": "",
+    "exclusivo": false
+  },
+  {
+    "tipo": "Relatório mensal",
+    "titulo": "[Título do relatório]",
+    "data": "[mês/aaaa]",
+    "resumo": "",
+    "link": "",
+    "exclusivo": true
+  },
+  {
+    "tipo": "Panorama global",
+    "titulo": "[Brasil, Argentina, EUA, Índia e China]",
+    "data": "[dd/mm/aaaa]",
+    "resumo": "",
+    "link": "",
+    "exclusivo": true
+  }
+]
