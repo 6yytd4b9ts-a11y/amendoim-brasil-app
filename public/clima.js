@@ -258,6 +258,7 @@ export function telaClima(D, h) {
     <div class="cartao-cab"><span class="rotulo">Radar de chuva ao vivo</span><span class="pilula pilula-verde">IPMet</span></div>
     <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Veja onde está chovendo agora, pelos radares de Bauru e Presidente Prudente.</span>
     <a class="btn btn-verde" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener">Abrir radar</a>
+    ${c.radarAlternativo ? `<span class="mini">O site do IPMet às vezes fica fora do ar. Se não abrir, <a class="link-mini" href="${esc(c.radarAlternativo)}" target="_blank" rel="noopener">veja as nuvens pelo satélite</a>.</span>` : ''}
   </section>
 
   <section class="cartao">
