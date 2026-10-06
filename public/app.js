@@ -1,6 +1,6 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
-import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio } from '/clima.js';
-import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoIndicativo, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe } from '/painel.js';
+import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio, alternarPrevisao } from '/clima.js';
+import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoIndicativo, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores } from '/painel.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
@@ -39,7 +39,11 @@ const I = {
   fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   grupo: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/>'
 };
-const H = () => ({ esc, ic, I, brl, numBr, pct, wa, linkSeguro });
+const H = () => {
+  const h = { esc, ic, I, brl, numBr, pct, wa, linkSeguro };
+  h.patrocinio = (local) => seloPatrocinio(D, local, h);
+  return h;
+};
 const corSigla = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
 
 // Termômetro do preço da casca: para onde o preço tende a ir nas próximas semanas.
@@ -83,7 +87,7 @@ function telaInicio() {
   const auto = D.climaAuto;
   const chuva7 = auto?.total7;
   const temChuva = chuva7 != null;
-  const rec = auto && auto.dias?.length ? recomendacaoPlantio(auto) : null;
+  const rec = auto && auto.dias?.length ? recomendacaoPlantio(auto, cfg.faseSafra) : null;
 
   return `
   <header class="topo-inicio">
@@ -127,7 +131,8 @@ function telaInicio() {
     <h2>${esc(b.titulo)}</h2>
     ${b.resumo ? `<p>${esc(b.resumo)}</p>` : ''}
     <div class="cartao-cab" style="margin-top:4px"><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti</span><span class="btn btn-escuro btn-pequeno" style="min-height:40px">Ler boletim</span></div>
-  </a>` : ''}
+  </a>
+  ${H().patrocinio('boletim')}` : ''}
 
   ${blocoNoticias()}
 
@@ -137,14 +142,7 @@ function telaInicio() {
 
   ${cartaoRedes()}
 
-  <section class="parceiros">
-    <span class="rotulo">${D.patrocinadores.length === 1 ? 'Oferecimento' : 'Parceiros Amendoim Brasil'}</span>
-    <div class="parceiros-grade" style="grid-template-columns:repeat(${Math.min(Math.max(D.patrocinadores.length, 1), 4)},1fr)">${D.patrocinadores.slice(0, 4).map((p) => {
-      const href = linkSeguro(p.link);
-      const dentro = p.logo ? `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">` : esc(p.nome);
-      return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${dentro}</a>` : `<span class="parceiro">${dentro}</span>`;
-    }).join('')}</div>
-  </section>`;
+  ${blocoPatrocinadores(D, H())}`;
 }
 
 function blocoNoticias() {
@@ -364,6 +362,7 @@ function telaBoletim(id) {
     <span class="tag-boletim">${ic(I.doc, 'style="width:16px;height:16px"')}${esc(b.tipo)} · ${esc(b.data)}</span>
     <h1>${esc(b.titulo)}</h1>
     <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+    ${H().patrocinio('boletim')}
     ${b.resumo ? `<div class="lead">${esc(b.resumo)}</div>` : ''}
     ${b.secoes.map((s) => `<section>
       <h2>${siglas[s.titulo] ? `<span class="sigla pilula ${corSigla[siglas[s.titulo]] || 'pilula-verde'}">${esc(siglas[s.titulo])}</span>` : ''}${esc(s.titulo)}</h2>
@@ -432,8 +431,8 @@ const ROTAS = {
   inicio: () => telaInicio(),
   mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
   alertas: () => telaAlertas(D, H()),
-  clima: () => telaClimaAuto(D, { esc, ic, I, numBr }),
-  ferramentas: (sub) => telaFerramentas(sub, { esc, ic, I, brl, numBr }),
+  clima: () => telaClimaAuto(D, H()),
+  ferramentas: (sub) => telaFerramentas(sub, H()),
   negociar: () => telaNegociar(),
   boletim: (id) => telaBoletim(id)
 };
@@ -459,8 +458,9 @@ function render(rolarTopo = true) {
 // Eventos delegados (filtros, gráfico, login)
 ligarFerramentas({ esc, ic, I, brl, numBr, render });
 document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-periodo],[data-boletim],[data-lado],[data-produto]');
+  const t = e.target.closest('[data-periodo],[data-boletim],[data-lado],[data-produto],[data-prev]');
   if (!t) return;
+  if (t.dataset.prev) { alternarPrevisao(+t.dataset.prev); }
   if (t.dataset.periodo) { estado.periodo = t.dataset.periodo; }
   if (t.dataset.boletim) { estado.filtroBoletim = t.dataset.boletim; }
   if (t.dataset.lado) { estado.lado = t.dataset.lado; }
