@@ -463,11 +463,18 @@ async function iniciar() {
   const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
   ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
   render();
-  atualizarClima(await localInicial());
+  // Mostra o clima na hora (local salvo ou Presidente Prudente) e troca para a localização da pessoa quando ela permitir.
+  atualizarClima(municipioAtual());
+  localInicial().then((m) => { if (m) atualizarClima(m); });
 }
 
+let pedidoClima = 0;
 async function atualizarClima(local) {
-  try { D.climaAuto = await carregarClima(local); } catch (e) { D.climaAuto = { erro: 'Não foi possível carregar o clima agora.', dias: [], alertas: [], municipio: local || municipioAtual(), inicioSafra: '0000-09-01' }; }
+  const meu = ++pedidoClima;
+  let r;
+  try { r = await carregarClima(local); } catch (e) { r = { erro: 'Não foi possível carregar o clima agora.', dias: [], alertas: [], municipio: local || municipioAtual(), inicioSafra: '0000-09-01' }; }
+  if (meu !== pedidoClima) return; // chegou uma escolha mais nova
+  D.climaAuto = r;
   const aba = rota().aba;
   if (aba === 'clima' || aba === 'inicio') render(false);
 }
