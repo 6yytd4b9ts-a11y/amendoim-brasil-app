@@ -3,8 +3,8 @@
   "unidade": "R$/saca 25 kg",
   "semana": "",
   "destaque": {
-    "regiao": "Pres. Prudente",
-    "preco": 80.0,
+    "regiao": "Tupã",
+    "preco": 77.0,
     "variacao": null,
     "fonte": "IEA-SP",
     "data": "05/10/2026",
@@ -40,15 +40,6 @@
   "referencias": [
     {
       "fonte": "IEA-SP",
-      "praca": "Presidente Prudente",
-      "preco": 80.0,
-      "variacao": null,
-      "data": "05/10/2026",
-      "detalhe": "Preço médio diário recebido pelo produtor",
-      "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
-    },
-    {
-      "fonte": "IEA-SP",
       "praca": "Tupã",
       "preco": 77.0,
       "variacao": null,
@@ -64,6 +55,15 @@
       "data": "28/09 a 02/10/2026",
       "detalhe": "Preço médio semanal recebido pelo produtor",
       "link": "https://consultaprecosdemercado.conab.gov.br/"
+    },
+    {
+      "fonte": "IEA-SP",
+      "praca": "Presidente Prudente",
+      "preco": 80.0,
+      "variacao": null,
+      "data": "05/10/2026",
+      "detalhe": "Preço médio diário recebido pelo produtor",
+      "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
     }
   ],
   "historico": {
