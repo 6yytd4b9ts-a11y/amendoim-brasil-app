@@ -4,5 +4,8 @@ set -euo pipefail
 mkdir -p public/img public/icons
 base64 -d assets/logo.png.b64 > public/img/logo.png
 base64 -d assets/colombo.png.b64 > public/img/colombo.png
-cat assets/icon-a.b64 assets/icon-b.b64 | base64 -d > public/icons/icon-512.png
+# Ícones: icon-512 com fundo transparente; icon-maskable-512 com fundo verde cheio (Android recorta em círculo, iPhone arredonda os cantos)
+for n in icon-512 icon-maskable-512; do
+  base64 -d "assets/$n.png.b64" > "public/icons/$n.png"
+done
 echo "Imagens prontas."
