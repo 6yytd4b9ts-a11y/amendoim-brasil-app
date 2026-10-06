@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
 .netlify/
+.env
 public/img/logo.png
 public/icons/icon-512.png
