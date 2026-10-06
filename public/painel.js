@@ -2,12 +2,6 @@
 // Cada bloco é um cartão resumido; o detalhe abre quando a pessoa toca.
 // h = utilitários do app (esc, ic, I, brl, numBr, pct, wa, linkSeguro).
 
-const EFEITO = {
-  alta: { cls: 'alta', txt: 'sustenta o preço' },
-  baixa: { cls: 'baixa', txt: 'pressiona o preço' },
-  neutro: { cls: 'neutro', txt: 'neutro' }
-};
-
 function seta(h, efeito) {
   const { I } = h;
   const svg = (p, c) => `<svg class="ic seta-ef ${c}" viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
@@ -43,11 +37,12 @@ export function blocoMercadoHoje(D, h) {
           <span class="cresce"><span class="hoje-rot">${esc(x.rotulo)}</span><span class="hoje-nota">${esc(x.nota)}</span></span>
           <b class="num">${esc(x.valor)}</b>
         </summary>
-        <p>${esc(x.detalhe)}</p>
+        <p>${esc(x.detalhe)}${h.linkSeguro(x.link) ? ` <a class="link-mini" href="${esc(x.link)}" target="_blank" rel="noopener">Ver na fonte</a>` : ''}</p>
       </details>`).join('')}
     </div>
     ${m.fato ? `<div class="fato"><span class="fato-tag">Fato do dia</span><b>${esc(m.fato.titulo)}</b><span>${esc(m.fato.texto)}</span></div>` : ''}
     <span class="mini legenda-ef">${seta(h, 'alta')} sustenta o preço · ${seta(h, 'baixa')} pressiona · toque para ver o porquê</span>
+    ${h.patrocinio ? h.patrocinio('mercado-hoje') : ''}
   </section>`;
 }
 
@@ -182,17 +177,20 @@ export function blocoExportacao(D, h) {
     <div class="grade-2" style="gap:10px">${e.itens.map((x) => `
       <div class="exp-tile"><span>${esc(x.nome)}</span><b class="num">${numBr(x.toneladas)} t</b><span class="var num ${x.variacao > 0 ? 'sobe' : 'cai'}">${pct(x.variacao)} vs 2025</span></div>`).join('')}
     </div>
+    ${e.precoMedio ? `<div class="exp-linha"><span>Preço médio de exportação</span><b class="num">US$ ${numBr(e.precoMedio.atual)}/t</b><span class="var num ${e.precoMedio.variacao > 0 ? 'sobe' : 'cai'}">${pct(e.precoMedio.variacao)}</span></div>` : ''}
     <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(e.leitura)}</p>
     <details class="abre">
       <summary>Ritmo dos embarques ${e.mensal?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
       <div class="grafico">${e.mensal ? barrasMensais(h, e.mensal) : ''}</div>
-      <span class="mini"><i class="leg" style="background:#CFE3D5"></i>2025 · <i class="leg" style="background:#007731"></i>2026 · toneladas de grão</span>
+      <span class="mini"><i class="leg" style="background:#CFE3D5"></i>2025 · <i class="leg" style="background:#007731"></i>2026 · toneladas de grão por mês</span>
       <p class="mini" style="margin:6px 0 0">${esc(e.ritmo || '')}</p>
     </details>
     <details class="abre">
       <summary>Principais destinos ${e.destinos?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
-      <div class="destinos">${(e.destinos?.lista || []).map(([p, v]) => `<div class="destino"><span>${esc(p)}</span><span class="destino-barra"><i style="width:${v}%"></i></span><b class="num">${numBr(v)}%</b></div>`).join('')}</div>
+      <div class="destinos">${(e.destinos?.lista || []).map(([p, v]) => `<div class="destino"><span>${esc(p)}</span><span class="destino-barra"><i style="width:${v}%"></i></span><b class="num">${numBr(v, 1)}%</b></div>`).join('')}</div>
+      <span class="mini">Participação no volume de grão exportado em ${esc(e.periodo)}.</span>
     </details>
+    ${e.fonte ? `<span class="mini">Fonte: ${h.linkSeguro(e.fonteLink) ? `<a class="link-mini" href="${esc(e.fonteLink)}" target="_blank" rel="noopener">${esc(e.fonte)}</a>` : esc(e.fonte)}</span>` : ''}
     <a href="#/mercado/consultoria" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
   </section>`;
 }
@@ -227,5 +225,33 @@ export function cartaoTermometroDetalhe(D, h, medidor) {
     </div>
     <span class="mini">${ic(I.sobe, 'style="width:12px;height:12px;stroke:#007731;stroke-width:2.6;vertical-align:-1px"')} segura o preço · ${ic(I.cai, 'style="width:12px;height:12px;stroke:#B3261E;stroke-width:2.6;vertical-align:-1px"')} pressiona · toque no fator para ver os dados</span>
     <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+  </section>`;
+}
+
+// ---------- PATROCINADORES ----------
+// Cada patrocinador pode ter um espaço fixo ("locais") além do rodapé do Início.
+// Itens com "exemplo": true mostram só o espaço reservado (para o teste de layout).
+export function seloPatrocinio(D, local, h) {
+  const { esc, linkSeguro } = h;
+  const p = (D.patrocinadores || []).find((x) => (x.locais || []).includes(local));
+  if (!p) return '';
+  if (p.exemplo || !p.logo) return `<div class="patrocinio vago"><span>Oferecimento</span><b>Espaço para patrocinador</b></div>`;
+  const href = linkSeguro(p.link);
+  const dentro = `<span>Oferecimento</span><img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
+  return href ? `<a class="patrocinio" href="${esc(href)}" target="_blank" rel="noopener sponsored">${dentro}</a>` : `<div class="patrocinio">${dentro}</div>`;
+}
+
+export function blocoPatrocinadores(D, h) {
+  const { esc, linkSeguro } = h;
+  const lista = (D.patrocinadores || []).filter((x) => (x.locais || ['rodape']).includes('rodape')).slice(0, 5);
+  if (!lista.length) return '';
+  return `<section class="parceiros">
+    <span class="rotulo">Patrocinadores</span>
+    <div class="patro-grade">${lista.map((p) => {
+      if (p.exemplo || !p.logo) return '<span class="parceiro vago">Seu logo aqui</span>';
+      const href = linkSeguro(p.link);
+      const img = `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
+      return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${img}</a>` : `<span class="parceiro">${img}</span>`;
+    }).join('')}</div>
   </section>`;
 }

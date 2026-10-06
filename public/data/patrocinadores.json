@@ -1,3 +1,7 @@
 [
-  { "nome": "Indústrias Colombo", "logo": "/img/colombo.png", "link": "https://industriascolombo.com.br/" }
+  { "nome": "Indústrias Colombo", "logo": "/img/colombo.png", "link": "https://industriascolombo.com.br/", "locais": ["mercado-hoje", "rodape"] },
+  { "nome": "", "exemplo": true, "locais": ["clima", "rodape"] },
+  { "nome": "", "exemplo": true, "locais": ["boletim", "rodape"] },
+  { "nome": "", "exemplo": true, "locais": ["ferramentas", "rodape"] },
+  { "nome": "", "exemplo": true, "locais": ["rodape"] }
 ]
