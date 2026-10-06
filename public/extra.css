@@ -81,3 +81,14 @@
 .matriz td.seu { outline: 2px solid var(--texto); outline-offset: -2px; border-radius: 4px; }
 .matriz th.seu-col { color: var(--texto); background: var(--amendoim-claro); }
 @media (max-width: 360px) { .campos-2 { grid-template-columns: 1fr; } .campos-2 .campo label { min-height: 0; } }
+
+/* Em breve, redes sociais e referências de preço */
+.selo-breve { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; background: var(--amendoim); color: #3A2404; padding: 3px 8px; border-radius: 6px; vertical-align: 1px; margin-left: 4px; }
+.em-breve { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; background: var(--amendoim-fundo); border: 1px solid var(--amendoim-borda); font-size: 13px; line-height: 1.4; color: #4A3A22; }
+.em-breve .selo-breve { margin: 0; flex-shrink: 0; }
+.redes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.redes a { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: var(--raio); background: #fff; border: 1px solid var(--borda); text-decoration: none; color: var(--texto); }
+.redes .ic { width: 26px; height: 26px; stroke: var(--verde); flex-shrink: 0; }
+.redes b { display: block; font-size: 14px; }
+.redes small { display: block; font-size: 12px; color: var(--texto-3); }
+.lista-linha.ref { text-decoration: none; color: var(--texto); align-items: center; }

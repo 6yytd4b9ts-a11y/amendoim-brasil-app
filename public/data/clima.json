@@ -4,5 +4,6 @@
   "ensoFonte": "INPE · Painel El Niño 2026-2027 · 01/10/2026",
   "ensoLink": "https://www.gov.br/inpe/pt-br/assuntos/ultimas-noticias/painel-el-nino-2026-2027-quarto-boletim-sobre-o-monitoramento-do-fenomeno-no-brasil-e-publicado",
   "ensoLinkPermanente": "https://clima.cptec.inpe.br/enos",
-  "radarLink": "https://www.ipmetradar.com.br/2mobileGis.php"
+  "radarLink": "https://www.ipmetradar.com.br/2mobileGis.php",
+  "radarAlternativo": "https://www.windy.com/?satellite,-22.120,-51.390,7"
 }
