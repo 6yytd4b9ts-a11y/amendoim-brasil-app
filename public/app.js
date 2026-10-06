@@ -33,7 +33,10 @@ const I = {
   alerta: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
   escudo: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="m9 12 2 2 4-4"/>',
   mais: '<path d="M12 5v14M5 12h14"/>',
-  globo: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
+  globo: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  insta: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/>',
+  fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  grupo: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/>'
 };
 const corSigla = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
 
@@ -93,9 +96,10 @@ function telaInicio() {
     <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brl(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
     <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600">
       ${dest.variacao != null ? ic(dest.variacao >= 0 ? I.sobe : I.cai, 'style="width:16px;height:16px;stroke:#F4AD46;stroke-width:2.4"') : ''}
-      <span>${dest.variacao != null ? pct(dest.variacao) + ' vs semana anterior' : 'Cotação da semana em breve'}</span>
+      <span>${dest.variacao != null ? pct(dest.variacao) + ' vs semana anterior' : dest.fonte ? `Fonte: ${esc(dest.fonte)} · ${esc(dest.data)}` : 'Cotação da semana em breve'}</span>
     </div>
-    <a class="btn-branco" href="#/mercado">Ver cotações por região</a>
+    ${(() => { const r = (c.referencias || []).find((x) => x.fonte === 'Conab'); return r ? `<span style="font-size:13px;opacity:.9">Conab, média de SP: <b class="num">${brl(r.preco)}</b>${r.variacao != null ? ` (${pct(r.variacao)} na semana)` : ''}</span>` : ''; })()}
+    <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
   </section>
 
   <div class="grade-2">
@@ -135,7 +139,7 @@ function telaInicio() {
   </section>
 
   <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Oportunidades no balcão</span><a class="link-mini" href="#/negociar">Ver balcão</a></div>
+    <div class="cartao-cab"><span class="rotulo">Oportunidades no balcão <span class="selo-breve">Em breve</span></span><a class="link-mini" href="#/negociar">Ver prévia</a></div>
     <div>${D.ofertas.slice(0, 2).map((o) => `
       <a class="lista-linha" href="#/negociar">
         <span class="lado ${o.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${o.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span>
@@ -146,6 +150,8 @@ function telaInicio() {
   </section>
 
   ${cartaoAlertas()}
+
+  ${cartaoRedes()}
 
   <section class="parceiros">
     <span class="rotulo">${D.patrocinadores.length === 1 ? 'Oferecimento' : 'Parceiros Amendoim Brasil'}</span>
@@ -182,12 +188,23 @@ function blocoNoticias() {
 }
 
 function cartaoAlertas() {
-  const link = wa('Quero receber os alertas da Amendoim Brasil no WhatsApp.');
+  const grupo = linkSeguro(D.config.grupoWhatsapp);
+  const link = grupo || wa('Quero receber os alertas da Amendoim Brasil no WhatsApp.');
   return `
   <section id="alertas" class="cartao" style="background:var(--verde-fundo);border-color:#C2E2CC;flex-direction:row;align-items:center">
-    ${ic(I.zap, 'style="width:32px;height:32px;stroke:#007731;flex-shrink:0"')}
-    <div class="cresce"><b style="font-size:15px;display:block">Alertas no WhatsApp</b><span style="font-size:13px;color:#3E4A40">Chuva, veranico e cotação da semana</span></div>
-    ${link ? `<a class="btn btn-verde btn-pequeno" href="${link}" target="_blank" rel="noopener">Ativar</a>` : `<span class="btn btn-verde btn-pequeno" style="opacity:.6" title="Configure o WhatsApp em config.json">Ativar</span>`}
+    ${ic(grupo ? I.grupo : I.zap, 'style="width:32px;height:32px;stroke:#007731;flex-shrink:0"')}
+    <div class="cresce"><b style="font-size:15px;display:block">${grupo ? 'Grupo no WhatsApp' : 'Alertas no WhatsApp'}</b><span style="font-size:13px;color:#3E4A40">Chuva, veranico, cotação e boletins</span></div>
+    ${link ? `<a class="btn btn-verde btn-pequeno" href="${esc(link)}" target="_blank" rel="noopener">${grupo ? 'Entrar' : 'Ativar'}</a>` : `<span class="btn btn-verde btn-pequeno" style="opacity:.6" title="Configure o WhatsApp em config.json">Ativar</span>`}
+  </section>`;
+}
+
+function cartaoRedes() {
+  const insta = linkSeguro(D.config.instagram);
+  const zap = wa('Olá Helder, vim pelo app Amendoim Brasil.');
+  if (!insta && !zap) return '';
+  return `<section class="redes">
+    ${insta ? `<a href="${esc(insta)}" target="_blank" rel="noopener">${ic(I.insta)}<span><b>Instagram</b><small>@amendoim.brasil</small></span></a>` : ''}
+    ${zap ? `<a href="${zap}" target="_blank" rel="noopener">${ic(I.zap)}<span><b>Fale com o Helder</b><small>WhatsApp</small></span></a>` : ''}
   </section>`;
 }
 
@@ -204,33 +221,44 @@ function topoMercado(atual, extra = '') {
 }
 
 function telaCotacoes() {
-  const c = D.cotacoes, cfg = D.config;
+  const c = D.cotacoes, cfg = D.config, h = c.historico || {};
   const chips = `<div class="chips"><button class="chip" aria-pressed="true">Casca</button>${(cfg.produtosEmBreve || []).map((p) => `<button class="chip" disabled>${esc(p)} <span class="breve">EM BREVE</span></button>`).join('')}</div>`;
+  const temProprias = (c.regioes || []).some((r) => r.preco != null);
   return `${topoMercado('cotacoes', chips)}
+  ${c.referencias?.length ? `
   <section class="cartao" style="gap:0;padding:4px 16px">
-    <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Casca por região · ${esc(c.unidade)}</span><span class="mini">${c.semana ? 'Semana ' + esc(c.semana) : ''}</span></div>
+    <div class="cartao-cab" style="padding:12px 0 4px"><span class="rotulo">Preço da casca · fontes oficiais</span><span class="mini">${esc(c.unidade)}</span></div>
+    ${c.referencias.map((r) => {
+      const href = linkSeguro(r.link);
+      return `<${href ? 'a' : 'div'} class="lista-linha ref" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+        <span class="cresce"><b style="font-size:15px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}${r.detalhe ? '<br>' + esc(r.detalhe) : ''}</span></span>
+        <span style="text-align:right"><b class="num" style="font-size:17px;display:block">${brl(r.preco)}</b>${r.variacao != null ? varChip(r.variacao) : ''}</span>
+        ${href ? ic(I.fora, 'style="width:16px;height:16px;stroke:var(--verde);flex-shrink:0" aria-label="Ver na fonte"') : ''}
+      </${href ? 'a' : 'div'}>`;
+    }).join('')}
+    <p class="mini" style="margin:0;padding:10px 0 12px">Toque na linha para conferir na fonte. Conab: preço em R$/kg convertido para saca de 25 kg.</p>
+  </section>` : ''}
+
+  ${temProprias ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Cotação Amendoim Brasil · ${esc(c.unidade)}</span><span class="mini">${c.semana ? 'Semana ' + esc(c.semana) : ''}</span></div>
     ${c.regioes.map((r) => `<div class="lista-linha"><span class="cresce" style="font-size:15px;font-weight:600">${esc(r.nome)}</span><b class="num" style="font-size:17px">${brl(r.preco)}</b>${varChip(r.variacao)}</div>`).join('')}
-  </section>
+  </section>` : ''}
 
   <a class="chamada" href="#/negociar">
-    <span class="cresce"><b style="font-size:15px;display:block">Tem amendoim pra vender?</b><span style="font-size:13px;color:#5C3A06">Veja quem está comprando no balcão</span></span>
+    <span class="cresce"><b style="font-size:15px;display:block">Tem amendoim pra vender?</b><span style="font-size:13px;color:#5C3A06">Veja como vai funcionar o balcão</span></span>
     ${ic(I.seta, 'style="stroke:#5C3A06"')}
   </a>
 
   <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${c.historico.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
+    <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
     <div class="chips" role="group" aria-label="Período">
       ${['3M', '6M', '1A'].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${p}</button>`).join('')}
       <a class="chip" href="#/mercado/consultoria" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}5 anos</a>
     </div>
     <div class="grafico" id="grafico">${graficoPreco()}</div>
+    ${h.fonte ? `<span class="mini">Fonte: ${linkSeguro(h.link) ? `<a class="link-mini" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
   </section>
-
-  ${c.referencias?.length ? `
-  <section class="cartao" style="gap:0;padding:4px 16px">
-    <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Referências públicas</span><span class="mini">R$/saca 25 kg</span></div>
-    ${c.referencias.map((r) => `<div class="lista-linha"><span class="cresce"><b style="font-size:14px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}</span></span><b class="num">${brl(r.preco)}</b></div>`).join('')}
-  </section>` : ''}
 
   ${cartaoTermometro()}
 
@@ -246,9 +274,14 @@ function telaCotacoes() {
 
 function graficoPreco() {
   const todos = D.cotacoes.historico.pontos || [];
-  const n = { '3M': 4, '6M': 7, '1A': 13 }[estado.periodo] || 7;
-  const pts = todos.slice(-n);
-  if (pts.length < 2) return '<div class="vazio">Histórico ainda sem dados.</div>';
+  if (todos.length < 2) return '<div class="vazio">Histórico ainda sem dados.</div>';
+  // Pontos semanais (AAAA-MM-DD) ou mensais (AAAA-MM): filtra pelo período escolhido.
+  const meses = { '3M': 3, '6M': 6, '1A': 12 }[estado.periodo] || 6;
+  const ult = new Date((todos[todos.length - 1].data + '-01').slice(0, 10) + 'T12:00:00Z');
+  ult.setUTCMonth(ult.getUTCMonth() - meses);
+  const corte = ult.toISOString().slice(0, 10);
+  let pts = todos.filter((p) => (p.data.length === 7 ? p.data + '-01' : p.data) >= corte);
+  if (pts.length < 2) pts = todos.slice(-2);
   const W = 320, H = 150, padL = 34, padB = 22, padT = 8;
   const vals = pts.map((p) => p.preco);
   let min = Math.min(...vals), max = Math.max(...vals);
@@ -258,16 +291,21 @@ function graficoPreco() {
   const linha = pts.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(p.preco).toFixed(1)}`).join(' ');
   const area = `${linha} L${x(pts.length - 1).toFixed(1)} ${H - padB} L${padL} ${H - padB} Z`;
   const ticks = [min, (min + max) / 2, max];
-  const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-  const rot = (d) => { const [a, m] = d.split('-'); return meses[+m - 1] + (m === '01' ? '/' + a.slice(2) : ''); };
-  const passo = Math.ceil(pts.length / 5);
+  const nomes = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const rot = (d) => { const [a, m] = d.split('-'); return nomes[+m - 1] + (m === '01' ? '/' + a.slice(2) : ''); };
+  const dica = (d) => { const [a, m, dd] = d.split('-'); return dd ? `${dd}/${m}/${a.slice(2)}` : `${nomes[+m - 1]}/${a.slice(2)}`; };
+  // Rótulos no início de cada mês, no máximo 6.
+  const viradas = pts.map((p, i) => i).filter((i) => i === 0 || pts[i].data.slice(0, 7) !== pts[i - 1].data.slice(0, 7));
+  const passo = Math.ceil(viradas.length / 6);
+  const rotulos = viradas.filter((_, k) => k % passo === 0);
+  const raio = pts.length > 20 ? 2.5 : 3.5;
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histórico de preço do amendoim em casca">
     ${ticks.map((t) => `<line x1="${padL}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="#EFEBE2"/><text class="eixo" x="${padL - 6}" y="${y(t) + 3}" text-anchor="end">${numBr(t)}</text>`).join('')}
     <path d="${area}" fill="#DCEFE2" opacity=".8"/>
     <path d="${linha}" fill="none" stroke="#007731" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    ${pts.map((p, i) => (i % passo === 0 || i === pts.length - 1) ? `<text class="eixo" x="${x(i)}" y="${H - 6}" text-anchor="middle">${rot(p.data)}</text>` : '').join('')}
-    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.preco)}" r="${i === pts.length - 1 ? 5 : 3.5}" fill="${i === pts.length - 1 ? '#F4AD46' : '#007731'}" stroke="#fff" stroke-width="2" data-i="${i}" style="cursor:pointer"/>`).join('')}
-    ${pts.map((p, i) => `<rect x="${x(i) - 12}" y="0" width="24" height="${H}" fill="transparent" data-ponto="${i}" data-x="${x(i)}" data-y="${y(p.preco)}" data-txt="${rot(p.data)}: ${brl(p.preco)}"/>`).join('')}
+    ${rotulos.map((i) => `<text class="eixo" x="${Math.max(padL + 8, x(i))}" y="${H - 6}" text-anchor="middle">${rot(pts[i].data)}</text>`).join('')}
+    ${pts.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.preco)}" r="${i === pts.length - 1 ? 5 : raio}" fill="${i === pts.length - 1 ? '#F4AD46' : '#007731'}" stroke="#fff" stroke-width="${pts.length > 20 ? 1 : 2}" data-i="${i}" style="cursor:pointer"/>`).join('')}
+    ${pts.map((p, i) => `<rect x="${x(i) - Math.max(3, 140 / pts.length)}" y="0" width="${Math.max(6, 280 / pts.length)}" height="${H}" fill="transparent" data-ponto="${i}" data-x="${x(i)}" data-y="${y(p.preco)}" data-txt="${dica(p.data)}: ${brl(p.preco)}"/>`).join('')}
   </svg>`;
 }
 
@@ -384,6 +422,7 @@ function telaNegociar() {
     <div class="segmento">${lados.map(([k, t]) => `<button data-lado="${k}" aria-pressed="${estado.lado === k}">${t}</button>`).join('')}</div>
     <div class="chips">${prods.map((p) => `<button class="chip" data-produto="${p}" aria-pressed="${estado.produto === p}">${p}</button>`).join('')}</div>
   </header>
+  <div class="em-breve"><span class="selo-breve">Em breve</span><span>O balcão ainda está em preparação. As ofertas abaixo são exemplos de como vai funcionar.</span></div>
   <div class="selo"><img src="/icons/icon-512.png" alt=""><span>Ofertas verificadas e negociação intermediada pela <b>Amendoim Brasil</b></span></div>
   ${lista.length ? lista.map((o) => {
     const link = wa(`Olá Helder, tenho interesse na oferta: ${o.lado} de ${o.produto}, ${o.volume}, ${o.regiao}.`);
