@@ -1,9 +1,10 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
-import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio } from '/clima.js';
+import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal } from '/clima.js';
+import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima'];
 const D = {};
-const estado = { periodo: '6M', filtroBoletim: 'Todos', lado: 'Todas', produto: 'Todos', calc: {} };
+const estado = { periodo: '6M', filtroBoletim: 'Todos', lado: 'Todas', produto: 'Todos' };
 
 // ---------- utilidades ----------
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -36,11 +37,33 @@ const I = {
 };
 const corSigla = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
 
-function termometroBarras(status) {
+// Termômetro do preço da casca: para onde o preço tende a ir nas próximas semanas.
+function posTermometro(status) {
   const s = (status || '').toLowerCase();
-  const i = s.startsWith('fra') ? 0 : s.startsWith('fir') ? 2 : 1;
-  const cls = ['ativo-fraco', 'ativo-estavel', 'ativo-firme'][i];
-  return `<div class="termometro">${[0, 1, 2].map((k) => `<span class="${k === i ? cls : ''}"></span>`).join('')}</div>`;
+  return s.startsWith('fra') ? 0 : s.startsWith('fir') ? 2 : 1;
+}
+function medidor(status) {
+  const i = posTermometro(status);
+  return `<div class="medidor" role="img" aria-label="Termômetro: ${esc(status)}"><i style="left:${[16.6, 50, 83.4][i]}%"></i></div>
+  <div class="medidor-nomes">${['Fraco', 'Estável', 'Firme'].map((t, k) => `<span class="${k === i ? 'atual' : ''}">${t}</span>`).join('')}</div>`;
+}
+function contaFatores(t) {
+  const f = t.fatores || [];
+  return { alta: f.filter((x) => x.efeito === 'alta').length, baixa: f.filter((x) => x.efeito === 'baixa').length };
+}
+function cartaoTermometro() {
+  const t = D.config.termometro;
+  return `<section class="cartao">
+    <div class="cartao-cab"><span class="rotulo">${esc(t.titulo || 'Termômetro do mercado')}</span>${t.atualizado ? `<span class="mini">${esc(t.atualizado)}</span>` : ''}</div>
+    ${t.subtitulo ? `<span style="font-size:13px;color:var(--texto-3);margin-top:-6px">${esc(t.subtitulo)}</span>` : ''}
+    ${medidor(t.status)}
+    <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(t.resumo)}</p>
+    ${(t.fatores || []).length ? `<div class="fatores">${t.fatores.map((f) => `<div class="fator ${f.efeito === 'baixa' ? 'baixa' : 'alta'}">
+      ${ic(f.efeito === 'baixa' ? I.cai : I.sobe, 'style="width:16px;height:16px;stroke-width:2.6"')}
+      <span class="cresce">${esc(f.nome)}</span><b>${esc(f.valor)}</b></div>`).join('')}</div>
+      <span class="mini">${ic(I.sobe, 'style="width:12px;height:12px;stroke:#007731;stroke-width:2.6;vertical-align:-1px"')} segura o preço · ${ic(I.cai, 'style="width:12px;height:12px;stroke:#B3261E;stroke-width:2.6;vertical-align:-1px"')} pressiona o preço</span>` : ''}
+    <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+  </section>`;
 }
 
 function varChip(v) {
@@ -77,17 +100,19 @@ function telaInicio() {
 
   <div class="grade-2">
     <a class="cartao" href="#/mercado" style="gap:10px;padding:14px">
-      <span class="rotulo">Termômetro</span>${termometroBarras(cfg.termometro.status)}
-      <span class="grande">${esc(cfg.termometro.status)}</span><span class="mini">Fraco · Estável · Firme</span>
+      <span class="rotulo">Preço da casca</span>
+      <span class="grande">${esc(cfg.termometro.status)}</span>
+      ${medidor(cfg.termometro.status)}
+      <span class="mini">${(() => { const f = contaFatores(cfg.termometro); return f.alta || f.baixa ? `${f.alta} ${f.alta === 1 ? 'fator' : 'fatores'} de alta · ${f.baixa} de baixa` : 'Tendência das próximas semanas'; })()}</span>
     </a>
     <a class="cartao" href="#/clima" style="gap:10px;padding:14px">
       <span class="rotulo">Chuva · 7 dias</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
-      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span><span class="mini">${auto ? 'Previsto em ' + esc(auto.municipio.nome) : 'Carregando previsão…'}</span>
+      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span><span class="mini">${auto ? 'Previsão ' + esc(nomeLocal(auto.municipio)) : 'Carregando previsão…'}</span>
     </a>
   </div>
 
   ${b ? `
-  <a class="boletim" href="${linkSeguro(b.link) || '#/mercado/analises'}" ${linkSeguro(b.link) ? 'target="_blank" rel="noopener"' : ''}>
+  <a class="boletim" href="${hrefBoletim(b)}" ${!b.secoes && linkSeguro(b.link) ? 'target="_blank" rel="noopener"' : ''}>
     <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}${esc(cfg.boletim.rotulo)}</span><span class="mini" style="color:#5C3A06">${esc(b.data)}</span></div>
     <h2>${esc(b.titulo)}</h2>
     ${b.resumo ? `<p>${esc(b.resumo)}</p>` : ''}
@@ -105,7 +130,7 @@ function telaInicio() {
   <section class="cartao">
     <div class="cartao-cab"><span class="rotulo">Panorama global</span><a class="link-mini" href="#/mercado/analises">Ver análises</a></div>
     <div>${D.panorama.map((p) => `
-      <div class="lista-linha"><span class="sigla pilula ${corSigla[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="cresce" style="font-weight:600">${esc(p.pais)}</span><span class="mini" style="font-size:13px">${esc(p.fase)}</span></div>`).join('')}
+      <a class="lista-linha" href="#/mercado/analises"><span class="sigla pilula ${corSigla[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="cresce"><b style="font-size:14px;display:block">${esc(p.pais)}</b><span class="mini">${esc(p.fase)}</span></span><b class="num" style="font-size:13px;color:var(--texto-2);text-align:right">${esc(p.indicador || '')}</b></a>`).join('')}
     </div>
   </section>
 
@@ -123,8 +148,8 @@ function telaInicio() {
   ${cartaoAlertas()}
 
   <section class="parceiros">
-    <span class="rotulo">Parceiros Amendoim Brasil</span>
-    <div class="parceiros-grade">${D.patrocinadores.slice(0, 4).map((p) => {
+    <span class="rotulo">${D.patrocinadores.length === 1 ? 'Oferecimento' : 'Parceiros Amendoim Brasil'}</span>
+    <div class="parceiros-grade" style="grid-template-columns:repeat(${Math.min(Math.max(D.patrocinadores.length, 1), 4)},1fr)">${D.patrocinadores.slice(0, 4).map((p) => {
       const href = linkSeguro(p.link);
       const dentro = p.logo ? `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">` : esc(p.nome);
       return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${dentro}</a>` : `<span class="parceiro">${dentro}</span>`;
@@ -134,21 +159,24 @@ function telaInicio() {
 
 function blocoNoticias() {
   if (!D.noticias.length) return '';
+  const lista = [...D.noticias].sort((a, b) => (b.destaque ? 1 : 0) - (a.destaque ? 1 : 0));
   return `
   <div class="secao-titulo"><h2>Notícias e vídeos</h2></div>
-  <div class="carrossel">${D.noticias.map((n) => {
+  <div class="carrossel">${lista.map((n) => {
     const href = linkSeguro(n.link);
     const yt = idYoutube(n.link);
     const video = n.tipo === 'video' || !!yt;
     const capaUrl = linkSeguro(n.capa) || (yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : '');
-    const capa = capaUrl ? `<img src="${esc(capaUrl)}" alt="" loading="lazy">` : `<span>${video ? '[Capa do vídeo]' : '[Imagem da matéria]'}</span>`;
+    const capa = capaUrl
+      ? `<img src="${esc(capaUrl)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('sem-imagem');this.replaceWith(Object.assign(document.createElement('b'),{textContent:${video ? "''" : esc(JSON.stringify(n.fonte || 'Amendoim Brasil'))}}))">`
+      : `${ic(I.doc, 'style="width:26px;height:26px;stroke:#fff"')}<b>${esc(n.fonte || 'Notícia')}</b>`;
     const tag = href ? 'a' : 'div';
-    return `<${tag} class="noticia" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
-      <div class="noticia-capa ${video ? 'video' : ''}">${capa}
+    return `<${tag} class="noticia ${n.destaque ? 'noticia-destaque' : ''}" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <div class="noticia-capa ${video ? 'video' : ''} ${capaUrl ? '' : 'sem-imagem'}">${capa}
         ${video ? `<span class="play"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="#1B1B17"/></svg></span>` : ''}
-        ${n.patrocinado ? '<span class="patrocinado">Patrocinado</span>' : ''}
+        ${n.destaque ? '<span class="patrocinado" style="background:var(--amendoim);color:#3A2404">Destaque</span>' : n.patrocinado ? '<span class="patrocinado">Patrocinado</span>' : ''}
       </div>
-      <div class="noticia-corpo"><span class="noticia-fonte">${esc(n.fonte)}</span><span class="noticia-titulo">${esc(n.titulo)}</span></div>
+      <div class="noticia-corpo"><span class="noticia-fonte">${esc(n.fonte)}${n.data ? ' · ' + esc(n.data) : ''}</span><span class="noticia-titulo">${esc(n.titulo)}</span></div>
     </${tag}>`;
   }).join('')}</div>`;
 }
@@ -204,13 +232,7 @@ function telaCotacoes() {
     ${c.referencias.map((r) => `<div class="lista-linha"><span class="cresce"><b style="font-size:14px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}</span></span><b class="num">${brl(r.preco)}</b></div>`).join('')}
   </section>` : ''}
 
-  <section class="cartao">
-    <span class="rotulo">Termômetro do mercado</span>
-    ${termometroBarras(cfg.termometro.status)}
-    <div class="fases-nomes" style="font-size:12px"><span>Fraco</span><span class="atual">${esc(cfg.termometro.status)}</span><span>Firme</span></div>
-    <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(cfg.termometro.resumo)}</p>
-    <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
-  </section>
+  ${cartaoTermometro()}
 
   <section class="cartao">
     <div class="cartao-cab"><span class="rotulo">Exportação</span><span class="pilula pilula-amendoim">${esc(cfg.exportacao.status)}</span></div>
@@ -249,24 +271,82 @@ function graficoPreco() {
   </svg>`;
 }
 
+function hrefBoletim(b) {
+  if (b.exclusivo) return '#/mercado/consultoria';
+  if (b.secoes?.length) return '#/boletim/' + encodeURIComponent(b.id);
+  return linkSeguro(b.link) || '#/mercado/analises';
+}
+
+const textoTendencia = { queda: ['Oferta em queda', 'pilula-amendoim'], alta: ['Oferta em alta', 'pilula-azul'], estavel: ['Oferta estável', 'pilula-verde'] };
+
 function telaAnalises() {
   const tipos = ['Todos', ...new Set(D.boletins.map((b) => b.tipo))];
   const lista = estado.filtroBoletim === 'Todos' ? D.boletins : D.boletins.filter((b) => b.tipo === estado.filtroBoletim);
+  const ult = D.boletins[0];
   return `${topoMercado('analises')}
+  ${ult ? `<a class="boletim" href="${hrefBoletim(ult)}">
+    <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}${esc(ult.tipo)}</span><span class="mini" style="color:#5C3A06">${esc(ult.data)}</span></div>
+    <h2>${esc(ult.titulo)}</h2>
+    ${ult.resumo ? `<p>${esc(ult.resumo)}</p>` : ''}
+    <div class="cartao-cab" style="margin-top:4px"><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti</span><span class="btn btn-escuro btn-pequeno" style="min-height:40px">Ler boletim</span></div>
+  </a>` : ''}
+
+  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
+  <div class="paises">${D.panorama.map((p) => {
+    const [tt, tc] = textoTendencia[p.tendencia] || ['', ''];
+    return `<article class="cartao pais">
+      <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px"><span class="sigla pilula ${corSigla[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><b style="font-size:16px">${esc(p.pais)}</b></span><span class="pilula">${esc(p.fase)}</span></div>
+      ${p.indicador ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b class="num" style="font-size:18px">${esc(p.indicador)}</b>${tt ? `<span class="pilula ${tc}" style="font-size:11px">${tt}</span>` : ''}</div>` : ''}
+      <p style="margin:0;font-size:14px;line-height:1.45;color:var(--texto-2)">${esc(p.resumo)}</p>
+    </article>`;
+  }).join('')}</div>
+
+  ${cartaoTermometro()}
+
   <section class="destaque" style="gap:12px">
     <b style="font-size:20px;line-height:1.25;letter-spacing:-0.01em">Decida a venda com informação de quem está no mercado</b>
     ${['Relatórios e boletins completos', 'Histórico de preços completo', 'Paridade de exportação em R$/saca', 'Alertas personalizados no WhatsApp'].map((t) => `<div style="display:flex;align-items:center;gap:10px;font-size:14px">${ic('<path d="M5 12l5 5 9-10"/>', 'style="width:18px;height:18px;stroke:#F4AD46;stroke-width:2.6"')}${t}</div>`).join('')}
     <a class="btn btn-amendoim" href="#/mercado/consultoria">Quero assinar</a>
   </section>
+
+  <div class="secao-titulo"><h2>Boletins e relatórios</h2></div>
   <div class="chips">${tipos.map((t) => `<button class="chip" data-boletim="${esc(t)}" aria-pressed="${estado.filtroBoletim === t}">${esc(t)}</button>`).join('')}</div>
   ${lista.map((r) => {
-    const href = !r.exclusivo && linkSeguro(r.link);
-    return `<a class="cartao" style="flex-direction:row;align-items:center;padding:14px" href="${href || '#/mercado/consultoria'}" ${href ? 'target="_blank" rel="noopener"' : ''}>
+    const href = hrefBoletim(r);
+    const fora = !r.exclusivo && !r.secoes?.length && linkSeguro(r.link);
+    return `<a class="cartao" style="flex-direction:row;align-items:center;padding:14px" href="${href}" ${fora ? 'target="_blank" rel="noopener"' : ''}>
       <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--amendoim-claro)">${ic(I.doc, 'style="stroke:#7A4A08"')}</span>
       <span class="cresce"><span style="font-size:12px;font-weight:700;color:var(--marrom);display:block">${esc(r.tipo)}</span><b style="font-size:15px;display:block">${esc(r.titulo)}</b><span class="mini">${esc(r.data)}</span></span>
       ${r.exclusivo ? ic(I.cadeado, 'style="width:18px;height:18px;stroke:#5F5B52" aria-label="Exclusivo"') : ic(I.seta, 'style="width:18px;height:18px"')}
     </a>`;
   }).join('')}`;
+}
+
+function telaBoletim(id) {
+  const b = D.boletins.find((x) => x.id === decodeURIComponent(id || '')) || D.boletins[0];
+  if (!b || b.exclusivo || !b.secoes?.length) return telaAnalises();
+  const siglas = Object.fromEntries(D.panorama.map((p) => [p.pais, p.sigla]));
+  const zap = wa(`Olá Helder, li o ${b.tipo.toLowerCase()} "${b.titulo}" e quero conversar sobre a comercialização.`);
+  const paras = (t) => String(t || '').split(/\n\s*\n/).map((p) => `<p>${esc(p)}</p>`).join('');
+  return `<header class="topo">
+    <a class="link-mini" href="#/mercado/analises" style="display:flex;align-items:center;gap:4px">${ic(I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Análises</a>
+  </header>
+  <article class="leitura">
+    <span class="tag-boletim">${ic(I.doc, 'style="width:16px;height:16px"')}${esc(b.tipo)} · ${esc(b.data)}</span>
+    <h1>${esc(b.titulo)}</h1>
+    <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+    ${b.resumo ? `<div class="lead">${esc(b.resumo)}</div>` : ''}
+    ${b.secoes.map((s) => `<section>
+      <h2>${siglas[s.titulo] ? `<span class="sigla pilula ${corSigla[siglas[s.titulo]] || 'pilula-verde'}">${esc(siglas[s.titulo])}</span>` : ''}${esc(s.titulo)}</h2>
+      ${paras(s.texto)}
+    </section>`).join('')}
+  </article>
+  <section class="destaque" style="gap:12px">
+    <b style="font-size:18px;line-height:1.3">Quer saber o melhor momento de vender a sua produção?</b>
+    <span style="font-size:14px;line-height:1.5;opacity:.9">A consultoria Amendoim Brasil acompanha o mercado com você, semana a semana.</span>
+    ${zap ? `<a class="btn btn-amendoim" href="${zap}" target="_blank" rel="noopener">Falar com o Helder</a>` : `<a class="btn btn-amendoim" href="#/mercado/consultoria">Conhecer a consultoria</a>`}
+  </section>
+  <a class="chamada" href="#/ferramentas/custo"><span class="cresce"><b style="font-size:15px;display:block">Faça a conta do seu custo por saca</b><span style="font-size:13px;color:#5C3A06">Calculadora com tabela de lucro</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
 }
 
 function telaConsultoria() {
@@ -290,91 +370,6 @@ function telaConsultoria() {
     <div class="sazonal" style="filter:blur(3px)" aria-hidden="true">${meses.map((m, i) => `<div><span style="height:${alt[i]}px"></span><small>${m}</small></div>`).join('')}</div>
     <span class="mini">Disponível para clientes da consultoria</span>
   </section>`;
-}
-
-// ---------- calculadoras ----------
-const CALCS = {
-  custo: {
-    nome: 'Custo por saca', desc: 'E sua margem com o preço de venda',
-    campos: [['custoHa', 'Custo total por hectare (R$)'], ['prod', 'Produtividade (sc 25 kg/ha)'], ['preco', 'Preço de venda (R$/sc) · opcional']],
-    calc: (v) => {
-      if (v.custoHa == null || !v.prod) return null;
-      const cs = v.custoHa / v.prod, m = v.preco != null ? v.preco - cs : null;
-      return { total: ['Seu custo por saca', brl(cs)], linhas: [['Margem por saca', m != null ? brl(m) : '—'], ['Resultado por hectare', m != null ? brl(m * v.prod) : '—']], venda: cs };
-    }
-  },
-  equilibrio: {
-    nome: 'Ponto de equilíbrio', desc: 'Produtividade mínima pra empatar',
-    campos: [['custoHa', 'Custo total por hectare (R$)'], ['preco', 'Preço de venda (R$/sc)']],
-    calc: (v) => (v.custoHa == null || !v.preco) ? null : { total: ['Produtividade mínima', numBr(v.custoHa / v.preco, 1) + ' sc/ha'], linhas: [['Em quilos por hectare', numBr((v.custoHa / v.preco) * 25) + ' kg/ha']] }
-  },
-  rendimento: {
-    nome: 'Rendimento casca → grão', desc: 'Quanto de grão sai da sua carga',
-    campos: [['sacas', 'Quantidade de casca (sacas 25 kg)'], ['rend', 'Rendimento de grão (%)']],
-    calc: (v) => {
-      if (!v.sacas || v.rend == null) return null;
-      const kg = v.sacas * 25 * (v.rend / 100);
-      return { total: ['Grão obtido', numBr(kg) + ' kg'], linhas: [['Em toneladas', numBr(kg / 1000, 2) + ' t'], ['Casca total', numBr(v.sacas * 25) + ' kg']] };
-    }
-  },
-  barter: {
-    nome: 'Barter', desc: 'Quantas sacas pagam semente e insumos',
-    campos: [['pacoteHa', 'Custo do pacote por hectare (R$)'], ['precoBarter', 'Preço da saca no barter (R$/sc)'], ['area', 'Área (ha) · opcional']],
-    calc: (v) => {
-      if (v.pacoteHa == null || !v.precoBarter) return null;
-      const sh = v.pacoteHa / v.precoBarter;
-      return { total: ['Sacas por hectare', numBr(sh, 1) + ' sc/ha'], linhas: [['Total de sacas', v.area ? numBr(sh * v.area) + ' sc' : '—']] };
-    }
-  },
-  semente: {
-    nome: 'Semente por hectare', desc: 'Custo da semente na sua área',
-    campos: [['kgHa', 'Semente (kg/ha)'], ['precoKg', 'Preço da semente (R$/kg)'], ['area', 'Área (ha)']],
-    calc: (v) => {
-      if (!v.kgHa || v.precoKg == null) return null;
-      const ch = v.kgHa * v.precoKg;
-      return { total: ['Custo por hectare', brl(ch)], linhas: [['Semente total', v.area ? numBr(v.kgHa * v.area) + ' kg' : '—'], ['Custo total', v.area ? brl(ch * v.area) : '—']] };
-    }
-  },
-  armazenagem: {
-    nome: 'Vale a pena armazenar?', desc: 'Quanto custa segurar o produto',
-    campos: [['preco', 'Preço hoje (R$/sc)'], ['armaz', 'Armazenagem (R$/sc por mês)'], ['juros', 'Custo do dinheiro (% ao mês)'], ['meses', 'Meses guardando']],
-    calc: (v) => {
-      if (v.preco == null || !v.meses) return null;
-      const custo = (v.armaz || 0) * v.meses + v.preco * ((v.juros || 0) / 100) * v.meses;
-      return { total: ['Preço futuro para empatar', brl(v.preco + custo)], linhas: [['Custo de segurar por saca', brl(custo)]] };
-    }
-  },
-  arrendamento: {
-    nome: 'Arrendamento em sacas', desc: 'Converta o valor da terra',
-    campos: [['valorHa', 'Arrendamento (R$/ha)'], ['preco', 'Preço da saca (R$/sc)']],
-    calc: (v) => (v.valorHa == null || !v.preco) ? null : { total: ['Equivale a', numBr(v.valorHa / v.preco, 1) + ' sc/ha'], linhas: [] }
-  }
-};
-
-function telaFerramentas(qual) {
-  const k = CALCS[qual] ? qual : 'custo';
-  const c = CALCS[k];
-  const vals = estado.calc[k] || {};
-  return `<header class="topo"><div><h1>Ferramentas</h1><div class="sub">Calculadoras para o dia a dia da lavoura</div></div></header>
-  <section class="cartao" style="gap:14px" id="calc" data-calc="${k}">
-    <div><b style="font-size:17px;display:block">${esc(c.nome)}</b><span class="mini">${esc(c.desc)}</span></div>
-    ${c.campos.map(([id, rot]) => `<div class="campo"><label for="c-${id}">${esc(rot)}</label><input id="c-${id}" data-campo="${id}" inputmode="decimal" value="${esc(vals[id] ?? '')}" autocomplete="off"></div>`).join('')}
-    <div id="calc-resultado">${resultadoCalc(k)}</div>
-  </section>
-  <span class="rotulo" style="padding:4px 4px 0">Outras calculadoras</span>
-  <div class="calc-grade">${Object.entries(CALCS).filter(([id]) => id !== k).map(([id, x]) => `<a class="calc-botao" href="#/ferramentas/${id}"><b>${esc(x.nome)}</b><span class="mini">${esc(x.desc)}</span></a>`).join('')}</div>`;
-}
-
-function resultadoCalc(k) {
-  const c = CALCS[k], raw = estado.calc[k] || {};
-  const v = {}; c.campos.forEach(([id]) => { v[id] = num(raw[id]); });
-  const r = c.calc(v);
-  if (!r) return `<div class="resultado" style="opacity:.55"><div class="linha"><span>Preencha os campos</span><span class="total">—</span></div></div>`;
-  return `<div class="resultado">
-    <div class="linha"><span>${esc(r.total[0])}</span><span class="total num">${esc(r.total[1])}</span></div>
-    ${r.linhas.length ? '<hr>' : ''}${r.linhas.map(([a, b]) => `<div class="linha"><span>${esc(a)}</span><b class="num">${esc(b)}</b></div>`).join('')}
-  </div>
-  ${k === 'custo' && r.venda ? `<a class="chamada" href="#/negociar" style="margin-top:12px;background:#fff;border-color:var(--borda)"><span class="cresce" style="font-size:14px;font-weight:700;color:var(--verde)">Ver compradores pagando acima de ${brl(r.venda)}</span>${ic(I.seta, 'style="stroke:#007731"')}</a>` : ''}`;
 }
 
 // ---------- negociar ----------
@@ -407,9 +402,11 @@ const ROTAS = {
   inicio: () => telaInicio(),
   mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
   clima: () => telaClimaAuto(D, { esc, ic, I, numBr }),
-  ferramentas: (sub) => telaFerramentas(sub),
-  negociar: () => telaNegociar()
+  ferramentas: (sub) => telaFerramentas(sub, { esc, ic, I, brl, numBr }),
+  negociar: () => telaNegociar(),
+  boletim: (id) => telaBoletim(id)
 };
+const ABA_DA_ROTA = { boletim: 'mercado' };
 
 function rota() {
   const [aba = 'inicio', sub] = location.hash.replace(/^#\/?/, '').split('/');
@@ -420,11 +417,13 @@ function render(rolarTopo = true) {
   const { aba, sub } = rota();
   const tela = document.getElementById('tela');
   tela.innerHTML = ROTAS[aba](sub);
-  document.querySelectorAll('.abas a').forEach((a) => { if (a.dataset.aba === aba) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  const marcada = ABA_DA_ROTA[aba] || aba;
+  document.querySelectorAll('.abas a').forEach((a) => { if (a.dataset.aba === marcada) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   if (rolarTopo) window.scrollTo(0, 0);
 }
 
-// Eventos delegados (filtros, calculadoras, gráfico, login)
+// Eventos delegados (filtros, gráfico, login)
+ligarFerramentas({ esc, ic, I, brl, numBr, render });
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-periodo],[data-boletim],[data-lado],[data-produto]');
   if (!t) return;
@@ -433,14 +432,6 @@ document.addEventListener('click', (e) => {
   if (t.dataset.lado) { estado.lado = t.dataset.lado; }
   if (t.dataset.produto) { estado.produto = t.dataset.produto; }
   render(false);
-});
-
-document.addEventListener('input', (e) => {
-  const inp = e.target.closest('[data-campo]');
-  if (!inp) return;
-  const k = document.getElementById('calc').dataset.calc;
-  (estado.calc[k] ||= {})[inp.dataset.campo] = inp.value;
-  document.getElementById('calc-resultado').innerHTML = resultadoCalc(k);
 });
 
 document.addEventListener('pointerover', (e) => mostraDica(e));
@@ -472,7 +463,7 @@ async function iniciar() {
   const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
   ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
   render();
-  atualizarClima();
+  atualizarClima(await localInicial());
 }
 
 async function atualizarClima(local) {
@@ -488,14 +479,14 @@ document.addEventListener('change', (e) => {
   definirMunicipio(m); D.climaAuto = null; render(false); atualizarClima(m);
 });
 
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('#usar-gps') || !navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition((p) => {
-    const m = { nome: 'Minha localização', uf: '', lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4) };
-    definirMunicipio(m); D.climaAuto = null; render(false); atualizarClima(m);
-  }, () => alertaGps());
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('#usar-gps')) return;
+  const s = document.querySelector('.topo .sub');
+  if (s) s.textContent = 'Buscando sua localização…';
+  const m = await localDoAparelho(15000);
+  if (!m) { if (s) s.textContent = 'Não foi possível usar sua localização. Escolha o município na lista.'; return; }
+  definirMunicipio(m); D.climaAuto = null; render(false); atualizarClima(m);
 });
-function alertaGps() { const s = document.querySelector('.topo .sub'); if (s) s.textContent = 'Não foi possível usar sua localização. Escolha o município na lista.'; }
 
 iniciar().catch((err) => {
   document.getElementById('tela').innerHTML = `<div class="vazio">Não foi possível carregar os dados. Verifique a conexão.<br><small>${esc(err.message)}</small></div>`;
