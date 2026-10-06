@@ -3,4 +3,5 @@ node_modules/
 .netlify/
 .env
 public/img/logo.png
+public/img/colombo.png
 public/icons/icon-512.png

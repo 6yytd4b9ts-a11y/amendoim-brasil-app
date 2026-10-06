@@ -1,7 +1,7 @@
 [
-  { "sigla": "BR", "pais": "Brasil", "fase": "Plantio" },
-  { "sigla": "AR", "pais": "Argentina", "fase": "Plantio" },
-  { "sigla": "US", "pais": "Estados Unidos", "fase": "Colheita" },
-  { "sigla": "IN", "pais": "Índia", "fase": "Colheita" },
-  { "sigla": "CN", "pais": "China", "fase": "Colheita" }
+  { "sigla": "BR", "pais": "Brasil", "fase": "Plantio", "tendencia": "queda", "indicador": "Área −25 a −30%", "resumo": "Plantio com boa umidade, área menor por falta de crédito. Exportação forte." },
+  { "sigla": "AR", "pais": "Argentina", "fase": "Pré-plantio", "tendencia": "queda", "indicador": "Área −8% (Córdoba)", "resumo": "Colheita atrasada afetou qualidade. Oferta curta até janeiro, preços firmes." },
+  { "sigla": "US", "pais": "Estados Unidos", "fase": "Colheita", "tendencia": "queda", "indicador": "Produção −26,6%", "resumo": "Safra menor, mas estoque recorde garante oferta. Acordo com a China inclui amendoim." },
+  { "sigla": "IN", "pais": "Índia", "fase": "Colheita", "tendencia": "queda", "indicador": "Quebra ~20%", "resumo": "Chuva irregular deve reduzir a produtividade. Pode pressionar a oferta na Ásia." },
+  { "sigla": "CN", "pais": "China", "fase": "Colheita", "tendencia": "estavel", "indicador": "Safra estável", "resumo": "Mercado interno fraco; câmbio e frete travam a exportação." }
 ]

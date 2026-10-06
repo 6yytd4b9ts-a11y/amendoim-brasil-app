@@ -1,26 +1,41 @@
 [
   {
-    "tipo": "Boletim semanal",
-    "titulo": "[Título do boletim da semana]",
-    "data": "[dd/mm/aaaa]",
-    "resumo": "[Primeiras linhas do boletim: o ponto principal do mercado nesta semana, em linguagem direta para o produtor.]",
+    "id": "2026-09",
+    "tipo": "Boletim mensal",
+    "titulo": "Setembro 2026: oferta mundial aperta e Brasil planta menos",
+    "data": "28/09/2026",
+    "resumo": "A oferta de amendoim encolhe nas principais origens e os preços internacionais seguem com viés de alta. No Brasil, o plantio começa com boa umidade, mas a área deve cair de 25% a 30%.",
+    "exclusivo": false,
     "link": "",
-    "exclusivo": false
-  },
-  {
-    "tipo": "Relatório mensal",
-    "titulo": "[Título do relatório]",
-    "data": "[mês/aaaa]",
-    "resumo": "",
-    "link": "",
-    "exclusivo": true
-  },
-  {
-    "tipo": "Panorama global",
-    "titulo": "[Brasil, Argentina, EUA, Índia e China]",
-    "data": "[dd/mm/aaaa]",
-    "resumo": "",
-    "link": "",
-    "exclusivo": true
+    "secoes": [
+      {
+        "titulo": "Resumo do mês",
+        "texto": "O mercado internacional andou bem mais que o interno. Argentina com colheita atrasada e problema de qualidade, Estados Unidos com área quase 28% menor, Brasil plantando menos e Índia com risco de quebra: a oferta mundial está encolhendo e os preços lá fora tendem a continuar subindo.\n\nAqui dentro, a exportação segue forte e segura o preço da casca, mas a demanda das indústrias continua parada. Os custos de produção seguem altos."
+      },
+      {
+        "titulo": "Brasil",
+        "texto": "O plantio da safra 2026/27 começou, com as primeiras áreas já semeadas e o grosso do plantio previsto entre 1º e 10 de outubro. A safra começa com chuva favorável e boa umidade no cinturão paulista. As previsões indicam chuva acima da média na primavera no oeste e no sul de São Paulo, padrão típico de El Niño. No Mato Grosso do Sul, as condições seguem mais irregulares.\n\nA área plantada deve cair de 25% a 30%, olhando a venda de semente, que é o primeiro termômetro. O motivo principal é a falta de crédito, juros altos e endividamento, e não o clima. O primeiro levantamento oficial da Conab sai em 15 de outubro.\n\nO custo continua alto: o diesel passou de R$ 7,10 o litro, cerca de 17% acima da safra passada. O barter de insumos ganha espaço, com contratos da safra nova já oferecidos em bases melhores.\n\nA demanda interna segue fraca e a exportação, forte. De janeiro a agosto, o Brasil exportou 215.289 toneladas de grão, alta de 21%. Já o óleo caiu 18%, para 80.286 toneladas, com a China comprando menos. A área menor já afeta beneficiadoras e esmagadoras, e algumas unidades podem parar de operar."
+      },
+      {
+        "titulo": "Argentina",
+        "texto": "A colheita terminou com muito atraso, e os últimos 20% a 25% da safra tiveram problemas de rendimento e qualidade. O jumbo (38/42) foi o mais afetado e abriu diferença de preço para o médio (40/50).\n\nNo porto de Roterdã, os preços giram em torno de US$ 1.650 a 1.700 a tonelada para splits blancheados, US$ 1.750 a 1.800 para 40/50 e US$ 1.850 a 1.900 para 38/42, quando se acha. As beneficiadoras estão perto de 80% vendidas, com oferta curta no curto prazo e disponibilidade só a partir de janeiro. A Bolsa de Cereais de Córdoba projeta área 8% menor na província para a nova safra."
+      },
+      {
+        "titulo": "Estados Unidos",
+        "texto": "O USDA estima a área de 2026 quase 28% menor e a produção 26,6% abaixo do ano passado. Mesmo assim, o estoque recorde da safra 2025 deve garantir oferta suficiente nesta temporada. O preço da safra velha subiu no último mês e se aproxima da safra nova, que segue firme.\n\nO acordo comercial entre EUA e China incluiu o amendoim, o que pode acabar com a taxa extra de 10%. Ao mesmo tempo, há rumor de que a China pode proibir a importação de amendoim em casca americano. O fechamento anunciado de uma beneficiadora no Arkansas pode trazer compradores de volta ao mercado."
+      },
+      {
+        "titulo": "Índia",
+        "texto": "A colheita da safra kharif começa agora. O consenso é de quebra de produtividade perto de 20%, por causa das chuvas irregulares. O clima até e durante a colheita vai definir volume e qualidade. Uma quebra maior teria efeito forte na oferta para a Ásia e no mercado internacional."
+      },
+      {
+        "titulo": "China",
+        "texto": "A colheita está em andamento, com mercado interno fraco e exportação travada pelo câmbio e pelo frete alto. A expectativa é de safra parecida ou um pouco menor que a anterior. Os contratos futuros de amendoim se recuperaram um pouco."
+      },
+      {
+        "titulo": "O que isso significa pro produtor",
+        "texto": "O cenário mundial é de oferta mais curta, o que dá sustentação ao preço do amendoim brasileiro, principalmente via exportação. O ponto de atenção é o custo: com diesel e juros altos, saber o seu custo por saca é o que separa lucro de prejuízo nesta safra. Use as calculadoras do app para fazer a sua conta."
+      }
+    ]
   }
 ]

@@ -1,20 +1,29 @@
 {
   "nomeApp": "Amendoim Brasil",
-  "whatsappHelder": "",
+  "whatsappHelder": "+551899622480",
   "regiaoPadrao": "Oeste Paulista",
   "safraAtual": "26/27 águas",
   "faseSafra": "Plantio",
   "fases": ["Plantio", "Emergência", "Florada", "Enchimento", "Arranquio"],
   "boletim": {
-    "rotulo": "Boletim da semana",
-    "frequencia": "semanal"
+    "rotulo": "Boletim do mês",
+    "frequencia": "mensal"
   },
   "termometro": {
-    "status": "Estável",
-    "resumo": "[Resumo da semana em três linhas: o que mudou no preço, quem está comprando e o que esperar para os próximos dias.]"
+    "titulo": "Termômetro do preço da casca",
+    "subtitulo": "Para onde o preço tende a ir nas próximas semanas",
+    "status": "Firme",
+    "resumo": "Oferta mundial apertada e área menor no Brasil sustentam o preço. O freio é a demanda interna parada.",
+    "fatores": [
+      { "nome": "Preço internacional", "valor": "Subindo", "efeito": "alta" },
+      { "nome": "Área plantada no Brasil", "valor": "−25 a −30%", "efeito": "alta" },
+      { "nome": "Exportação", "valor": "Forte", "efeito": "alta" },
+      { "nome": "Demanda das indústrias", "valor": "Parada", "efeito": "baixa" }
+    ],
+    "atualizado": "06/10/2026"
   },
   "exportacao": {
-    "status": "Estável"
+    "status": "Forte"
   },
   "produtosEmBreve": ["Debulhado", "Blancheado"]
 }

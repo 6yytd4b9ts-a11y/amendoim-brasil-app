@@ -1,4 +1,8 @@
 {
-  "recomendacao": "[Orientação para esta fase: umidade do solo, janela de plantio e cuidados com a previsão.]",
-  "enso": "El Niño forte em formação (NOAA, set/2026), com chance de evento histórico até o fim do ano."
+  "recomendacao": "",
+  "enso": "El Niño muito forte: 95% de chance de seguir muito intenso entre outubro e dezembro, durando pelo menos até o início de 2027. Na primavera, tende a trazer chuva acima da média em parte do Sudeste e no Sul, e tempo mais seco e quente no Mato Grosso do Sul.",
+  "ensoFonte": "INPE · Painel El Niño 2026-2027 · 01/10/2026",
+  "ensoLink": "https://www.gov.br/inpe/pt-br/assuntos/ultimas-noticias/painel-el-nino-2026-2027-quarto-boletim-sobre-o-monitoramento-do-fenomeno-no-brasil-e-publicado",
+  "ensoLinkPermanente": "https://clima.cptec.inpe.br/enos",
+  "radarLink": "https://www.ipmetradar.com.br/2mobileGis.php"
 }

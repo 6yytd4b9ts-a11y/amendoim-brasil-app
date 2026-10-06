@@ -1,26 +1,43 @@
 [
   {
     "tipo": "video",
-    "fonte": "YouTube · [Canal]",
-    "titulo": "[Título do vídeo ou entrevista]",
-    "link": "",
+    "fonte": "YouTube · Indústrias Colombo",
+    "titulo": "Onde a qualidade da semente se perde? | Ep. 14 Amendoim & Prosa",
+    "link": "https://www.youtube.com/watch?v=E-tkfjhc__k",
+    "capa": "",
+    "destaque": true,
+    "patrocinado": false
+  },
+  {
+    "tipo": "video",
+    "fonte": "YouTube · Cooperativa Casul",
+    "titulo": "Reunião da Câmara Setorial do Amendoim (30/09/26)",
+    "link": "https://www.youtube.com/live/55ase-YlOfQ",
     "capa": "",
     "patrocinado": false
   },
   {
     "tipo": "noticia",
-    "fonte": "[Portal]",
-    "titulo": "[Título da notícia sobre o mercado de amendoim]",
-    "link": "",
+    "fonte": "INPE · 01/10/2026",
+    "titulo": "Painel El Niño: 95% de chance de evento muito forte até dezembro",
+    "link": "https://www.gov.br/inpe/pt-br/assuntos/ultimas-noticias/painel-el-nino-2026-2027-quarto-boletim-sobre-o-monitoramento-do-fenomeno-no-brasil-e-publicado",
     "capa": "",
     "patrocinado": false
   },
   {
     "tipo": "noticia",
-    "fonte": "[Portal]",
-    "titulo": "[Título da notícia sobre a safra]",
-    "link": "",
-    "capa": "",
+    "fonte": "Exame · 18/09/2026",
+    "titulo": "Safra 2026/27 começa: calendário, sanidade e clima orientam o plantio",
+    "link": "https://exame.com/agro/safra-2026-27-comeca-no-brasil-calendario-sanidade-e-clima-orientam-o-plantio/",
+    "capa": "https://classic.exame.com/wp-content/uploads/2025/09/MM25_MAT-DESEMPENHO_.jpg",
+    "patrocinado": false
+  },
+  {
+    "tipo": "noticia",
+    "fonte": "Campo Grande News · 17/04/2026",
+    "titulo": "MAPA define janela ideal para plantio de amendoim em MS na safra 26/27",
+    "link": "https://www.campograndenews.com.br/lado-rural/mapa-define-janela-ideal-para-plantio-de-amendoim-em-ms-na-safra-26-27",
+    "capa": "https://cdn6.campograndenews.com.br/uploads/noticias/2026/04/17/3ma47zi877cwg.png",
     "patrocinado": false
   }
 ]
