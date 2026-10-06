@@ -1,4 +1,5 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
+import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio } from '/clima.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima'];
 const D = {};
@@ -10,6 +11,7 @@ const brl = (n) => (n == null || !isFinite(n)) ? 'R$ —' : 'R$ ' + Number(n).to
 const numBr = (n, d = 0) => (n == null || !isFinite(n)) ? '—' : Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
 const pct = (n) => (n == null) ? '—' : (n > 0 ? '+' : '') + numBr(n, 1) + '%';
 const num = (v) => { const n = parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : null; };
+const idYoutube = (u) => { const m = String(u || '').match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([\w-]{11})/); return m ? m[1] : ''; };
 const linkSeguro = (u) => /^https?:\/\//i.test(u || '') ? u : '';
 const wa = (texto) => {
   const n = (D.config.whatsappHelder || '').replace(/\D/g, '');
@@ -50,8 +52,9 @@ function varChip(v) {
 function telaInicio() {
   const c = D.cotacoes, cfg = D.config, b = D.boletins[0];
   const dest = c.destaque || {};
-  const chuva7 = (D.clima.previsao7dias || []).reduce((s, d) => s + (d.mm || 0), 0);
-  const temChuva = (D.clima.previsao7dias || []).some((d) => d.mm != null);
+  const auto = D.climaAuto;
+  const chuva7 = auto?.total7;
+  const temChuva = chuva7 != null;
   const fases = cfg.fases || [];
   const iFase = Math.max(0, fases.indexOf(cfg.faseSafra));
 
@@ -79,7 +82,7 @@ function telaInicio() {
     </a>
     <a class="cartao" href="#/clima" style="gap:10px;padding:14px">
       <span class="rotulo">Chuva · 7 dias</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
-      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span><span class="mini">Previsto na sua região</span>
+      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span><span class="mini">${auto ? 'Previsto em ' + esc(auto.municipio.nome) : 'Carregando previsão…'}</span>
     </a>
   </div>
 
@@ -135,8 +138,10 @@ function blocoNoticias() {
   <div class="secao-titulo"><h2>Notícias e vídeos</h2></div>
   <div class="carrossel">${D.noticias.map((n) => {
     const href = linkSeguro(n.link);
-    const video = n.tipo === 'video';
-    const capa = linkSeguro(n.capa) ? `<img src="${esc(n.capa)}" alt="" loading="lazy">` : `<span>${video ? '[Capa do vídeo]' : '[Imagem da matéria]'}</span>`;
+    const yt = idYoutube(n.link);
+    const video = n.tipo === 'video' || !!yt;
+    const capaUrl = linkSeguro(n.capa) || (yt ? `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` : '');
+    const capa = capaUrl ? `<img src="${esc(capaUrl)}" alt="" loading="lazy">` : `<span>${video ? '[Capa do vídeo]' : '[Imagem da matéria]'}</span>`;
     const tag = href ? 'a' : 'div';
     return `<${tag} class="noticia" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       <div class="noticia-capa ${video ? 'video' : ''}">${capa}
@@ -287,47 +292,6 @@ function telaConsultoria() {
   </section>`;
 }
 
-function telaClima() {
-  const c = D.clima;
-  const dias = c.previsao7dias || [];
-  const total = dias.reduce((s, d) => s + (d.mm || 0), 0);
-  const pctMedia = (c.chuvaSafraMm != null && c.mediaHistoricaMm) ? Math.round((c.chuvaSafraMm / c.mediaHistoricaMm) * 100) : null;
-  const larg = (v) => Math.max(4, Math.min(100, v));
-  return `<header class="topo"><div class="topo-linha">
-    <div><h1>Clima</h1><div class="sub">Chuva, alertas e fase da safra</div></div>
-    <button class="chip" style="min-height:44px">${ic(I.pino, 'style="width:16px;height:16px;stroke:#007731"')}${esc(c.municipio)}</button>
-  </div></header>
-  ${!c.fonteConectada ? `<div class="selo" style="background:var(--azul-claro);border-color:#C8D9EA;color:#203F5C">${ic(I.globo, 'style="width:20px;height:20px;flex-shrink:0"')}<span>Os dados de clima entram assim que a fonte de previsão e o radar forem contratados.</span></div>` : ''}
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Radar de chuva</span></div>
-    <div class="radar">[Radar licenciado · IPMet ou equivalente]</div>
-  </section>
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Previsão · 7 dias</span><b class="num" style="font-size:13px">${dias.some((d) => d.mm != null) ? numBr(total) + ' mm no total' : '— mm'}</b></div>
-    <div class="dias">${dias.map((d) => `<div class="dia">${esc(d.dia)}${ic(d.mm == null || d.mm > 0 ? I.chuva : I.sol, `style="width:22px;height:22px;stroke:${d.mm == null ? '#CFC8B8' : d.mm > 0 ? '#2F6FA3' : '#D58A16'}"`)}<small class="num">${d.mm != null ? numBr(d.mm) + 'mm' : '—'}</small></div>`).join('')}</div>
-  </section>
-  <section class="cartao" style="gap:14px">
-    <div class="cartao-cab"><span class="rotulo">Chuva na safra vs média</span><span class="pilula pilula-azul">${pctMedia != null ? pctMedia + '% da média' : '—'}</span></div>
-    <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><b>Safra ${esc(D.config.safraAtual)} até agora</b><b class="num">${c.chuvaSafraMm != null ? numBr(c.chuvaSafraMm) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${pctMedia != null ? larg(pctMedia * 0.7) : 0}%;background:var(--azul)"></span></div></div>
-    <div style="display:flex;flex-direction:column;gap:6px"><div class="cartao-cab" style="font-size:13px"><span style="font-weight:600;color:var(--texto-3)">Média dos últimos 10 anos</span><b class="num">${c.mediaHistoricaMm != null ? numBr(c.mediaHistoricaMm) + ' mm' : '—'}</b></div><div class="barra"><span style="width:${c.mediaHistoricaMm != null ? 70 : 0}%;background:#9CC3E3"></span></div></div>
-  </section>
-  <section class="cartao alerta">
-    <div style="display:flex;align-items:center;gap:8px">${ic(I.alerta, 'style="width:20px;height:20px;stroke:#7A4A08"')}<b style="font-size:15px;color:#6B3F08">Mais de 10 dias sem chuva</b></div>
-    ${c.semChuva10dias.length ? c.semChuva10dias.map((v) => `<div class="cartao-cab" style="padding:8px 0;border-top:1px solid var(--amendoim-borda)"><b style="font-size:14px">${esc(v.municipio)}</b><b class="num" style="color:#6B3F08">${numBr(v.dias)} dias</b></div>`).join('') : '<span class="mini" style="color:#5C3A06">Nenhuma região em alerta agora.</span>'}
-  </section>
-  <section class="cartao">
-    <span class="rotulo">Momento da safra · ${esc(D.config.safraAtual)}</span>
-    ${(D.config.fases || []).map((f) => f === D.config.faseSafra
-      ? `<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:11px;background:var(--verde);border:4px solid var(--verde-claro)"></span><b class="cresce" style="font-size:15px">${esc(f)}</b><span class="pilula pilula-verde">Agora</span></div>`
-      : `<div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:11px;border:2px solid #CFC8B8"></span><span class="cresce" style="font-size:15px;color:var(--texto-3)">${esc(f)}</span></div>`).join('')}
-    <div style="padding:12px;border-radius:12px;background:var(--fundo);display:flex;flex-direction:column;gap:4px"><b style="font-size:12px;color:var(--verde)">Recomendação da semana</b><span style="font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(c.recomendacao)}</span></div>
-  </section>
-  <section class="cartao" style="flex-direction:row;align-items:center">
-    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--azul-claro)">${ic(I.globo, 'style="stroke:#2F5F8A"')}</span>
-    <span class="cresce"><span class="mini" style="font-weight:600;display:block">El Niño · La Niña</span><b style="font-size:15px">${esc(c.enso)}</b></span>
-  </section>`;
-}
-
 // ---------- calculadoras ----------
 const CALCS = {
   custo: {
@@ -442,7 +406,7 @@ function telaNegociar() {
 const ROTAS = {
   inicio: () => telaInicio(),
   mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
-  clima: () => telaClima(),
+  clima: () => telaClimaAuto(D, { esc, ic, I, numBr }),
   ferramentas: (sub) => telaFerramentas(sub),
   negociar: () => telaNegociar()
 };
@@ -508,7 +472,30 @@ async function iniciar() {
   const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
   ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
   render();
+  atualizarClima();
 }
+
+async function atualizarClima(local) {
+  try { D.climaAuto = await carregarClima(local); } catch (e) { D.climaAuto = { erro: 'Não foi possível carregar o clima agora.', dias: [], alertas: [], municipio: local || municipioAtual(), inicioSafra: '0000-09-01' }; }
+  const aba = rota().aba;
+  if (aba === 'clima' || aba === 'inicio') render(false);
+}
+
+document.addEventListener('change', (e) => {
+  if (e.target.id !== 'sel-municipio') return;
+  const m = MUNICIPIOS.find((x) => x.nome === e.target.value);
+  if (!m) return;
+  definirMunicipio(m); D.climaAuto = null; render(false); atualizarClima(m);
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#usar-gps') || !navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition((p) => {
+    const m = { nome: 'Minha localização', uf: '', lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4) };
+    definirMunicipio(m); D.climaAuto = null; render(false); atualizarClima(m);
+  }, () => alertaGps());
+});
+function alertaGps() { const s = document.querySelector('.topo .sub'); if (s) s.textContent = 'Não foi possível usar sua localização. Escolha o município na lista.'; }
 
 iniciar().catch((err) => {
   document.getElementById('tela').innerHTML = `<div class="vazio">Não foi possível carregar os dados. Verifique a conexão.<br><small>${esc(err.message)}</small></div>`;
