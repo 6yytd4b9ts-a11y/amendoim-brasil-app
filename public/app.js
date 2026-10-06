@@ -1,8 +1,9 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
-import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal } from '/clima.js';
+import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio } from '/clima.js';
+import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoIndicativo, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe } from '/painel.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 
-const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima'];
+const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
 const D = {};
 const estado = { periodo: '6M', filtroBoletim: 'Todos', lado: 'Todas', produto: 'Todos' };
 
@@ -38,6 +39,7 @@ const I = {
   fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   grupo: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/>'
 };
+const H = () => ({ esc, ic, I, brl, numBr, pct, wa, linkSeguro });
 const corSigla = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
 
 // Termômetro do preço da casca: para onde o preço tende a ir nas próximas semanas.
@@ -81,14 +83,13 @@ function telaInicio() {
   const auto = D.climaAuto;
   const chuva7 = auto?.total7;
   const temChuva = chuva7 != null;
-  const fases = cfg.fases || [];
-  const iFase = Math.max(0, fases.indexOf(cfg.faseSafra));
+  const rec = auto && auto.dias?.length ? recomendacaoPlantio(auto) : null;
 
   return `
   <header class="topo-inicio">
     <button class="btn-icone" aria-label="Município da lavoura" onclick="location.hash='#/clima'">${ic(I.pino)}</button>
     <img src="/img/logo.png" alt="Amendoim Brasil">
-    <button class="btn-icone" aria-label="Alertas no WhatsApp" onclick="document.getElementById('alertas').scrollIntoView({behavior:'smooth',block:'center'})">${ic(I.sino)}</button>
+    <a class="btn-icone sino" aria-label="Alertas" href="#/alertas">${ic(I.sino)}<span class="ponto-sino"></span></a>
   </header>
 
   <section class="destaque">
@@ -102,18 +103,23 @@ function telaInicio() {
     <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
   </section>
 
+  ${blocoMercadoHoje(D, H())}
+
   <div class="grade-2">
-    <a class="cartao" href="#/mercado" style="gap:10px;padding:14px">
-      <span class="rotulo">Preço da casca</span>
+    <a class="cartao" href="#/mercado/termometro" style="gap:10px;padding:14px">
+      <span class="rotulo">Termômetro</span>
       <span class="grande">${esc(cfg.termometro.status)}</span>
       ${medidor(cfg.termometro.status)}
       <span class="mini">${(() => { const f = contaFatores(cfg.termometro); return f.alta || f.baixa ? `${f.alta} ${f.alta === 1 ? 'fator' : 'fatores'} de alta · ${f.baixa} de baixa` : 'Tendência das próximas semanas'; })()}</span>
     </a>
     <a class="cartao" href="#/clima" style="gap:10px;padding:14px">
       <span class="rotulo">Chuva · 7 dias</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
-      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span><span class="mini">${auto ? 'Previsão ' + esc(nomeLocal(auto.municipio)) : 'Carregando previsão…'}</span>
+      <span class="grande num">${temChuva ? numBr(chuva7) + ' mm' : '— mm'}</span>
+      <span class="mini">${rec ? `<b style="color:var(--verde-escuro)">${esc(rec.titulo)}</b>` : auto ? 'Previsão ' + esc(nomeLocal(auto.municipio)) : 'Carregando previsão…'}</span>
     </a>
   </div>
+
+  ${blocoOportunidades(D, H())}
 
   ${b ? `
   <a class="boletim" href="${hrefBoletim(b)}" ${!b.secoes && linkSeguro(b.link) ? 'target="_blank" rel="noopener"' : ''}>
@@ -125,29 +131,7 @@ function telaInicio() {
 
   ${blocoNoticias()}
 
-  <a class="cartao" href="#/clima">
-    <div class="cartao-cab"><span class="rotulo">Momento da safra · ${esc(cfg.safraAtual)}</span><span class="pilula pilula-verde">${esc(cfg.faseSafra)}</span></div>
-    <div class="fases">${fases.map((_, i) => `<span class="${i <= iFase ? 'feito' : ''}"></span>`).join('')}</div>
-    <div class="fases-nomes">${fases.map((f, i) => `<span class="${i === iFase ? 'atual' : ''}">${esc(f)}</span>`).join('')}</div>
-  </a>
-
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Panorama global</span><a class="link-mini" href="#/mercado/analises">Ver análises</a></div>
-    <div>${D.panorama.map((p) => `
-      <a class="lista-linha" href="#/mercado/analises"><span class="sigla pilula ${corSigla[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="cresce"><b style="font-size:14px;display:block">${esc(p.pais)}</b><span class="mini">${esc(p.fase)}</span></span><b class="num" style="font-size:13px;color:var(--texto-2);text-align:right">${esc(p.indicador || '')}</b></a>`).join('')}
-    </div>
-  </section>
-
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Oportunidades no balcão <span class="selo-breve">Em breve</span></span><a class="link-mini" href="#/negociar">Ver prévia</a></div>
-    <div>${D.ofertas.slice(0, 2).map((o) => `
-      <a class="lista-linha" href="#/negociar">
-        <span class="lado ${o.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${o.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span>
-        <span class="cresce"><b style="font-size:14px;display:block">${esc(o.categoria)} · ${esc(o.volume)}</b><span class="mini">${esc(o.regiao)}</span></span>
-        <b class="num" style="font-size:14px">${esc(o.preco)}</b>
-      </a>`).join('')}
-    </div>
-  </section>
+  ${blocoPanoramaCompacto(D, H())}
 
   ${cartaoAlertas()}
 
@@ -224,10 +208,11 @@ function telaCotacoes() {
   const c = D.cotacoes, cfg = D.config, h = c.historico || {};
   const chips = `<div class="chips"><button class="chip" aria-pressed="true">Casca</button>${(cfg.produtosEmBreve || []).map((p) => `<button class="chip" disabled>${esc(p)} <span class="breve">EM BREVE</span></button>`).join('')}</div>`;
   const temProprias = (c.regioes || []).some((r) => r.preco != null);
+  const ult = D.boletins[0];
   return `${topoMercado('cotacoes', chips)}
   ${c.referencias?.length ? `
   <section class="cartao" style="gap:0;padding:4px 16px">
-    <div class="cartao-cab" style="padding:12px 0 4px"><span class="rotulo">Preço da casca · fontes oficiais</span><span class="mini">${esc(c.unidade)}</span></div>
+    <div class="cartao-cab" style="padding:12px 0 4px"><span class="rotulo">Cotações oficiais · casca</span><span class="mini">${esc(c.unidade)}</span></div>
     ${c.referencias.map((r) => {
       const href = linkSeguro(r.link);
       return `<${href ? 'a' : 'div'} class="lista-linha ref" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
@@ -239,16 +224,13 @@ function telaCotacoes() {
     <p class="mini" style="margin:0;padding:10px 0 12px">Toque na linha para conferir na fonte. Conab: preço em R$/kg convertido para saca de 25 kg.</p>
   </section>` : ''}
 
+  ${blocoIndicativo(D, H())}
+
   ${temProprias ? `
   <section class="cartao" style="gap:0;padding:4px 16px">
     <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Cotação Amendoim Brasil · ${esc(c.unidade)}</span><span class="mini">${c.semana ? 'Semana ' + esc(c.semana) : ''}</span></div>
     ${c.regioes.map((r) => `<div class="lista-linha"><span class="cresce" style="font-size:15px;font-weight:600">${esc(r.nome)}</span><b class="num" style="font-size:17px">${brl(r.preco)}</b>${varChip(r.variacao)}</div>`).join('')}
   </section>` : ''}
-
-  <a class="chamada" href="#/negociar">
-    <span class="cresce"><b style="font-size:15px;display:block">Tem amendoim pra vender?</b><span style="font-size:13px;color:#5C3A06">Veja como vai funcionar o balcão</span></span>
-    ${ic(I.seta, 'style="stroke:#5C3A06"')}
-  </a>
 
   <section class="cartao">
     <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
@@ -260,15 +242,24 @@ function telaCotacoes() {
     ${h.fonte ? `<span class="mini">Fonte: ${linkSeguro(h.link) ? `<a class="link-mini" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
   </section>
 
-  ${cartaoTermometro()}
+  ${cartaoTermometroDetalhe(D, H(), medidor)}
 
-  <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Exportação</span><span class="pilula pilula-amendoim">${esc(cfg.exportacao.status)}</span></div>
-    <a href="#/mercado/consultoria" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--fundo);text-decoration:none;color:var(--texto)">
-      ${ic(I.cadeado, 'style="width:20px;height:20px"')}
-      <span class="cresce"><b style="font-size:14px;display:block">Paridade em R$/saca de casca</b><span class="mini">Exclusivo para assinantes</span></span>
-      <span class="link-mini">Assinar</span>
-    </a>
+  ${blocoOfertaDemanda(D, H())}
+
+  ${blocoExportacao(D, H())}
+
+  ${blocoMundo(D, H())}
+
+  ${ult ? `<section class="boletim">
+    <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}Análise · ${esc(ult.tipo)}</span><span class="mini" style="color:#5C3A06">${esc(ult.data)}</span></div>
+    <h2>${esc(ult.titulo)}</h2>
+    <div class="cartao-cab" style="margin-top:4px"><a class="link-mini" href="#/mercado/analises" style="color:#5C3A06">Ver todas as análises</a><a class="btn btn-escuro btn-pequeno" style="min-height:40px" href="${hrefBoletim(ult)}">Ler</a></div>
+  </section>` : ''}
+
+  <section class="destaque" style="gap:12px">
+    <b style="font-size:19px;line-height:1.25">Quer decidir a venda com quem está no mercado todo dia?</b>
+    <span style="font-size:14px;line-height:1.5;opacity:.9">Consultoria Amendoim Brasil: recomendação de comercialização, histórico completo e paridade de exportação.</span>
+    <a class="btn btn-amendoim" href="#/mercado/consultoria">Conhecer a consultoria</a>
   </section>`;
 }
 
@@ -440,12 +431,13 @@ function telaNegociar() {
 const ROTAS = {
   inicio: () => telaInicio(),
   mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
+  alertas: () => telaAlertas(D, H()),
   clima: () => telaClimaAuto(D, { esc, ic, I, numBr }),
   ferramentas: (sub) => telaFerramentas(sub, { esc, ic, I, brl, numBr }),
   negociar: () => telaNegociar(),
   boletim: (id) => telaBoletim(id)
 };
-const ABA_DA_ROTA = { boletim: 'mercado' };
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio' };
 
 function rota() {
   const [aba = 'inicio', sub] = location.hash.replace(/^#\/?/, '').split('/');
@@ -459,6 +451,9 @@ function render(rolarTopo = true) {
   const marcada = ABA_DA_ROTA[aba] || aba;
   document.querySelectorAll('.abas a').forEach((a) => { if (a.dataset.aba === marcada) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   if (rolarTopo) window.scrollTo(0, 0);
+  // Atalhos para uma seção da aba Mercado (#/mercado/mundo, #/mercado/termometro…)
+  const alvo = sub && document.getElementById('sec-' + sub);
+  if (alvo && rolarTopo) { alvo.scrollIntoView({ block: 'start' }); if (alvo.tagName === 'DETAILS') alvo.open = true; }
 }
 
 // Eventos delegados (filtros, gráfico, login)
@@ -502,9 +497,20 @@ async function iniciar() {
   const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
   ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
   render();
+  carregarDolar();
   // Mostra o clima na hora (local salvo ou Presidente Prudente) e troca para a localização da pessoa quando ela permitir.
   atualizarClima(municipioAtual());
   localInicial().then((m) => { if (m) atualizarClima(m); });
+}
+
+// Dólar comercial ao vivo (AwesomeAPI). Se falhar, fica o valor do mercado.json.
+async function carregarDolar() {
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+    const j = (await r.json()).USDBRL;
+    D.dolar = { bid: +j.bid, pct: +j.pctChange };
+    if (rota().aba === 'inicio') render(false);
+  } catch (e) { /* mantém o valor fixo */ }
 }
 
 let pedidoClima = 0;
