@@ -277,21 +277,21 @@ export function telaClima(D, h) {
           <span class="prev-nome">${esc(d.dia)}</span><span class="prev-data">${dataCurta(d.data)}</span>
           ${ic(d.mm >= SECO ? I.chuva : I.sol, `style="width:20px;height:20px;stroke:${d.mm >= SECO ? '#2F6FA3' : '#D58A16'}"`)}
           <span class="prev-barra"><i style="height:${Math.round(((d.mm || 0) / maxMm) * 100)}%"></i></span>
-          <b class="num">${numBr(d.mm)}</b><small class="num">${d.prob != null ? d.prob + '%' : ''}</small>
+          <b class="num">${numBr(d.mm)}<small> mm</small></b><small class="num">${d.prob != null ? d.prob + '%' : ''}</small>
         </div>`
       : `<div class="prev-dia" style="opacity:.5"><span class="prev-nome">…</span></div>`).join('')}</div>
-    ${dias.length ? `<div class="mini">mm por dia · % = chance de chuva · Máx/mín hoje <b class="num">${numBr(dias[0].tmax)}° / ${numBr(dias[0].tmin)}°</b>${periodoPrev === 15 ? ' · depois de 7 dias a previsão é menos precisa' : ''}</div>` : ''}
+    ${dias.length ? `<div class="mini">% = chance de chuva · Máx/mín hoje <b class="num">${numBr(dias[0].tmax)}° / ${numBr(dias[0].tmin)}°</b>${periodoPrev === 15 ? ' · depois de 7 dias a previsão é menos precisa' : ''}</div>` : ''}
     ${h.patrocinio ? h.patrocinio('clima') : ''}
   </section>
 
   <section class="cartao" style="gap:12px">
-    <span class="rotulo">Chuva acumulada na safra</span>
-    ${a && a.chuvaSafra != null ? `<p class="frase-safra">Desde <b>01/09</b> choveu <b class="num">${mm(a.chuvaSafra)}</b> ${esc(nomeLocal(a.municipio))}. ${frase}</p>` : `<span class="mini">${carregando ? 'carregando…' : 'Sem dados do histórico agora.'}</span>`}
+    <div><span class="rotulo" style="display:block">Chuva acumulada desde 01/09</span>${a ? `<span class="mini">Lavoura ${esc(nomeLocal(a.municipio))}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? '' : `<span class="mini">${carregando ? 'carregando…' : 'Sem dados do histórico agora.'}</span>`}
     ${a && a.chuvaSafra != null ? `
     <div class="comp-linha"><div class="cartao-cab"><b>Esta safra · 01/09 a ${dataCurta(a.ate)}/${anoA}</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
     <div class="comp-linha"><div class="cartao-cab"><span>Safra passada · 01/09 a ${dataCurta(a.fimPassada)}/${anoA - 1}</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
     ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras · mesmo período</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}
-    <span class="mini">Últimos 30 dias: <b class="num">${mm(a.chuva30passados)}</b></span>` : ''}
+    <p class="frase-safra">${frase} Nos últimos 30 dias choveu <b class="num">${mm(a.chuva30passados)}</b>.</p>` : ''}
   </section>
 
   <section class="cartao alerta">
