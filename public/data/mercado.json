@@ -1,0 +1,82 @@
+{
+  "atualizado": "06/10/2026",
+  "hoje": [
+    {
+      "id": "fisico",
+      "rotulo": "Preço físico",
+      "valor": "R$ 78 a 82",
+      "nota": "Indicativo Amendoim Brasil · estável",
+      "efeito": "neutro",
+      "detalhe": "Faixa de negócios observada no mercado físico nesta semana. Referências oficiais: IEA Tupã R$ 77,00 e Conab média SP R$ 76,00."
+    },
+    {
+      "id": "dolar",
+      "rotulo": "Dólar",
+      "valor": "R$ 4,98",
+      "nota": "−0,5% hoje",
+      "efeito": "baixa",
+      "detalhe": "Dólar mais baixo reduz quanto a exportação paga em reais. Pesa contra o preço da casca, mas o preço lá fora subindo compensa por enquanto."
+    },
+    {
+      "id": "exportacao",
+      "rotulo": "Exportação",
+      "valor": "Forte",
+      "nota": "+21% no ano",
+      "efeito": "alta",
+      "detalhe": "De janeiro a agosto o Brasil exportou 215.289 t de grão, 21% a mais que em 2025. A exportação absorve produto e segura o preço interno."
+    },
+    {
+      "id": "demanda",
+      "rotulo": "Demanda das indústrias",
+      "valor": "Fraca",
+      "nota": "compras só para o curto prazo",
+      "efeito": "baixa",
+      "detalhe": "As indústrias de doce e torrado compram o mínimo, esperando o preço ceder. É o principal freio do mercado agora."
+    },
+    {
+      "id": "oferta",
+      "rotulo": "Oferta de produto",
+      "valor": "Baixa",
+      "nota": "entressafra e área menor",
+      "efeito": "alta",
+      "detalhe": "Pouco amendoim disponível até a colheita da safra 26/27, e a área plantada deve cair de 25% a 30%."
+    }
+  ],
+  "fato": {
+    "titulo": "Conab divulga o 1º levantamento da safra 26/27 em 15/10",
+    "texto": "O mercado espera a confirmação oficial de área menor. Se vier abaixo de 25%, reforça a firmeza do preço."
+  },
+  "indicativo": {
+    "min": 78,
+    "max": 82,
+    "data": "semana de 05 a 09/10/2026",
+    "condicao": "Casca seca e limpa, posta na beneficiadora · Alta Paulista e Oeste Paulista",
+    "exemplo": true
+  },
+  "ofertaDemanda": [
+    { "nome": "Oferta de casca", "escala": ["Baixa", "Média", "Alta"], "nivel": 0, "efeito": "alta", "detalhe": "Entressafra: pouco produto na mão do produtor e das beneficiadoras." },
+    { "nome": "Demanda industrial", "escala": ["Fraca", "Normal", "Forte"], "nivel": 0, "efeito": "baixa", "detalhe": "Indústrias comprando só o necessário para as próximas semanas." },
+    { "nome": "Exportação", "escala": ["Fraca", "Normal", "Forte"], "nivel": 2, "efeito": "alta", "detalhe": "Embarques 21% acima de 2025 no acumulado do ano." },
+    { "nome": "Disponibilidade de produto", "escala": ["Baixa", "Média", "Alta"], "nivel": 0, "efeito": "alta", "detalhe": "Lotes de qualidade estão escassos; quem tem produto bom consegue prêmio." }
+  ],
+  "exportacao": {
+    "titulo": "Exportações 21% acima de 2025",
+    "leitura": "Fator positivo para o mercado: a exportação absorve produto e segura o preço da casca mesmo com a indústria comprando pouco.",
+    "periodo": "jan a ago/2026",
+    "itens": [
+      { "nome": "Grão", "toneladas": 215289, "variacao": 21 },
+      { "nome": "Óleo", "toneladas": 80286, "variacao": -18 }
+    ],
+    "ritmo": "Embarques seguem firmes no 2º semestre, acima do mesmo período do ano passado.",
+    "mensal": {
+      "exemplo": true,
+      "meses": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago"],
+      "atual": [24100, 22800, 25600, 27900, 28800, 29400, 28600, 28089],
+      "anterior": [21300, 19800, 21900, 22600, 23100, 23500, 22900, 22825]
+    },
+    "destinos": {
+      "exemplo": true,
+      "lista": [["Rússia", 27], ["Argélia", 14], ["Holanda", 11], ["Reino Unido", 7], ["Outros", 41]]
+    }
+  }
+}

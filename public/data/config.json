@@ -17,10 +17,12 @@
     "status": "Firme",
     "resumo": "Oferta mundial apertada e área menor no Brasil sustentam o preço. O freio é a demanda interna parada.",
     "fatores": [
-      { "nome": "Preço internacional", "valor": "Subindo", "efeito": "alta" },
-      { "nome": "Área plantada no Brasil", "valor": "−25 a −30%", "efeito": "alta" },
-      { "nome": "Exportação", "valor": "Forte", "efeito": "alta" },
-      { "nome": "Demanda das indústrias", "valor": "Parada", "efeito": "baixa" }
+      { "nome": "Preço internacional", "valor": "Subindo", "efeito": "alta", "detalhe": "Em Roterdã, o 40/50 argentino está entre US$ 1.750 e 1.800/t e o 38/42 entre US$ 1.850 e 1.900/t, com oferta curta até janeiro." },
+      { "nome": "Safra mundial", "valor": "Menor", "efeito": "alta", "detalhe": "EUA com produção 26,6% menor, Argentina com colheita atrasada e problema de qualidade, Índia com quebra perto de 20%." },
+      { "nome": "Oferta brasileira", "valor": "−25 a −30%", "efeito": "alta", "detalhe": "A venda de semente indica área plantada 25% a 30% menor na safra 26/27, por falta de crédito e juros altos. A Conab confirma em 15/10." },
+      { "nome": "Exportação", "valor": "Forte", "efeito": "alta", "detalhe": "215.289 t de grão exportadas de janeiro a agosto, 21% acima de 2025." },
+      { "nome": "Demanda interna", "valor": "Parada", "efeito": "baixa", "detalhe": "Indústrias de doce e torrado comprando só o necessário, esperando o preço ceder." },
+      { "nome": "Dólar", "valor": "Mais baixo", "efeito": "baixa", "detalhe": "Com o dólar perto de R$ 5,00, a exportação paga menos em reais. Pesa contra, mas o preço lá fora compensa por enquanto." }
     ],
     "atualizado": "06/10/2026"
   },
