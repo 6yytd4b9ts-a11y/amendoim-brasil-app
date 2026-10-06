@@ -91,7 +91,7 @@ const FERR = {
 };
 
 // Ordem em que as ferramentas aparecem.
-const ORDEM = ['custo', 'armazenar', 'barter', 'avista', 'frete', 'dolar', 'rendimento', 'arrendamento'];
+const ORDEM = ['custo', 'avista', 'armazenar', 'barter', 'frete', 'dolar', 'rendimento', 'arrendamento'];
 
 // ---------- estado salvo ----------
 let st = carregar();
