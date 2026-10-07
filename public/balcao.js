@@ -2,7 +2,8 @@
 // O contato de quem anuncia nunca aparece: o interessado sempre fala com o Helder.
 import { ativar, prefsSalvas } from '/alertas.js';
 
-const estado = { lado: 'Todas', produto: 'Todos', enviado: false };
+const estado = { lado: 'Todas', produto: 'Todos', enviado: false, ultimo: null };
+const NOME_PRODUTO = { Casca: 'amendoim em casca', Debulhado: 'amendoim debulhado', Blancheado: 'amendoim blancheado', Semente: 'semente de amendoim' };
 const PRODUTOS = ['Casca', 'Debulhado', 'Blancheado', 'Semente'];
 const chaveSalva = () => { try { return localStorage.getItem('ab-chave-numeros') || ''; } catch (e) { return ''; } };
 const dataCurta = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }); };
@@ -54,15 +55,32 @@ export function telaNegociar(D, h) {
 }
 
 export function telaAnunciar(D, h) {
-  const { ic, I } = h;
+  const { ic, I, wa, esc } = h;
   const voltar = `<a class="link-mini" href="#/negociar" style="display:flex;align-items:center;gap:4px">${ic(I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Balcão</a>`;
   if (estado.enviado) {
-    return `<header class="topo">${voltar}<div><h1>Anúncio recebido</h1></div></header>
+    // Último passo: o anunciante manda o anúncio para o Helder no WhatsApp (contato humano na hora, com fotos).
+    const u = estado.ultimo || {};
+    const cod = u.id ? u.id.slice(-5).toUpperCase() : '';
+    const txt = [
+      `Olá Helder, acabei de anunciar no balcão do app Amendoim Brasil${cod ? ` (anúncio ${cod})` : ''}:`,
+      `${u.lado === 'Compra' ? 'COMPRA' : 'VENDA'} de ${NOME_PRODUTO[u.categoria] || u.categoria || 'amendoim'}`,
+      `Quantidade: ${u.volume || '-'}`,
+      `Preço: ${u.preco || 'a combinar'}`,
+      `Cidade: ${u.regiao || '-'}`,
+      `Entrega: ${u.entrega || 'a combinar'}`,
+      u.detalhe ? `Detalhes: ${u.detalhe}` : null,
+      `Nome: ${u.nome || ''}`,
+      '',
+      'Posso mandar fotos do produto por aqui.'
+    ].filter((l) => l !== null).join('\n');
+    const zap = wa(txt);
+    return `<header class="topo">${voltar}<div><h1>Falta um passo</h1></div></header>
     <section class="cartao" style="gap:12px;text-align:center;align-items:center;padding:24px 18px">
       <span class="sigla" style="width:56px;height:56px;border-radius:50%;background:var(--verde-claro)">${ic('<path d="M5 12l5 5 9-10"/>', 'style="width:28px;height:28px;stroke:#007731;stroke-width:2.6"')}</span>
-      <b style="font-size:18px">Obrigado! O Helder vai conferir o seu anúncio.</b>
-      <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Ele pode chamar você no WhatsApp para confirmar os detalhes. Depois de aprovado, o anúncio fica no balcão por 45 dias.</span>
-      <a class="btn btn-verde" href="#/negociar" data-novo-anuncio>Voltar ao balcão</a>
+      <b style="font-size:18px">Anúncio registrado${cod ? ` · ${esc(cod)}` : ''}</b>
+      <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Agora envie para o Helder no WhatsApp. Ele confere, pede fotos se precisar e publica no balcão.</span>
+      ${zap ? `<a class="btn btn-verde" style="align-self:stretch" href="${zap}" target="_blank" rel="noopener" data-ev="anuncio-zap">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Enviar para o Helder no WhatsApp</a>` : ''}
+      <a class="link-mini" href="#/negociar" data-novo-anuncio>Voltar ao balcão</a>
     </section>`;
   }
   const opc = (nome, lista, marcado) => lista.map((v) => `<label class="opcao"><input type="radio" name="${nome}" value="${v}" ${v === marcado ? 'checked' : ''} required><span>${v === 'Venda' ? 'Quero vender' : v === 'Compra' ? 'Quero comprar' : v}</span></label>`).join('');
@@ -209,7 +227,9 @@ export function ligarBalcao(D, h, render, evento) {
       const r = await fetch('/api/balcao', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ acao: 'novo', ...dados }) });
       if (r.status === 429) throw new Error('limite');
       if (!r.ok) throw new Error('http');
+      const resp = await r.json().catch(() => ({}));
       evento('anuncio-enviado');
+      estado.ultimo = { ...dados, id: resp.id || '' };
       estado.enviado = true;
       render();
     } catch (er) {
