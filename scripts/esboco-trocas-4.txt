@@ -58,20 +58,38 @@ const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'rendimento', 'dolar', '
       <span class="mini">O aviso chega quando o preço publicado da referência escolhida passar do seu alvo.</span>
 >>>>>>>
 <<<<<<< public/painel-esboco.js
-      <p class="mini">Nesta fase de teste, o conteúdo fica salvo só neste aparelho. Quando o app oficial estiver no ar, o que você salvar aqui vale para todo mundo.</p>
+      salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
 =======
-      <p class="mini">Nesta fase, o conteúdo fica salvo só neste aparelho. Quando o painel estiver ligado ao servidor, o que você salvar aqui vale para todo mundo.</p>
+      salvarConteudo(c); est.msg = 'Salvo. Vale para o app aberto neste aparelho.'; redesenhar();
 >>>>>>>
 <<<<<<< public/painel-esboco.js
-      ${campo('rendimento', 'Rendimento casca → grão (%)', c.balanco.rendimento)}
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70 };
 =======
-      ${campo('rendimento', 'Rendimento casca → grão (%)', c.balanco.rendimento)}
-      ${campo('exportGrao', 'Exportação de grão · 12 meses (mil t de grão)', c.balanco.exportGrao)}
-      ${campo('exportOleo', 'Exportação de óleo · 12 meses (mil t em casca equiv.)', c.balanco.exportOleo)}
-      <label class="pe-campo"><span>Fonte da exportação</span><input name="exportFonte" value="${esc(c.balanco.exportFonte || '')}" placeholder="Comex Stat · período"></label>
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70, exportGrao: n('pe-expg'), exportOleo: n('pe-expo'), exportFonte: t('pe-expf'), exportExemplo: false };
 >>>>>>>
 <<<<<<< public/painel-esboco.js
-      c.balanco = { consumoKgHab: num(fd.get('consumoKgHab')), populacaoMi: num(fd.get('populacaoMi')), sementeKgHa: num(fd.get('sementeKgHa')), rendimento: num(fd.get('rendimento')) };
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+      </div>
 =======
-      c.balanco = { consumoKgHab: num(fd.get('consumoKgHab')), populacaoMi: num(fd.get('populacaoMi')), sementeKgHa: num(fd.get('sementeKgHa')), rendimento: num(fd.get('rendimento')), exportGrao: num(fd.get('exportGrao')), exportOleo: num(fd.get('exportOleo')), exportFonte: String(fd.get('exportFonte') || ''), exportExemplo: false };
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+      </div>
+      <span class="mini">Ao salvar, a exportação deixa de ser "exemplo" no app.</span>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+=======
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+        <div class="campo"><label>Exportação de grão (mil t de grão)</label>${inp('pe-expg', c.balanco.exportGrao ?? '', 'number')}</div>
+        <div class="campo"><label>Exportação de óleo (mil t, em casca)</label>${inp('pe-expo', c.balanco.exportOleo ?? '', 'number')}</div>
+        <div class="campo"><label>Fonte/período da exportação</label>${inp('pe-expf', c.balanco.exportFonte || '')}</div>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+  ${aviso('<b>Esboço:</b> o que você salvar aqui aparece no app <b>deste aparelho</b> (abra Mercado › Assinantes). Na versão final vale para todos os assinantes na hora.')}
+=======
+  ${aviso('<b>Nesta fase:</b> o que você salvar aqui aparece no app <b>deste aparelho</b> (abra Mercado › Assinantes). Na versão final vale para todos os assinantes na hora.')}
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+  ${aviso('<b>Esboço:</b> nomes fictícios para você ver como fica. Na versão final a lista vem do cadastro e os pagamentos do Asaas, atualizados sozinhos.')}
+=======
+  ${aviso('<b>Nesta fase:</b> nomes fictícios para você ver como fica. Na versão final a lista vem do cadastro e os pagamentos do Asaas, atualizados sozinhos.')}
 >>>>>>>
