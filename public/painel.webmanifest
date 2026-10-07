@@ -1,0 +1,16 @@
+{
+  "name": "Painel Amendoim Brasil",
+  "short_name": "Painel AB",
+  "description": "Painel privado do app Amendoim Brasil.",
+  "lang": "pt-BR",
+  "id": "/painel",
+  "start_url": "/painel",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F4EE",
+  "theme_color": "#1B1B17",
+  "icons": [
+    { "src": "/icons/painel-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

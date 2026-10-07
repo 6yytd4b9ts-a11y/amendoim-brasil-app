@@ -9,5 +9,7 @@ base64 -d assets/badge.png.b64 > public/icons/badge.png   # ícone pequeno das n
 for n in icon-512 icon-maskable-512; do
   base64 -d "assets/$n.png.b64" > "public/icons/$n.png"
 done
+# Ícone do Painel (app de controle): o mesmo ícone verde com selo de engrenagem
+base64 -d assets/painel-180.png.b64 > public/icons/painel-180.png
 cp public/icons/icon-maskable-512.png public/img/og-app.png   # prévia do link (WhatsApp): o mesmo ícone verde do app
 echo "Imagens prontas."
