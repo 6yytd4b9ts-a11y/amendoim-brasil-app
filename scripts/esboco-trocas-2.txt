@@ -1,132 +1,37 @@
-<<<<<<< public/esboco.js
-  ctx = { ...ctx, ...opcoes };
-=======
-  ctx = { ...ctx, ...opcoes };
-  ligarExportar();
->>>>>>>
-<<<<<<< public/esboco.js
-    <div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
-      <section class="cartao es-cadeado">
-        ${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
-        <b class="es-h1" style="text-align:center">Estimativas Amendoim Brasil</b>
-        <span class="es-txt" style="text-align:center">Área, produção e balanço de cada safra, com a leitura do Helder. Exclusivo para assinantes.</span>
-        <a class="btn btn-verde" href="#/conta/criar" style="width:100%">Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}</a>
-        <a class="btn btn-escuro" href="#/conta/entrar" style="width:100%">Já sou assinante</a>
-      </section>
-    </div>`;
-=======
-    ${cartaoExclusivo(h, 'Estimativas Amendoim Brasil', 'Quanto o Brasil vai plantar e colher, safra por safra, com a leitura do Helder.', ['Área, produtividade e produção de cada safra', 'Balanço de oferta e demanda do Brasil', 'Atualizado todo mês'], '#/conta/criar', `Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}`)}
-    <a class="btn btn-escuro" href="#/conta/entrar">Já sou assinante</a>`;
->>>>>>>
-<<<<<<< public/esboco.js
-  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · 2 meses grátis']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
-  ${cartao('produtor', ['Estimativas Amendoim Brasil', 'Dados de exportação completos', 'Histórico de preço e sazonalidade'])}
-  ${cartao('empresa', ['Tudo do Produtor', 'Paridade de exportação', 'Alertas avançados e relatório mensal', 'Até 3 pessoas da empresa'])}`;
-=======
-  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · mais barato']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
-  ${cartao('produtor', ['Estimativas Amendoim Brasil todo mês', 'Leitura semanal do mercado', 'Agenda do mercado com lembretes', 'Histórico de 5 anos e alerta de preço-alvo'])}
-  ${cartao('empresa', ['Tudo do Produtor', 'Preço por destino: Argélia, Rússia, África do Sul…', 'Exportação completa e paridade', 'Relatório mensal e até 3 pessoas'])}`;
->>>>>>>
-<<<<<<< public/esboco.js
-  ${card(empresa ? '#/alertas' : '#/conta/planos', sinoMais, 'Alertas avançados', empresa ? 'Exportação, destino e preço por país' : 'Plano Empresa', !empresa)}
-=======
-  ${card(empresa ? '#/alertas' : '#/conta/planos', sinoMais, 'Alertas avançados', empresa ? 'Exportação, destino e preço por país' : 'Plano Empresa', !empresa)}
-  ${cartaoExportar(h)}
->>>>>>>
-<<<<<<< public/esboco.js
-  ${card('#/estimativas', grafico, 'Estimativas Amendoim Brasil', 'Área, produção e balanço por safra')}
-=======
-  ${card('#/estimativas', grafico, 'Estimativas Amendoim Brasil', 'Área, produção e balanço por safra')}
-  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do mercado', 'USDA, Conab, feiras e eventos, com lembrete')}
-  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
-  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
->>>>>>>
-<<<<<<< public/esboco.js
-
-  <a class="cartao es-previa" href="#/estimativas">
-    <div class="cartao-cab"><span class="rotulo">Estimativa de safra ${h.esc(c.estimativas[c.estimativas.length - 1].safra)}</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#7A4A08"')}</div>
-    <div class="es-borrado" aria-hidden="true"><div class="dx-tiles">
-      <div class="dx-tile"><span>Área</span><b>${nf(c.estimativas[c.estimativas.length - 1].areaMin)} mil ha</b></div>
-      <div class="dx-tile"><span>Produção</span><b>${nf(p.scMeio / 1e6, 1)} mi sc</b></div>
-      <div class="dx-tile"><span>Variação</span><b>−00%</b></div>
-    </div></div>
-    <span class="mini">Toque para ver o que tem dentro</span>
-  </a>
-=======
->>>>>>>
-<<<<<<< public/esboco.js
-    ${c.diasTeste ? `<span class="mini" style="text-align:center">${c.diasTeste} dias grátis para conhecer · cancele quando quiser</span>` : ''}
-=======
-    <span class="mini" style="text-align:center">Depois: R$ ${nf(c.planos.produtor.mensal, 2)} por mês, ou R$ ${nf(c.planos.produtor.anual / 12, 2)}/mês no plano anual</span>
->>>>>>>
-<<<<<<< public/esboco.js
-    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">Criar conta e assinar</a>
-=======
-    ${c.diasTeste ? `<div class="es-teste"><b>${c.diasTeste} dias grátis para conhecer</b><span>Use tudo durante ${c.diasTeste} dias. Se não gostar, cancele antes e não paga nada.</span></div>` : ''}
-    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">${c.diasTeste ? `Começar meus ${c.diasTeste} dias grátis` : 'Criar conta e assinar'}</a>
->>>>>>>
-<<<<<<< public/esboco.js
-    <span class="pilula pilula-amendoim" style="align-self:flex-start">EXCLUSIVO ASSINANTES</span>
-    <b class="es-h1">Informação na ponta do lápis para vender e comprar melhor</b>
-    <span class="es-txt">Estimativas próprias da Amendoim Brasil, dados de exportação completos e histórico de preço, atualizados por quem está no mercado.</span>
-    <div class="es-lista">
-      ${item('Estimativas Amendoim Brasil: área, produção e balanço')}
-      ${item('Exportação mês a mês, destinos e preço por país')}
-      ${item('Histórico de preço de 1 e 5 anos e sazonalidade')}
-      ${item('Empresa: paridade de exportação e alertas avançados')}
-=======
-    <span class="pilula pilula-verde" style="align-self:flex-start">ÁREA DO ASSINANTE</span>
-    <b class="es-h1">Venda e compre amendoim sabendo para onde o preço vai</b>
-    <span class="es-txt">O que o Helder acompanha todo dia no mercado, direto no seu celular. Informação que não está no grupo de WhatsApp nem no jornal.</span>
-    <div class="es-benef">
-      ${benef('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>', 'Saber a safra antes da Conab', 'A estimativa da Amendoim Brasil sai antes dos números oficiais e é feita com quem está no campo. Quem sabe que a área caiu 30% não vende barato.')}
-      ${benef(h.I.doc, 'Toda segunda: segurar ou vender?', 'A leitura da semana em 5 minutos: o que a indústria está fazendo, como está a exportação e para onde o preço tende a ir.')}
-      ${benef('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', 'O app avisa quando chegar no seu preço', 'Você define o alvo (ex.: R$ 82) e recebe o aviso no celular. Com o histórico de 5 anos para ver a melhor época de vender.')}
-      ${benef('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Nenhuma data pega você de surpresa', 'USDA, Conab e feiras internacionais na agenda, com lembrete um dia antes.')}
-      ${benef('<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>', 'Leve tudo para a sua planilha', 'Excel e PDF com estimativas, cotações e histórico, gerados na hora.')}
->>>>>>>
-<<<<<<< public/esboco.js
-  return `<header class="topo"><a class="link-mini" href="${href}" ${extra} style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}${texto}</a></header>`;
-}
-=======
-  return `<header class="topo"><a class="link-mini" href="${href}" ${extra} style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}${texto}</a></header>`;
-}
-const benef = (icone, titulo, txt) => `<div class="es-benef-item"><span class="es-benef-ic">${h.ic(icone, 'style="width:20px;height:20px;stroke:#007731"')}</span><span><b>${titulo}</b><span>${txt}</span></span></div>`;
->>>>>>>
-<<<<<<< public/esboco.js
-import { conteudo, sessao, salvarSessao, assinante, producao } from '/esboco-dados.js';
-=======
-import { conteudo, sessao, salvarSessao, assinante, producao } from '/esboco-dados.js';
-import { cartaoExclusivo } from '/esboco3.js';
-import { cartaoExportar, ligarExportar } from '/esboco-export.js';
->>>>>>>
 <<<<<<< public/painel-esboco2.js
-    c.leituraClima = t('pe-leitura');
+    salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
 =======
-    c.leituraClima = t('pe-leitura');
     c.enso = { ...(c.enso || {}), titulo: t('pe-enso-tit'), selo: t('pe-enso-selo'), regioes: (document.getElementById('pe-enso-reg')?.value || '').split('\n').map((l) => l.split('|')).filter((a) => a.length >= 2 && a[0].trim()).map(([nome, ...r]) => ({ nome: nome.trim(), texto: r.join('|').trim() })) };
     if (c.destinos?.lista) c.destinos = { ...c.destinos, exemplo: false, semana: new Date().toLocaleDateString('pt-BR'), lista: c.destinos.lista.map((x, i) => ({ ...x, pais: t(`pd-p-${i}`) || x.pais, comex: n(`pd-c-${i}`), min: n(`pd-a-${i}`), max: n(`pd-b-${i}`) })) };
+    salvarConteudo(c); est.msg = 'Salvo. Vale para o app aberto neste aparelho.'; redesenhar();
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+      salvarConteudo(c); est.msg = 'Evento adicionado. Abra a Agenda no app deste aparelho para ver.'; redesenhar();
+=======
+      salvarConteudo(c); est.msg = 'Evento adicionado.'; redesenhar();
 >>>>>>>
 <<<<<<< public/painel-esboco2.js
       const c = conteudo(); c.agenda = (c.agenda || []).filter((y) => y.id !== x.dataset.peAgRem); salvarConteudo(c); est.msg = 'Evento removido.'; redesenhar(); return;
+    }
 =======
       const c = conteudo(); c.agenda = (c.agenda || []).filter((y) => y.id !== x.dataset.peAgRem); salvarConteudo(c); est.msg = 'Evento removido.'; redesenhar(); return;
     }
     if (q('[data-pe-not-add]')) {
       if (!t('not-tit')) { est.msg = 'Escreva a manchete.'; redesenhar(); return; }
       const c = conteudo(); c.noticias = [{ id: 'n' + Date.now(), dia: hojeISO(), titulo: t('not-tit'), fonte: t('not-fonte'), link: t('not-link'), resumo: t('not-res') }, ...(c.noticias || []).filter((n) => !n.exemplo)].slice(0, 30);
-      salvarConteudo(c); est.msg = 'Manchete no ar. Abra o app neste aparelho para ver.'; redesenhar(); return;
+      salvarConteudo(c); est.msg = 'Manchete no ar neste aparelho.'; redesenhar(); return;
     }
     if ((x = q('[data-pe-not-rem]'))) { const c = conteudo(); c.noticias = (c.noticias || []).filter((n) => n.id !== x.dataset.peNotRem); salvarConteudo(c); redesenhar(); return; }
     if (q('[data-pe-enq-lancar]')) {
       const perg = t('enq-perg'), ops = (document.getElementById('enq-ops')?.value || '').split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 6);
       if (!perg || ops.length < 2) { est.msg = 'Escreva a pergunta e pelo menos duas opções.'; redesenhar(); return; }
       const c = conteudo(); c.enquete = { id: 'q' + Date.now(), pergunta: perg, opcoes: ops, dias: +t('enq-dias') || 7, inicio: new Date().toISOString() };
-      salvarConteudo(c); est.msg = 'Enquete no ar. Abra o app neste aparelho para ver.'; redesenhar(); return;
+      salvarConteudo(c); est.msg = 'Enquete no ar neste aparelho.'; redesenhar(); return;
     }
     if ((x = q('[data-pe-enq-fim]'))) {
       if (!x.dataset.certeza) { x.dataset.certeza = '1'; x.textContent = 'Confirmar encerramento'; return; }
       const c = conteudo(); c.enquete = { ...c.enquete, dias: 0 }; salvarConteudo(c); est.msg = 'Enquete encerrada.'; redesenhar(); return;
+    }
 >>>>>>>
 <<<<<<< public/painel-esboco2.js
     if ((x = q('[data-pe-feito]'))) { const j = lerFeito(); j.itens[x.dataset.peFeito] = true; gravarFeito(j); redesenhar(); return; }
@@ -239,6 +144,11 @@ function blocoNoticias() {
   </section>`; })()}
 >>>>>>>
 <<<<<<< public/painel-esboco2.js
+  ${aviso('<b>Esboço:</b> produtores fictícios (e o seu cadastro, se você fez neste aparelho). Na versão final, cada produtor que se cadastra no app entra aqui sozinho. Só você vê os nomes; no app aparece só a soma.')}
+=======
+  ${aviso('<b>Nesta fase:</b> produtores fictícios (e o seu cadastro, se você fez neste aparelho). Na versão final, cada produtor que se cadastra no app entra aqui sozinho. Só você vê os nomes; no app aparece só a soma.')}
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
   ${item('fisico', 'Preço do mercado físico', `
     <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe o que o mercado está pagando de verdade:</span>
     <div class="pe-grade"><div class="campo"><label>Alta Paulista (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 82,00"></div><div class="campo"><label>Mogiana (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 84,00"></div></div>
@@ -296,6 +206,12 @@ const lerLista = (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]
 =======
   return voltar + cartaoExclusivo(h, 'Preço por destino', 'Quanto Argélia, Rússia, África do Sul e Europa estão pagando pelo amendoim brasileiro, semana a semana. Para quem exporta, beneficia ou compra para a indústria.',
     ['Preço médio oficial do mês (Comex Stat)', 'Faixa negociada na semana, por destino', 'Exportação completa e paridade em R$/saca'], '#/conta/planos', 'Ver o plano Empresa');
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <details class="abre"><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px"><b>Comex:</b> preço médio oficial embarcado no mês (Comex Stat, automático). <b>Negociado na semana:</b> faixa levantada pela Amendoim Brasil com exportadores e importadores. A seta mostra a tendência da semana.</p></details>
+=======
+      <span class="mini">Fontes: <b>Comex</b> = Comex Stat/MDIC, média do mês${d.mes ? ` (${h.esc(d.mes)})` : ''} · <b>Negociado</b> = levantamento semanal da Amendoim Brasil com exportadores e importadores${d.exemplo ? ' · <i>valores de exemplo até o Helder preencher no painel</i>' : d.semana ? ` · semana de ${h.esc(d.semana)}` : ''}</span>
+      <details class="abre"><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px"><b>Comex:</b> preço médio oficial do que foi embarcado no mês. É o número fechado, do governo. <b>Negociado na semana:</b> faixa que o Helder levanta toda semana ligando para quem exporta e para quem compra lá fora. É o preço de agora, antes de virar estatística. A seta mostra a tendência da semana.</p></details>
 >>>>>>>
 <<<<<<< public/esboco3.js
   </div>`;
