@@ -11,6 +11,7 @@ const pct = (a, b) => (b ? num((a / b) * 100, 1) + '%' : '—');
 const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 const hojeISO = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 const somaDias = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const milhar = (s) => String(s ?? '').replace(/(^|[^\d.,])(\d{4,})/g, (_, a, n) => a + n.replace(/\B(?=(\d{3})+$)/g, '.')); // 50000 → 50.000
 const slug = (s, max = 24) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, max).replace(/-+$/, '');
 
 const ABAS = { inicio: 'Início', mercado: 'Mercado', clima: 'Clima', ferramentas: 'Ferramentas', negociar: 'Negociar (balcão)', boletim: 'Leitura de boletim', alertas: 'Alertas', anuncie: 'Anuncie no app', numeros: 'Números', admin: 'Aprovar anúncios' };
@@ -26,7 +27,7 @@ const LOCAIS = { 'mercado-hoje': 'Mercado hoje (tela inicial)', rodape: 'Rodapé
 const DISP = { android: 'Android', iphone: 'iPhone', computador: 'Computador' };
 const MODO = { app: 'App instalado', navegador: 'Pelo navegador' };
 
-const est = { k: '', dados: null, extras: null, periodo: 30, aba: 'geral', patros: [], relatorio: null, balcao: null };
+const est = { k: '', dados: null, extras: null, periodo: 30, aba: 'geral', patros: [], relatorio: null, balcao: null, zerar: false };
 
 // ---------- dados ----------
 function diasDoPeriodo() {
@@ -107,7 +108,15 @@ function telaGeral() {
       <div><span>Dia de maior uso</span><b>${melhorDia && (est.dados[melhorDia] || {})['aparelho-dia'] ? ddmm(melhorDia) + ' · ' + num(est.dados[melhorDia]['aparelho-dia']) + ' aparelhos' : '—'}</b></div>
       <div><span>Pedidos de preço físico</span><b>${num(exato('fisico', dias))}</b></div>
       <div><span>Envios para o WhatsApp</span><b>${num(total('compartilhar', dias) + exato('pdf-enviar', dias))}</b></div>
-    </section>`;
+    </section>
+    ${est.zerar ? `<section class="cartao pn-zerar">
+      <b style="font-size:16px">Zerar todos os números?</b>
+      <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Apaga acessos, abas, ferramentas, regiões e impressões dos patrocinadores. Não dá para desfazer. Anúncios do balcão e alertas dos celulares continuam.</span>
+      <label class="rotulo" for="pn-zerar-txt">Para confirmar, digite ZERAR</label>
+      <input id="pn-zerar-txt" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <div class="duas-acoes"><button class="btn btn-pequeno btn-perigo" data-zerar-ok>Zerar agora</button><button class="btn btn-pequeno btn-contorno" data-zerar-cancela>Cancelar</button></div>
+      <span class="mini" id="pn-zerar-msg"></span>
+    </section>` : `<button class="pn-zerar-link" data-zerar>Zerar números (recomeçar a contagem)</button>`}`;
 }
 
 function telaUso() {
@@ -179,11 +188,11 @@ function telaBalcao() {
   const linha = (a) => {
     const x = a.publico || {}, c = a.contato || {};
     const dig = String(c.whatsapp || ''), tel = dig.length >= 12 && dig.startsWith('55') ? dig : '55' + dig;
-    const zap = `https://wa.me/${tel}?text=${encodeURIComponent(`Olá ${c.nome || ''}, aqui é o Helder da Amendoim Brasil. Recebi o seu anúncio no balcão (${x.lado} de ${x.produto}, ${x.volume}). Pode me mandar fotos do produto?`)}`;
+    const zap = `https://wa.me/${tel}?text=${encodeURIComponent(`Olá ${c.nome || ''}, aqui é o Helder da Amendoim Brasil. Recebi o seu anúncio no balcão (${x.lado} de ${x.produto}, ${milhar(x.volume)}). Pode me mandar fotos do produto?`)}`;
     return `<article class="cartao" style="gap:8px">
       <div class="cartao-cab"><span class="lado ${x.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${x.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span><span class="mini">${new Date(a.criado).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(a.id.slice(-5).toUpperCase())}</span></div>
-      <b style="font-size:16px">${esc(x.produto)} · ${esc(x.volume)}</b>
-      <span class="mini">${esc(x.regiao)} · ${esc(x.preco)} · entrega ${esc(x.entrega)}${x.detalhe ? '<br>' + esc(x.detalhe) : ''}</span>
+      <b style="font-size:16px">${esc(x.produto)} · ${esc(milhar(x.volume))}</b>
+      <span class="mini">${esc(x.regiao)} · ${esc(milhar(x.preco))} · entrega ${esc(x.entrega)}${x.detalhe ? '<br>' + esc(x.detalhe) : ''}</span>
       <a class="btn btn-escuro btn-pequeno" href="${zap}" target="_blank" rel="noopener">Chamar ${esc(c.nome || '')} no WhatsApp · ${esc(dig)}</a>
       <div class="duas-acoes">${a.status === 'pendente'
         ? `<button class="btn btn-verde btn-pequeno" data-adm="aprovar" data-id="${esc(a.id)}">Aprovar e publicar</button><button class="btn btn-pequeno btn-contorno" data-adm="recusar" data-id="${esc(a.id)}">Recusar</button>`
@@ -260,6 +269,19 @@ document.addEventListener('click', async (e) => {
   const rel = t.closest('[data-relatorio]');
   if (rel) { est.relatorio = rel.dataset.relatorio; desenhar(); scrollTo(0, 0); return; }
   if (t.closest('[data-fechar-rel]')) { est.relatorio = null; desenhar(); return; }
+  if (t.closest('[data-zerar]')) { est.zerar = true; desenhar(); $('#pn-zerar-txt')?.focus(); return; }
+  if (t.closest('[data-zerar-cancela]')) { est.zerar = false; desenhar(); return; }
+  if (t.closest('[data-zerar-ok]')) {
+    const msg = $('#pn-zerar-msg'), b = t.closest('[data-zerar-ok]');
+    if (($('#pn-zerar-txt')?.value || '').trim().toUpperCase() !== 'ZERAR') { msg.textContent = 'Digite ZERAR para confirmar.'; return; }
+    b.disabled = true; msg.textContent = 'Zerando…';
+    try {
+      const r = await fetch('/api/numeros', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ k: est.k, acao: 'zerar', confirma: 'ZERAR' }) });
+      if (!r.ok) throw new Error('http ' + r.status);
+      est.zerar = false; carregar();
+    } catch (er) { b.disabled = false; msg.textContent = 'Não foi possível zerar agora. Tente de novo.'; }
+    return;
+  }
   const adm = t.closest('[data-adm]');
   if (adm) {
     if (adm.dataset.adm !== 'aprovar' && !adm.dataset.certeza) {

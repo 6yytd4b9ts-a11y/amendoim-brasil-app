@@ -5,6 +5,7 @@ import { loja, json, chaveOk, idDe, avisar, hojeBR } from '../lib/base.mjs';
 const LADOS = ['Venda', 'Compra'];
 const CATEGORIAS = { Casca: 'Amendoim em casca', Debulhado: 'Amendoim debulhado', Blancheado: 'Amendoim blancheado', Semente: 'Semente de amendoim' };
 const VALIDADE_DIAS = 45;
+const milhar = (s) => String(s ?? '').replace(/(^|[^\d.,])(\d{4,})/g, (_, a, n) => a + n.replace(/\B(?=(\d{3})+$)/g, '.')); // 50000 → 50.000
 const txt = (v, max) => String(v ?? '').replace(/[\u0000-\u001f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 
 async function todos() {
@@ -14,7 +15,7 @@ async function todos() {
   return itens.filter(Boolean).sort((a, b) => (a.criado < b.criado ? 1 : -1));
 }
 const vivo = (a) => a.status === 'aprovado' && Date.now() - new Date(a.aprovado).getTime() < VALIDADE_DIAS * 86400000;
-const publico = (a) => ({ id: a.id, data: a.aprovado || a.criado, ...a.publico });
+const publico = (a) => ({ id: a.id, data: a.aprovado || a.criado, ...a.publico, volume: milhar(a.publico?.volume), preco: milhar(a.publico?.preco) });
 
 export default async (req, context) => {
   if (req.method === 'GET') return json({ anuncios: (await todos()).filter(vivo).map(publico) });
@@ -27,7 +28,7 @@ export default async (req, context) => {
     if (b.site) return json({ ok: true }); // campo invisível: robô
     const lado = LADOS.includes(b.lado) ? b.lado : null;
     const categoria = CATEGORIAS[b.categoria] ? b.categoria : null;
-    const volume = txt(b.volume, 40), regiao = txt(b.regiao, 60), nome = txt(b.nome, 60);
+    const volume = milhar(txt(b.volume, 40)), regiao = txt(b.regiao, 60), nome = txt(b.nome, 60);
     const whatsapp = String(b.whatsapp || '').replace(/\D/g, '').slice(0, 13);
     if (!lado || !categoria || !volume || !regiao || !nome || whatsapp.length < 10 || !b.aceite) return json({ erro: 'campos' }, 400);
     const limite = loja('balcao-limite'), chaveIp = `${hojeBR()}-${idDe(context?.ip || 'x')}`;
@@ -39,7 +40,7 @@ export default async (req, context) => {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const anuncio = {
       id, status: 'pendente', criado: new Date().toISOString(), aprovado: null,
-      publico: { lado, categoria, produto: CATEGORIAS[categoria], volume, preco: txt(b.preco, 30) || 'A combinar', entrega: txt(b.entrega, 30) || 'A combinar', regiao, detalhe: txt(b.detalhe, 200) },
+      publico: { lado, categoria, produto: CATEGORIAS[categoria], volume, preco: milhar(txt(b.preco, 30)) || 'A combinar', entrega: txt(b.entrega, 30) || 'A combinar', regiao, detalhe: txt(b.detalhe, 200) },
       contato: { nome, whatsapp }
     };
     await l.setJSON(id, anuncio);

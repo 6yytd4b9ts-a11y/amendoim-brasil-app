@@ -1,6 +1,7 @@
 // Números do app para o painel do Helder (só com a chave).
 // Soma as partes de cada dia; dias antigos são consolidados numa chave só para o painel abrir rápido.
 // ?v=2 devolve { dias, extras }; sem v, devolve só os dias (formato antigo da tela #/numeros).
+// POST { k, acao: 'zerar', confirma: 'ZERAR' } apaga todos os números (uso e patrocínio).
 import { getStore } from '@netlify/blobs';
 import { chaveOk, loja, json } from '../lib/base.mjs';
 
@@ -14,6 +15,17 @@ async function emLotes(itens, fn, n = 25) {
 }
 
 export default async (req) => {
+  // Zerar os números (antes do lançamento oficial): só com a chave e a palavra de confirmação.
+  if (req.method === 'POST') {
+    let b = {};
+    try { b = JSON.parse(await req.text()) || {}; } catch (e) { /* corpo inválido */ }
+    if (!chaveOk(b.k)) return json({ erro: 'chave' }, 401);
+    if (b.acao !== 'zerar' || b.confirma !== 'ZERAR') return json({ erro: 'confirmacao' }, 400);
+    const m = getStore({ name: 'metricas', consistency: 'strong' });
+    const { blobs } = await m.list();
+    await emLotes(blobs, (x) => m.delete(x.key), 50);
+    return json({ ok: true, apagados: blobs.length });
+  }
   const q = new URL(req.url).searchParams;
   if (!chaveOk(q.get('k'))) return json({ erro: 'chave' }, 401);
   const dias = Math.min(Math.max(Number(q.get('dias')) || 90, 7), 400);
