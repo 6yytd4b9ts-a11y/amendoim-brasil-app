@@ -1,0 +1,71 @@
+<<<<<<< public/esboco3.js
+  if (assinante()) return telaDados(D, h).replace('Brasil e mundo · clientes da consultoria', 'Brasil e mundo · incluso na sua assinatura').replace('Área exclusiva para clientes da consultoria Amendoim Brasil', 'Sua assinatura inclui estes dados').replace('Código de acesso', 'Enquanto o pagamento não está ligado, use o código que o Helder enviou');
+=======
+  if (assinante()) return telaDados(D, h);
+>>>>>>>
+<<<<<<< public/esboco3.js
+        <thead><tr><th>Destino</th><th>${h.esc(d.mes || 'Mês')}<br><small>US$/t</small></th><th>12 meses<br><small>US$/t</small></th><th>${h.esc(d.mes || 'Mês')}<br><small>t</small></th>${temFaixa ? '<th>Negociado<br>na semana</th>' : ''}<th></th></tr></thead>
+=======
+        <thead><tr><th>Destino</th><th>${h.esc(d.mes || 'Mês')}<br><small>US$/t</small></th><th>Média 12 meses<br><small>${h.esc(d.periodo || '')} · US$/t</small></th><th>${h.esc(d.mes || 'Mês')}<br><small>t</small></th>${temFaixa ? '<th>Negociado<br>na semana</th>' : ''}<th></th></tr></thead>
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <details class="abre"><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px">O preço é o valor FOB declarado nos embarques (já sem frete e seguro) dividido pelo peso embarcado. Mostra o que foi pago de fato, por destino. Os dados oficiais saem com cerca de um mês de atraso.${temFaixa ? ' <b>Negociado na semana</b> é a faixa que o Helder levanta com exportadores e importadores: o preço de agora, antes de virar estatística.' : ''}</p></details>
+=======
+      <details class="abre" open><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px"><b>${h.esc(d.mes || 'Mês')}</b> é o preço médio daquele mês. <b>Média 12 meses</b> é a média dos 12 meses até o mesmo mês (${h.esc(d.periodo || '')}), para você ver se o mês está acima ou abaixo do que o destino costuma pagar. O preço é o valor FOB declarado nos embarques (já sem frete e seguro) dividido pelo peso embarcado. Mostra o que foi pago de fato, por destino. Os dados oficiais saem com cerca de um mês de atraso.${temFaixa ? ' <b>Negociado na semana</b> é a faixa que o Helder levanta com exportadores e importadores: o preço de agora, antes de virar estatística.' : ''}</p></details>
+>>>>>>>
+<<<<<<< public/exportacao.js
+    <div><h1>Dados de exportação</h1><div class="sub">Brasil e mundo · clientes da consultoria</div></div></header>`;
+  const cod = codigoSalvo();
+  if (!est.dados && cod && !est.carregando && !est.erro) { setTimeout(() => carregar(cod)); }
+=======
+    <div><h1>Dados de exportação</h1><div class="sub">Brasil e mundo · incluso na sua assinatura</div></div></header>`;
+  if (!est.dados && !est.carregando && !est.erro) { setTimeout(() => carregar(codigoSalvo())); }
+>>>>>>>
+<<<<<<< public/exportacao.js
+    const zap = wa('Olá Helder, quero acesso aos dados de exportação do app (consultoria Amendoim Brasil).');
+=======
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <span class="sigla" style="width:52px;height:52px;border-radius:16px;background:var(--verde-claro)">${ic(I.cadeado, 'style="width:26px;height:26px;stroke:#007731"')}</span>
+      <b style="font-size:18px">Área exclusiva para clientes da consultoria Amendoim Brasil</b>
+      <span class="mini" style="font-size:14px;line-height:1.5;color:var(--texto-2)">Exportação mês a mês dos últimos anos, destinos e preço por país, e o balanço de Argentina, EUA, Índia e China.</span>
+      <form id="form-dados" class="campo" style="gap:10px;width:100%">
+        <label for="cod-dados">Código de acesso</label>
+        <input id="cod-dados" inputmode="numeric" autocomplete="one-time-code" maxlength="12" value="${esc(cod)}" placeholder="Digite o código">
+        <button class="btn btn-verde" type="submit" ${est.carregando ? 'disabled' : ''}>${est.carregando ? 'Abrindo…' : 'Acessar'}</button>
+      </form>
+      ${est.erro ? `<span class="mini" style="color:#B3261E;font-weight:700">${esc(est.erro)}</span>` : ''}
+      ${zap ? `<a class="link-mini" href="${zap}" target="_blank" rel="noopener" data-ev="dados-pedir">Ainda não é cliente? Fale com o Helder</a>` : ''}
+=======
+      ${est.erro ? `<b style="font-size:18px">Não foi possível abrir agora</b><span class="mini" style="color:#B3261E;font-weight:700">${esc(est.erro)}</span><button class="btn btn-verde" type="button" data-dx-tentar>Tentar de novo</button>` : '<b style="font-size:18px">Abrindo os dados…</b><span class="mini">Buscando Comex Stat e USDA.</span>'}
+>>>>>>>
+<<<<<<< public/exportacao.js
+  <button class="link-mini dx-sair" data-dx-sair>Sair da área da consultoria</button>`;
+=======
+`;
+>>>>>>>
+<<<<<<< public/exportacao.js
+    if (p) { est.prod = p.dataset.dxProd; render(false); return; }
+    if (e.target.closest('[data-dx-sair]')) { est.dados = null; est.erro = ''; try { localStorage.removeItem(CHAVE); } catch (er) { /* ignora */ } render(false); }
+=======
+    if (p) { est.prod = p.dataset.dxProd; render(false); return; }
+    if (e.target.closest('[data-dx-tentar]')) { est.erro = ''; render(false); return; }
+    if (e.target.closest('[data-dx-sair]')) { est.dados = null; est.erro = ''; try { localStorage.removeItem(CHAVE); } catch (er) { /* ignora */ } render(false); }
+>>>>>>>
+<<<<<<< netlify/functions/exportacao.mjs
+const MAX_TENTATIVAS = 15; // por aparelho/rede por dia
+=======
+const MAX_TENTATIVAS = 120; // pedidos por aparelho/rede por dia
+>>>>>>>
+<<<<<<< netlify/functions/exportacao.mjs
+  if (!codigoOk(b.codigo)) { await limite.set(chave, String(n + 1)); return json({ erro: 'codigo' }, 401); }
+=======
+  // Sem código: quem assina o app abre direto (a trava é a assinatura, na tela). Com código errado ainda conta tentativa.
+  if (b.codigo && !codigoOk(b.codigo)) { await limite.set(chave, String(n + 1)); return json({ erro: 'codigo' }, 401); }
+  await limite.set(chave, String(n + 1));
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v19';
+=======
+const VERSAO = 'ab-v20';
+>>>>>>>
