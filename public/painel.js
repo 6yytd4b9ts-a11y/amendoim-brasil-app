@@ -44,13 +44,28 @@ export function blocoMercadoHoje(D, h) {
   </section>`;
 }
 
+// Mercado físico: o preço de negócio do dia vem direto com o Helder (o IEA e a Conab são médias).
+export function blocoMercadoFisico(D, h) {
+  const { ic, I } = h;
+  const zap = h.wa('Olá Helder, quero saber o preço do mercado físico de hoje para o amendoim em casca. Minha região é: ');
+  if (!zap) return '';
+  return `<section class="cartao fisico" id="sec-fisico">
+    <div class="cartao-cab"><span class="rotulo">Mercado físico · diário</span><span class="pilula pilula-verde">Hoje</span></div>
+    <b style="font-size:18px;line-height:1.3">Quanto o mercado está pagando hoje?</b>
+    <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">IEA e Conab mostram médias oficiais. O preço de negócio muda todo dia conforme o comprador, a qualidade e o volume. Peça o preço do dia direto com o Helder.</p>
+    <a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Receber o preço do mercado físico</a>
+    <span class="mini" style="text-align:center">Resposta pelo WhatsApp · sem compromisso</span>
+  </section>`;
+}
+
 // Versão completa, com a explicação de cada item (aba Mercado).
 export function blocoMercadoHojeDetalhe(D, h) {
   const { esc } = h;
   const m = D.mercado;
   if (!m) return '';
   const itens = itensHoje(D, h);
-  return `<section class="cartao" id="sec-hoje">
+  return `${blocoMercadoFisico(D, h)}
+  <section class="cartao" id="sec-hoje">
     <div class="cartao-cab"><span class="rotulo">Mercado hoje · o que mudou</span><span class="mini">${esc(m.atualizado)}</span></div>
     <div class="hoje-lista">${itens.map((x) => `
       <details class="hoje-item">
