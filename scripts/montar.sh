@@ -6,7 +6,7 @@ base64 -d assets/logo.png.b64 > public/img/logo.png
 base64 -d assets/colombo.png.b64 > public/img/colombo.png
 base64 -d assets/badge.png.b64 > public/icons/badge.png   # ícone pequeno das notificações (Android)
 # Ícones: icon-512 com fundo transparente; icon-maskable-512 com fundo verde cheio (Android recorta em círculo, iPhone arredonda os cantos)
-for n in icon-512 icon-maskable-512; do
+for n in icon-512 icon-maskable-512 icon-32; do
   base64 -d "assets/$n.png.b64" > "public/icons/$n.png"
 done
 # Ícone do Painel (app de controle): o mesmo ícone verde com selo de engrenagem
