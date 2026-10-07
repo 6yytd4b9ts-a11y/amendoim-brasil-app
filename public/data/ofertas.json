@@ -1,5 +1,5 @@
 [
-  { "lado": "Venda", "categoria": "Casca", "produto": "Amendoim em casca", "detalhe": "[Cultivar] · [umidade / classificação]", "volume": "[000] sc", "preco": "Em breve", "entrega": "[Imediata]", "regiao": "Oeste Paulista" },
-  { "lado": "Compra", "categoria": "Debulhado", "produto": "Amendoim debulhado", "detalhe": "[Tipo / peneira] · [com ou sem controle]", "volume": "[00] t", "preco": "Em breve", "entrega": "[Prazo]", "regiao": "Alta Paulista" },
-  { "lado": "Venda", "categoria": "Semente", "produto": "Semente certificada", "detalhe": "[Cultivar] · [germinação]", "volume": "[00.000] kg", "preco": "R$ 10,00/kg", "entrega": "[Prazo]", "regiao": "Mato Grosso do Sul" }
+  { "lado": "Venda", "categoria": "Casca", "produto": "Amendoim em casca", "detalhe": "Cultivar e classificação sob consulta", "volume": "lotes", "preco": "Em breve", "entrega": "Imediata", "regiao": "Oeste Paulista" },
+  { "lado": "Compra", "categoria": "Debulhado", "produto": "Amendoim debulhado", "detalhe": "Tipo e peneira sob consulta", "volume": "cargas", "preco": "Em breve", "entrega": "A combinar", "regiao": "Alta Paulista" },
+  { "lado": "Venda", "categoria": "Semente", "produto": "Semente certificada", "detalhe": "Cultivar e germinação sob consulta", "volume": "sob consulta", "preco": "R$ 10,00/kg", "entrega": "A combinar", "regiao": "Mato Grosso do Sul" }
 ]
