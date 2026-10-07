@@ -5,6 +5,7 @@ import { telaAlertas, ligarAlertas, atualizarLocalAlertas, alertasAtivos } from 
 import { telaNegociar, telaAnunciar, telaBalcaoAdmin, telaAnuncie, ligarBalcao, carregarAnuncios } from '/balcao.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 import { bandeira } from '/bandeiras.js';
+import { evento, eventoAbertura, registrarRegiao, observarPatrocinios, slug } from '/medicao.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
 const D = {};
@@ -437,7 +438,13 @@ function render(rolarTopo = true) {
   tela.innerHTML = ROTAS[aba](sub);
   const marcada = ABA_DA_ROTA[aba] || aba;
   document.querySelectorAll('.abas a').forEach((a) => { if (a.dataset.aba === marcada) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  if (rolarTopo) { window.scrollTo(0, 0); if (aba !== 'inicio' || location.hash) evento('aba-' + aba.replace('balcao-admin', 'admin')); }
+  if (rolarTopo) {
+    window.scrollTo(0, 0);
+    if (aba !== 'inicio' || location.hash) evento('aba-' + aba.replace('balcao-admin', 'admin'));
+    if (aba === 'ferramentas') evento('ferr-' + slug(sub || 'custo', 20));
+    if (aba === 'boletim' && sub) evento('boletim-' + slug(decodeURIComponent(sub), 30));
+  }
+  observarPatrocinios(tela, rolarTopo);
   // Atalhos para uma seção da aba Mercado (#/mercado/mundo, #/mercado/termometro…)
   const alvo = sub && document.getElementById('sec-' + sub);
   if (alvo && rolarTopo) { alvo.scrollIntoView({ block: 'start' }); if (alvo.tagName === 'DETAILS') alvo.open = true; }
@@ -543,28 +550,6 @@ async function baixarPdf(id, modo) {
   salvarArquivo(arquivo);
 }
 
-// ---------- medição (anônima: só conta aberturas e cliques, sem dados pessoais) ----------
-const MEDIR = location.hostname === 'amendoim-brasil.netlify.app';
-function evento(nome) {
-  if (!MEDIR || !/^[a-z0-9-]{1,30}$/.test(nome)) return;
-  try {
-    const corpo = JSON.stringify({ e: nome });
-    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/evento', corpo))) fetch('/api/evento', { method: 'POST', body: corpo, keepalive: true }).catch(() => {});
-  } catch (e) { /* medição nunca atrapalha o app */ }
-}
-function eventoAbertura() {
-  evento('abriu');
-  try {
-    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
-    const ultimo = localStorage.getItem('ab-dia');
-    if (ultimo !== hoje) {
-      evento('aparelho-dia'); // conta cada aparelho uma vez por dia
-      if (ultimo) evento('voltou'); // já tinha aberto em outro dia
-      else evento('aparelho-novo');
-      localStorage.setItem('ab-dia', hoje);
-    }
-  } catch (e) { /* sem armazenamento */ }
-}
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-ev]');
   if (a) evento(a.dataset.ev);
@@ -640,7 +625,7 @@ async function iniciar() {
   carregarDolar();
   // Mostra o clima na hora (local salvo ou Presidente Prudente) e troca para a localização da pessoa quando ela permitir.
   atualizarClima(municipioAtual());
-  localInicial().then((m) => { if (m) atualizarClima(m); });
+  localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
 }
 
 // Dólar comercial ao vivo (AwesomeAPI). Se falhar, fica o valor do mercado.json.
