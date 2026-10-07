@@ -19,10 +19,11 @@
     .pn-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .pn-topo .marca { display: flex; align-items: center; gap: 10px; }
     .pn-topo img { height: 34px; }
+    .pn-topo .btn { white-space: nowrap; padding: 0 14px; }
     .pn-topo h1 { margin: 0; font-size: 18px; font-weight: 800; }
     .pn-topo small { display: block; font-size: 12px; color: var(--texto-3); font-weight: 600; }
     #pn-entrar { max-width: 420px; }
-    #pn-entrar input { flex: 1; min-height: 44px; border: 1px solid var(--borda); border-radius: 12px; padding: 0 12px; font: inherit; font-size: 15px; }
+    #pn-entrar input { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--borda); border-radius: 12px; padding: 0 12px; font: inherit; font-size: 15px; }
     #pn-corpo { display: flex; flex-direction: column; gap: 14px; }
     .pn-abas { position: sticky; top: 0; z-index: 5; overflow-x: auto; scrollbar-width: none; }
     .pn-abas button { white-space: nowrap; padding: 0 10px; flex: 1 0 auto; font-size: 13px; }
@@ -92,7 +93,7 @@
   <div class="pn">
     <div class="pn-topo">
       <div class="marca"><img src="/img/logo.png" alt=""><div><h1>Painel do app</h1><small>Amendoim Brasil · acesso restrito</small></div></div>
-      <button class="btn btn-pequeno btn-contorno" id="pn-sair" hidden>Sair</button>
+      <div style="display:flex;gap:8px"><a class="btn btn-pequeno btn-contorno" href="/#/inicio">Voltar</a><button class="btn btn-pequeno btn-contorno" id="pn-sair" hidden>Sair</button></div>
     </div>
     <form id="pn-entrar" class="cartao" style="gap:10px" hidden>
       <label class="rotulo" for="pn-chave">Chave de acesso</label>

@@ -194,6 +194,15 @@ export function telaAnuncie(D, h) {
 
 export function ligarBalcao(D, h, render, evento) {
   ctx = { D, h, render, evento };
+  // Área do Helder: 5 toques seguidos no logo da tela inicial abrem o painel privado (que pede a chave).
+  let toques = 0, ultimo = 0;
+  document.addEventListener('pointerup', (e) => {
+    if (!e.target.closest('.topo-inicio img')) return;
+    const agora = Date.now();
+    toques = agora - ultimo < 1500 ? toques + 1 : 1;
+    ultimo = agora;
+    if (toques >= 5) { toques = 0; location.href = '/painel'; }
+  });
   document.addEventListener('click', async (e) => {
     const f = e.target.closest('[data-lado-b],[data-produto-b]');
     if (f) { if (f.dataset.ladoB) estado.lado = f.dataset.ladoB; if (f.dataset.produtoB) estado.produto = f.dataset.produtoB; render(false); return; }
