@@ -1,0 +1,332 @@
+<<<<<<< public/app.js
+    if (aba === 'ferramentas') evento('ferr-' + slug(sub || 'custo', 20));
+=======
+    if (aba === 'ferramentas') evento('ferr-' + slug(sub || 'inicio', 20));
+>>>>>>>
+<<<<<<< public/app.js
+      <span class="rotulo">Chuva · 7 dias</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
+=======
+      <span class="rotulo">Chuva · 7 dias${auto?.municipio ? ` <span class="rotulo-local">— ${esc(nomeLocal(auto.municipio))}</span>` : ''}</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
+>>>>>>>
+<<<<<<< public/app.js
+      <span class="rotulo">Termômetro</span>
+=======
+      <span class="rotulo">Termômetro do mercado</span>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  return `<div class="es-mapa"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa de chuva dos últimos 7 dias nas regiões produtoras">${rotUF}${bolhas}</svg>
+    <div class="es-mapa-leg"><span><i style="background:#E9E4D8"></i>seco</span><span><i style="background:#7FAED6"></i>5–20 mm</span><span><i style="background:#2F6FA3"></i>20–40</span><span><i style="background:#1F4E78"></i>40+</span></div></div>`;
+=======
+  const estados = Object.entries(UFS).map(([uf, d]) => `<path d="${d}" class="${PROD.includes(uf) ? 'mc-uf-prod' : 'mc-uf-n'}"/>`).join('');
+  const pontos = pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.rr.toFixed(1)}" fill="${cor(p.mm)}" class="mc-ponto"><title>${esc(p.r.nome)}: ${numBr(p.mm)} mm</title></circle>`).join('');
+  return `<div class="es-mapa"><svg viewBox="60 95 300 255" role="img" aria-label="Mapa do Brasil com a chuva dos últimos 7 dias nas regiões produtoras">${estados}${pontos}${rotulos}</svg>
+    <div class="es-mapa-leg"><span><i style="background:#D9D3C4"></i>seco</span><span><i style="background:#B9D3E8"></i>1–5 mm</span><span><i style="background:#7FAED6"></i>5–20</span><span><i style="background:#2F6FA3"></i>20–40</span><span><i style="background:#1F4E78"></i>40+</span></div>
+    <span class="mini" style="text-align:center">Milímetros que choveram nos últimos 7 dias · estados produtores em verde claro (recorte do Centro-Sul)</span></div>`;
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    pts.forEach((p) => { p.x = Math.min(W - p.rr - 4, Math.max(p.rr + 4, p.x)); p.y = Math.min(H - p.rr - 16, Math.max(p.rr + 14, p.y)); });
+  }
+  const ufs = {};
+  pts.forEach((p) => { (ufs[p.r.uf] = ufs[p.r.uf] || []).push(p); });
+  const rotUF = Object.entries(ufs).map(([uf, l]) => { const x = l.reduce((s, p) => s + p.x, 0) / l.length, y = Math.min(...l.map((p) => p.y - p.rr)) - 6; return `<text x="${x.toFixed(0)}" y="${Math.max(11, y).toFixed(0)}" class="mc-uf">${uf}</text>`; }).join('');
+  const curto = (n) => n.replace('Presidente ', 'Pres. ').replace('Glória de ', 'Gl. ').replace('Chapadão do Sul', 'Chapadão').replace('Campo Grande', 'C. Grande').replace('Campo Verde', 'C. Verde');
+  // nome só quando cabe: a bolha mais próxima abaixo está a mais de 16px
+  const bolhas = [...pts].sort((a, b) => (b.r.choveu7 || 0) - (a.r.choveu7 || 0)).map((p) => {
+    const mm = p.r.choveu7 || 0, claro = mm < 5;
+    const livre = !pts.some((q) => q !== p && ((Math.abs(q.x - p.x) < 34 && q.y > p.y && q.y - p.y < p.rr + 18) || (Math.abs(q.x - p.x) < 46 && Math.abs(q.y - p.y) < 26 && (q.r.choveu7 || 0) > mm)));
+    return `<g><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.rr.toFixed(1)}" fill="${cor(mm)}"/><text x="${p.x.toFixed(1)}" y="${(p.y + 3.5).toFixed(1)}" class="mc-mm ${claro ? 'escuro' : ''}">${numBr(mm)}</text>${livre ? `<text x="${p.x.toFixed(1)}" y="${(p.y + p.rr + 10).toFixed(1)}" class="mc-nome">${esc(curto(p.r.nome))}</text>` : ''}</g>`;
+=======
+    return '';
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const lats = regs.map((r) => r.lat), lons = regs.map((r) => r.lon);
+  const la0 = Math.min(...lats) - 0.6, la1 = Math.max(...lats) + 0.9, lo0 = Math.min(...lons) - 0.9, lo1 = Math.max(...lons) + 0.9;
+  const W = 340, H = 330;
+  const X = (lon) => 18 + ((lon - lo0) / (lo1 - lo0)) * (W - 36), Y = (lat) => 16 + ((la1 - lat) / (la1 - la0)) * (H - 40);
+  const cor = (mm) => (mm >= 40 ? '#1F4E78' : mm >= 20 ? '#2F6FA3' : mm >= 5 ? '#7FAED6' : mm >= 1 ? '#C9DCEC' : '#E9E4D8');
+  const raio = (mm) => 8 + Math.min(12, Math.sqrt(mm || 0) * 1.8);
+  // posição real; bolhas que se encostam são afastadas um pouco para não se cobrirem
+  const pts = regs.map((r) => ({ r, x: X(r.lon), y: Y(r.lat), rr: raio(r.choveu7 || 0) }));
+  for (let it = 0; it < 60; it++) {
+    for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) {
+      const p = pts[a], q = pts[b], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 0.01, min = p.rr + q.rr + 3;
+      if (d < min) { const f = (min - d) / 2, ux = dx / d, uy = dy / d; p.x -= ux * f; p.y -= uy * f; q.x += ux * f; q.y += uy * f; }
+=======
+  const cor = (mm) => (mm >= 40 ? '#1F4E78' : mm >= 20 ? '#2F6FA3' : mm >= 5 ? '#7FAED6' : mm >= 1 ? '#B9D3E8' : '#D9D3C4');
+  const raio = (mm) => 3.2 + Math.min(3.6, Math.sqrt(mm || 0) * 0.55);
+  const PROD = ['SP', 'MG', 'MS', 'MT', 'PR', 'GO'];
+  const pts = regs.map((r) => { const [x, y] = projetar(r.lat, r.lon); return { r, x, y, rr: raio(r.choveu7 || 0), mm: r.choveu7 || 0 }; }).sort((p, q) => q.mm - p.mm);
+  // rótulo (só os milímetros) ao lado do ponto, no primeiro lado livre
+  const caixas = pts.map((p) => ({ x0: p.x - p.rr, x1: p.x + p.rr, y0: p.y - p.rr, y1: p.y + p.rr }));
+  const bate = (c) => caixas.some((o) => c.x0 < o.x1 && c.x1 > o.x0 && c.y0 < o.y1 && c.y1 > o.y0);
+  const rotulos = pts.map((p) => {
+    const t = numBr(p.mm) + ' mm', w = t.length * 5 + 2, h = 10;
+    const lados = [[p.rr + 2, 0, 'start'], [-p.rr - 2, 0, 'end'], [0, -p.rr - 5, 'middle'], [0, p.rr + 11, 'middle'], [p.rr + 2, -9, 'start'], [p.rr + 2, 10, 'start'], [-p.rr - 2, -9, 'end'], [-p.rr - 2, 10, 'end']];
+    for (const [dx, dy, an] of lados) {
+      const x = p.x + dx, y = p.y + dy + 3;
+      const c = { x0: an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y0: y - h + 2, y1: y + 2 };
+      c.x1 = c.x0 + w;
+      if (!bate(c)) { caixas.push(c); return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" class="mc-mm" text-anchor="${an}">${t}</text>`; }
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+// Mapa de chuva: bolhas nas regiões produtoras, posição real (lat/lon), tamanho e cor pelos milímetros dos últimos 7 dias.
+=======
+// Mapa de chuva: contorno do Brasil com um ponto em cada região produtora; cor e tamanho pelos milímetros dos últimos 7 dias.
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+import { MUNICIPIOS, municipioAtual, recomendacaoPlantio } from '/clima.js';
+=======
+import { MUNICIPIOS, municipioAtual, recomendacaoPlantio } from '/clima.js';
+import { UFS, MAPA_W, MAPA_H, projetar } from '/esboco-mapa.js';
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+export const assinante = () => { const s = sessao(); return !!s && ['ativo', 'cortesia'].includes(s.status); };
+=======
+export const assinante = () => { const s = sessao(); return !!s && ['ativo', 'cortesia'].includes(s.status) && !(s.testeAte && s.testeAte < new Date().toISOString().slice(0, 10)); };
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  // Plano Empresa: preço por destino. Comex = média oficial do mês (automática); faixa = negociação da semana (o Helder digita).
+  destinos: { exemplo: true, mes: 'set/2026', semana: 'exemplo', lista: [
+    { pais: 'Argélia', comex: 1180, min: 1150, max: 1210, tend: 'sobe' },
+    { pais: 'Rússia', comex: 1240, min: 1200, max: 1260, tend: 'estavel' },
+    { pais: 'África do Sul', comex: 1210, min: 1180, max: 1230, tend: 'sobe' },
+    { pais: 'Países Baixos', comex: 1350, min: 1320, max: 1380, tend: 'estavel' },
+    { pais: 'Reino Unido', comex: 1390, min: 1350, max: 1400, tend: 'cai' },
+    { pais: 'Polônia', comex: 1300, min: 1270, max: 1320, tend: 'estavel' }
+=======
+  // Plano Empresa: preço por destino. comex = US$/t FOB médio dos embarques do mês (Comex Stat/MDIC); t = toneladas do mês; ano = média ponderada dos 12 meses; min/max = faixa negociada na semana (o Helder digita no painel).
+  destinos: { mes: 'ago/2026', periodo: 'set/2025 a ago/2026', lista: [
+    { pais: 'Argélia', comex: 1187, t: 2964, ano: 1088, tend: 'sobe' },
+    { pais: 'Países Baixos', comex: 1343, t: 4734, ano: 1286, tend: 'sobe' },
+    { pais: 'Rússia', comex: 1102, t: 3506, ano: 1028, tend: 'sobe' },
+    { pais: 'África do Sul', comex: 1104, t: 2330, ano: 999, tend: 'sobe' },
+    { pais: 'Egito', comex: 1250, t: 3123, ano: 1156, tend: 'sobe' },
+    { pais: 'Espanha', comex: 1288, t: 1267, ano: 1275, tend: 'sobe' },
+    { pais: 'Polônia', comex: 1104, t: 1039, ano: 1130, tend: 'cai' },
+    { pais: 'Romênia', comex: 1227, t: 1514, ano: 1099, tend: 'sobe' },
+    { pais: 'Colômbia', comex: 1081, t: 1830, ano: 1162, tend: 'cai' },
+    { pais: 'China', comex: 934, t: 448, ano: 855, tend: 'sobe' },
+    { pais: 'Estônia', comex: 1075, t: 630, ano: 1038, tend: 'estavel' },
+    { pais: 'Reino Unido', comex: 1230, t: 200, ano: 1237, tend: 'sobe' }
+>>>>>>>
+<<<<<<< public/esboco.js
+    if (id === 'esb-form-email') { if (emProducao()) { est.msg = 'A entrada por e-mail e senha chega junto com o pagamento. Por enquanto, use o código do WhatsApp.'; ctx.render(false); return; } entrar({ email: v('esb-email') }); return; }
+=======
+    if (id === 'esb-form-email') { const s0 = sessao(); if (emProducao() && !(s0 && s0.email && s0.email.toLowerCase() === v('esb-email').toLowerCase())) { est.msg = 'Não achei esta conta neste aparelho. Crie a conta (teste grátis) ou entre com o código que o Helder enviou no WhatsApp.'; ctx.render(false); return; } entrar({ email: v('esb-email') }); return; }
+>>>>>>>
+<<<<<<< public/esboco.js
+    if (q('[data-esb-copiar]')) { try { await navigator.clipboard.writeText('00020126PIX-DE-EXEMPLO-AMENDOIM-BRASIL'); } catch (er) { /* ignora */ } q('[data-esb-copiar]').textContent = 'Código copiado'; return; }
+=======
+    if (q('[data-esb-copiar]')) { try { await navigator.clipboard.writeText('00020126PIX-DE-EXEMPLO-AMENDOIM-BRASIL'); } catch (er) { /* ignora */ } q('[data-esb-copiar]').textContent = 'Código copiado'; return; }
+    if (q('[data-esb-teste]')) {
+      const s0 = sessao();
+      if (!s0) { location.hash = '#/conta/criar'; return; }
+      const dias = conteudo().diasTeste || 7, ate = new Date(Date.now() + dias * 864e5);
+      salvarSessao({ ...s0, status: 'ativo', plano: 'produtor', periodo: est.periodo, forma: 'teste', teste: true, testeAte: ate.toISOString().slice(0, 10), vence: ate.toLocaleDateString('pt-BR') });
+      ctx.evento('esb-teste'); location.hash = '#/conta/pronto'; return;
+    }
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha('Próxima cobrança', s.status === 'ativo' ? `${h.esc(s.vence || '—')} · ${preco(p[s.periodo || 'mensal'])}` : '—')}
+=======
+    ${linha(s.teste ? 'Teste grátis até' : 'Próxima cobrança', s.teste ? h.esc(s.vence || '—') : s.status === 'ativo' ? `${h.esc(s.vence || '—')} · ${preco(p[s.periodo || 'mensal'])}` : '—')}
+>>>>>>>
+<<<<<<< public/esboco.js
+  const st = { ativo: ['Ativa', 'pilula-verde'], cortesia: ['Cortesia', 'pilula-verde'], atrasado: ['Pagamento atrasado', 'pilula-amendoim'], cancelado: ['Cancelada', 'pilula-amendoim'], sem: ['Sem assinatura', 'pilula-amendoim'] }[s.status || 'sem'];
+=======
+  const st = s.teste && s.status === 'ativo' ? ['Teste grátis', 'pilula-verde'] : { ativo: ['Ativa', 'pilula-verde'], cortesia: ['Cortesia', 'pilula-verde'], atrasado: ['Pagamento atrasado', 'pilula-amendoim'], cancelado: ['Cancelada', 'pilula-amendoim'], sem: ['Sem assinatura', 'pilula-amendoim'] }[s.status || 'sem'];
+>>>>>>>
+<<<<<<< public/esboco.js
+      <span class="pilula pilula-verde" style="align-self:flex-start">Plano ${h.esc(p.nome)} · ${est.periodo === 'anual' ? 'anual' : 'mensal'}</span>
+      <b class="es-h1">A cobrança automática está sendo ligada</b>
+      <span class="es-txt">Enquanto o pagamento pelo app não abre, o Helder libera o seu acesso direto pelo WhatsApp${c.diasTeste ? `, com os ${c.diasTeste} dias grátis` : ''}. Você recebe um código de acesso e entra em "Já sou assinante".</span>
+      ${zap ? `<a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener" data-ev="assinar-zap">${h.ic(h.I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Pedir meu acesso no WhatsApp</a>` : ''}
+      <a class="btn btn-escuro" href="#/conta/entrar">Já tenho o código</a>
+      <span class="mini">Valor do plano: <b class="num">${preco(v)}</b> ${est.periodo === 'anual' ? 'por ano' : 'por mês'}. Pix ou cartão, pelo Asaas, assim que a cobrança abrir.</span>
+=======
+      <span class="pilula pilula-verde" style="align-self:flex-start">${dias} dias grátis</span>
+      <b class="es-h1">Comece o seu teste grátis</b>
+      <span class="es-txt">Use a área do assinante por ${dias} dias, sem pagar nada e sem cartão. Depois do teste, o Helder libera a assinatura pelo WhatsApp até a cobrança automática abrir.${est.plano === 'empresa' ? ' O plano Empresa é liberado pelo Helder no WhatsApp; o teste é do plano Produtor.' : ''}</span>
+      <button class="btn btn-verde" type="button" data-esb-teste>Começar meus ${dias} dias grátis</button>
+      ${zap ? `<a class="btn btn-escuro" href="${zap}" target="_blank" rel="noopener" data-ev="assinar-zap">${h.ic(h.I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Falar com o Helder no WhatsApp</a>` : ''}
+      <span class="mini">Depois do teste: <b class="num">${preco(c.planos.produtor[est.periodo])}</b> ${est.periodo === 'anual' ? 'por ano' : 'por mês'} no plano Produtor.</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+    const zap = h.wa(`Olá Helder! Quero assinar o plano ${p.nome} (${est.periodo}) do app Amendoim Brasil. Meu nome: ${s?.nome || ''}.`);
+=======
+    const zap = h.wa(`Olá Helder! Quero assinar o plano ${p.nome} (${est.periodo}) do app Amendoim Brasil. Meu nome: ${s?.nome || ''}.`);
+    const dias = c.diasTeste || 7;
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="pilula pilula-verde" style="align-self:flex-start">ÁREA DO ASSINANTE</span>
+    <b class="es-h1">Venda e compre amendoim sabendo para onde o preço vai</b>
+    <span class="es-txt">O que o Helder acompanha todo dia no mercado, direto no seu celular. Informação que não está no grupo de WhatsApp nem no jornal.</span>
+    <div class="es-benef">
+      ${benef('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>', 'Saber a safra antes da Conab', 'A estimativa da Amendoim Brasil sai antes dos números oficiais e é feita com quem está no campo. Quem sabe que a área caiu 30% não vende barato.')}
+      ${benef(h.I.doc, 'Toda segunda: segurar ou vender?', 'A leitura da semana em 5 minutos: o que a indústria está fazendo, como está a exportação e para onde o preço tende a ir.')}
+      ${benef('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', 'O app avisa quando chegar no seu preço', 'Você define o alvo (ex.: R$ 82) e recebe o aviso no celular. Com o histórico de 5 anos para ver a melhor época de vender.')}
+      ${benef('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Nenhuma data pega você de surpresa', 'Eventos do amendoim, feiras e relatórios na agenda, com lembrete um dia antes.')}
+      ${benef('<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>', 'Leve tudo para a sua planilha', 'Excel e PDF com estimativas, cotações e histórico, gerados na hora.')}
+=======
+    <span class="pilula pilula-verde" style="align-self:flex-start">EXCLUSIVO ASSINANTES</span>
+    <b class="es-h1">Informação na ponta do lápis para vender e comprar melhor</b>
+    <div class="es-lista">
+      ${item('Estimativa da safra Amendoim Brasil, antes da Conab')}
+      ${item('Toda segunda: segurar ou vender?')}
+      ${item('Aviso no celular quando o preço chegar no seu alvo')}
+      ${item('Dados de exportação completos, mês a mês e por destino')}
+      ${item('Agenda do setor com lembrete')}
+      ${item('Planilha e PDF com cotações e histórico')}
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-bal-sobra.neg { background: #FCE4E0; } .es-bal-sobra.neg > b.num { color: #9A2F1E; }
+=======
+.es-bal-sobra.neg { background: #FCE4E0; } .es-bal-sobra.neg > b.num { color: #9A2F1E; }
+.rotulo-local { font-weight: 700; color: var(--texto-2); }
+.es-btn-perfil { position: relative; }
+.es-selo { position: absolute; right: -2px; bottom: -2px; width: 17px; height: 17px; border-radius: 50%; background: var(--verde); border: 2px solid var(--fundo, #F6F4EE); display: grid; place-items: center; }
+.es-selo svg { width: 9px; height: 9px; }
+.es-mapa .mc-uf-n { fill: #EFEBE0; stroke: #fff; stroke-width: 1.2; stroke-linejoin: round; }
+.es-mapa .mc-uf-prod { fill: #DCEBDD; stroke: #fff; stroke-width: 1.2; stroke-linejoin: round; }
+.es-mapa .mc-ponto { stroke: #fff; stroke-width: 1.2; }
+.es-mapa .mc-mm { font-size: 8.5px; font-weight: 800; fill: #2B2A25; paint-order: stroke; stroke: #fff; stroke-width: 2.4px; stroke-linejoin: round; }
+
+/* Ferramentas: tela inicial em grupos */
+.fh-grupo { display: flex; flex-direction: column; gap: 8px; }
+.fh-rot { text-transform: uppercase; letter-spacing: .06em; font-size: 12px; padding: 0 4px; }
+.fh-lista { display: flex; flex-direction: column; background: var(--cartao, #fff); border: 1px solid var(--borda); border-radius: 18px; overflow: hidden; }
+.fh-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; text-decoration: none; color: inherit; min-height: 64px; }
+.fh-item + .fh-item { border-top: 1px solid var(--borda); }
+.fh-item b { display: block; font-size: 16px; }
+.fh-item .mini { display: block; margin-top: 1px; }
+.fh-ic { width: 42px; height: 42px; border-radius: 13px; background: var(--verde-claro, #E7F4EB); color: #007731; display: grid; place-items: center; flex-shrink: 0; }
+.fh-ic svg { width: 22px; height: 22px; }
+.fh-seta { width: 18px; height: 18px; color: var(--texto-3); flex-shrink: 0; }
+.fh-item:active { background: var(--verde-claro, #E7F4EB); }
+.fh-voltar { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; }
+.fh-voltar svg { width: 16px; height: 16px; }
+.fh-outras { display: flex; flex-wrap: wrap; gap: 8px; }
+.fh-mini { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 20px; background: #fff; border: 1px solid var(--borda); text-decoration: none; color: var(--texto-2); font-weight: 600; font-size: 13px; }
+.fh-mini .fh-ic { width: 28px; height: 28px; border-radius: 14px; }
+.fh-mini .fh-ic svg { width: 16px; height: 16px; }
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-mapa .mc-uf { font-size: 11px; font-weight: 800; fill: #A8A193; text-anchor: middle; letter-spacing: .06em; }
+.es-mapa .mc-mm { font-size: 10px; font-weight: 800; fill: #fff; text-anchor: middle; }
+.es-mapa .mc-mm.escuro { fill: #5F5B52; }
+.es-mapa .mc-nome { font-size: 8.5px; font-weight: 700; fill: #5F5B52; text-anchor: middle; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <span class="mini">Fontes: <b>Comex</b> = Comex Stat/MDIC, média do mês${d.mes ? ` (${h.esc(d.mes)})` : ''} · <b>Negociado</b> = levantamento semanal da Amendoim Brasil com exportadores e importadores${d.exemplo ? ' · <i>valores de exemplo até o Helder preencher no painel</i>' : d.semana ? ` · semana de ${h.esc(d.semana)}` : ''}</span>
+      <details class="abre"><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px"><b>Comex:</b> preço médio oficial do que foi embarcado no mês. É o número fechado, do governo. <b>Negociado na semana:</b> faixa que o Helder levanta toda semana ligando para quem exporta e para quem compra lá fora. É o preço de agora, antes de virar estatística. A seta mostra a tendência da semana.</p></details>
+=======
+      <span class="mini">Fonte: Comex Stat/MDIC · média ponderada pelo peso embarcado, todos os calibres e tipos de grão (cru e blancheado)${d.periodo ? ` · 12 meses = ${h.esc(d.periodo)}` : ''}${temFaixa && d.semana ? ` · faixa negociada: semana de ${h.esc(d.semana)}` : ''}. A seta compara o mês com a média dos 3 meses anteriores.</span>
+      <details class="abre"><summary>Como ler esta tabela</summary><p class="es-txt" style="margin:0 0 10px">O preço é o valor FOB declarado nos embarques (já sem frete e seguro) dividido pelo peso embarcado. Mostra o que foi pago de fato, por destino. Os dados oficiais saem com cerca de um mês de atraso.${temFaixa ? ' <b>Negociado na semana</b> é a faixa que o Helder levanta com exportadores e importadores: o preço de agora, antes de virar estatística.' : ''}</p></details>
+>>>>>>>
+<<<<<<< public/esboco3.js
+        <thead><tr><th>Destino</th><th>Comex<br>${h.esc(d.mes || '')}</th><th>Negociado<br>na semana</th><th></th></tr></thead>
+        <tbody>${d.lista.map((x) => `<tr><th>${h.esc(x.pais)}</th><td class="num">${nf(x.comex)}</td><td class="num">${nf(x.min)}–${nf(x.max)}</td><td>${seta(x.tend)}</td></tr>`).join('')}</tbody>
+=======
+        <thead><tr><th>Destino</th><th>${h.esc(d.mes || 'Mês')}<br><small>US$/t</small></th><th>12 meses<br><small>US$/t</small></th><th>${h.esc(d.mes || 'Mês')}<br><small>t</small></th>${temFaixa ? '<th>Negociado<br>na semana</th>' : ''}<th></th></tr></thead>
+        <tbody>${d.lista.map((x) => `<tr><th>${h.esc(x.pais)}</th><td class="num"><b>${nf(x.comex)}</b></td><td class="num">${x.ano ? nf(x.ano) : '–'}</td><td class="num">${x.t ? nf(x.t) : '–'}</td>${temFaixa ? `<td class="num">${x.min > 0 ? nf(x.min) + '–' + nf(x.max) : '–'}</td>` : ''}<td>${seta(x.tend)}</td></tr>`).join('')}</tbody>
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <span class="mini">Amendoim em grão · US$ por tonelada</span>
+=======
+      <span class="mini">Amendoim em grão sem casca · US$ por tonelada, FOB</span>
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const seta = (t) => (t === 'sobe' ? '<span class="dx-sobe">▲</span>' : t === 'cai' ? '<span class="dx-cai">▼</span>' : '<span class="mini">=</span>');
+=======
+  const seta = (t) => (t === 'sobe' ? '<span class="dx-sobe">▲</span>' : t === 'cai' ? '<span class="dx-cai">▼</span>' : '<span class="mini">=</span>');
+  const temFaixa = d.lista.some((x) => x.min > 0 && x.max > 0);
+>>>>>>>
+<<<<<<< public/esboco3.js
+    ${(() => { const p = pracaPerto(D); return p ? `<a class="es-hero-iea" href="#/mercado"><span class="cresce"><b>IEA · ${h.esc(p.praca)}</b><small>${p.perto ? 'praça mais perto de você' : 'preço diário'} · ${h.esc(p.data || '')}</small></span><b class="num">${brl(p.preco)}</b>${p.variacao ? `<span class="es-hero-var ${p.variacao > 0 ? 'sobe' : 'cai'}">${p.variacao > 0 ? '+' : ''}${nf(p.variacao, 1)}%</span>` : ''}</a>` : ''; })()}
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `<a class="btn-icone es-btn-perfil" href="#/mercado/consultoria" aria-label="Minha conta e área do assinante" data-ev="esb-perfil">${iniciais ? `<b>${h.esc(iniciais)}</b>` : h.ic(PESSOA)}</a>`;
+=======
+  return `<a class="btn-icone es-btn-perfil" href="#/mercado/consultoria" aria-label="Minha conta e área do assinante" data-ev="esb-perfil">${iniciais ? `<b>${h.esc(iniciais)}</b>` : h.ic(PESSOA)}${s && assinante() ? `<i class="es-selo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${PESSOA}</svg></i>` : ''}</a>`;
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    ${h.patrocinio ? h.patrocinio('ferramentas') : ''}
+=======
+    ${h.patrocinio ? h.patrocinio('ferramentas') : ''}
+  </section>
+  <section class="fh-grupo"><span class="rotulo fh-rot">Outras ferramentas</span>
+    <div class="fh-outras">${ORDEM.filter((id) => id !== k).map((id) => `<a class="fh-mini" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span>${esc(FERR[id].nome)}</a>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  return `<header class="topo"><div><h1>Ferramentas</h1><div class="sub">Faça a conta da sua lavoura</div></div>
+    <div class="chips" role="tablist">${ORDEM.map((id) => [id, FERR[id]]).map(([id, x]) => `<a class="chip" href="#/ferramentas/${id}" aria-pressed="${id === k}" style="text-decoration:none">${esc(x.nome)}</a>`).join('')}</div>
+  </header>
+=======
+  return `<header class="topo"><a class="link-mini fh-voltar" href="#/ferramentas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Ferramentas</a></header>
+>>>>>>>
+<<<<<<< public/ferramentas.js
+export function telaFerramentas(qual, h) {
+=======
+export function telaFerramentas(qual, h) {
+  if (!FERR[qual]) return telaHub(h);
+>>>>>>>
+<<<<<<< public/ferramentas.js
+// ---------- tela ----------
+=======
+// ---------- tela ----------
+// ---------- Tela inicial das Ferramentas: grupos e cartões ----------
+const ICONES = {
+  custo: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  arrendamento: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/>',
+  barter: '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+  avista: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
+  armazenar: '<path d="M3 10l9-6 9 6v10H3z"/><path d="M8 20v-6h8v6"/>',
+  frete: '<path d="M2 6h11v10H2zM13 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  dolar: '<circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M15 9.5c0-1-1.3-1.8-3-1.8s-3 .8-3 1.9 1.3 1.6 3 1.9 3 .8 3 1.9-1.3 1.9-3 1.9-3-.8-3-1.8"/>',
+  rendimento: '<path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/>'
+};
+const GRUPOS = [
+  ['Sua lavoura', ['custo', 'arrendamento', 'barter']],
+  ['Vender melhor', ['avista', 'armazenar', 'frete']],
+  ['Conversões', ['dolar', 'rendimento']]
+];
+const icone = (id) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[id] || ''}</svg>`;
+function telaHub(h) {
+  const { esc } = h;
+  return `<header class="topo"><div><h1>Ferramentas</h1><div class="sub">Faça a conta da sua lavoura</div></div></header>
+  ${GRUPOS.map(([nome, ids]) => `<section class="fh-grupo"><span class="rotulo fh-rot">${esc(nome)}</span>
+    <div class="fh-lista">${ids.map((id) => `<a class="fh-item" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span><span class="cresce"><b>${esc(FERR[id].nome)}</b><span class="mini">${esc(FERR[id].desc)}</span></span><svg class="fh-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>`).join('')}</div>
+  </section>`).join('')}
+  <p class="mini" style="text-align:center;margin:0 8px">Seus números ficam salvos só neste aparelho.</p>
+}
+
+>>>>>>>
+<<<<<<< public/index.html
+  <link rel="icon" type="image/png" href="/icons/icon-512.png">
+=======
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    if (c.destinos?.lista) c.destinos = { ...c.destinos, exemplo: false, semana: new Date().toLocaleDateString('pt-BR'), lista: c.destinos.lista.map((x, i) => ({ ...x, pais: t(`pd-p-${i}`) || x.pais, comex: n(`pd-c-${i}`), min: n(`pd-a-${i}`), max: n(`pd-b-${i}`) })) };
+=======
+    if (c.destinos?.lista) c.destinos = { ...c.destinos, exemplo: false, semana: new Date().toLocaleDateString('pt-BR'), lista: c.destinos.lista.map((x, i) => ({ ...x, pais: t(`pd-p-${i}`) || x.pais, comex: n(`pd-c-${i}`), min: n(`pd-a-${i}`) || null, max: n(`pd-b-${i}`) || null })) };
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+      <div class="pe-dest pe-dest-cab"><span>Destino</span><span>Comex</span><span>Mín.</span><span>Máx.</span></div>
+=======
+      <div class="pe-dest pe-dest-cab"><span>Destino</span><span>Mês</span><span>Mín. sem.</span><span>Máx. sem.</span></div>
+>>>>>>>
+<<<<<<< public/painel.js
+    <a href="#/destinos" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Preço por destino e paridade</b><span class="mini">★ Plano Empresa</span></span><span class="link-mini">Ver</span></a>
+=======
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v17';
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
+=======
+const VERSAO = 'ab-v18';
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
