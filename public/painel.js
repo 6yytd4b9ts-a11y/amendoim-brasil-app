@@ -1,6 +1,7 @@
 // Painel de mercado: blocos novos da Home e da aba Mercado (teste de layout).
 // Cada bloco é um cartão resumido; o detalhe abre quando a pessoa toca.
 // h = utilitários do app (esc, ic, I, brl, numBr, pct, wa, linkSeguro).
+import { listaOfertas } from '/balcao.js';
 
 function seta(h, efeito) {
   const { I } = h;
@@ -35,7 +36,7 @@ export function quando(br) {
 
 // ---------- HOME ----------
 // Resumo do dia em 4 quadros (o preço já está no destaque verde). Toque leva à aba Mercado.
-const DESTINO = { dolar: '#/mercado/hoje', exportacao: '#/mercado/exportacao', demanda: '#/mercado/oferta', oferta: '#/mercado/oferta' };
+const DESTINO = { dolar: '#/mercado/hoje', exportacao: '#/mercado/exportacao', demanda: '#/mercado/termometro', oferta: '#/mercado/termometro' };
 export function blocoMercadoHoje(D, h) {
   const { esc } = h;
   const m = D.mercado;
@@ -94,24 +95,19 @@ export function blocoMercadoHojeDetalhe(D, h) {
 }
 
 export function blocoOportunidades(D, h) {
-  const { esc, wa } = h;
-  const ofertas = D.ofertas || [];
-  const vender = wa('Olá Helder, quero vender amendoim. Pode me ajudar?');
-  const comprar = wa('Olá Helder, estou procurando amendoim para comprar.');
+  const { esc } = h;
+  const ofertas = listaOfertas(D).slice(0, 3);
   return `<section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Oportunidades de negócio <span class="selo-breve">Em breve</span></span><a class="link-mini" href="#/negociar">Ver balcão</a></div>
-    <div>${ofertas.slice(0, 3).map((o) => `
+    <div class="cartao-cab"><span class="rotulo">Balcão de ofertas</span><a class="link-mini" href="#/negociar">Ver todas</a></div>
+    <div>${ofertas.map((o) => `
       <a class="lista-linha" href="#/negociar">
         <span class="lado ${o.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${o.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span>
         <span class="cresce"><b style="font-size:14px;display:block">${esc(o.categoria)} · ${esc(o.volume)}</b><span class="mini">${esc(o.regiao)}</span></span>
         <b class="num" style="font-size:14px">${esc(o.preco)}</b>
       </a>`).join('')}
     </div>
-    <div class="duas-acoes">
-      ${vender ? `<a class="btn btn-verde btn-pequeno" href="${vender}" target="_blank" rel="noopener" data-ev="vender">Quero vender</a>` : ''}
-      ${comprar ? `<a class="btn btn-escuro btn-pequeno" href="${comprar}" target="_blank" rel="noopener" data-ev="comprar">Quero comprar</a>` : ''}
-    </div>
-    <span class="mini">A outra parte não aparece: o contato e a negociação passam pela Amendoim Brasil.</span>
+    <a class="btn btn-verde btn-pequeno" href="#/negociar/anunciar" data-ev="anunciar-abrir">Anunciar compra ou venda</a>
+    <span class="mini">O contato de quem anuncia não aparece: a negociação passa pela Amendoim Brasil.</span>
   </section>`;
 }
 
@@ -124,29 +120,6 @@ export function blocoPanoramaCompacto(D, h) {
       <div class="pm-item"><span class="sigla pilula ${cor[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="pm-fase">${esc(p.fase)}</span><b>${esc(p.indicador || '')}</b></div>`).join('')}
     </div>
   </a>`;
-}
-
-// ---------- ALERTAS ----------
-export function telaAlertas(D, h) {
-  const { esc, ic, I, linkSeguro } = h;
-  const grupo = linkSeguro(D.config.grupoWhatsapp);
-  const tipos = [
-    ['Mudança de preço', 'Quando a casca subir ou cair na sua praça'],
-    ['Termômetro mudou', 'Quando o mercado virar de Estável para Firme ou Fraco'],
-    ['Preço-alvo atingido', 'Você define o preço e o app avisa quando chegar'],
-    ['Nova demanda de compra', 'Comprador procurando produto na sua região'],
-    ['Alerta climático', 'Veranico, chuva forte ou risco no arranquio'],
-    ['Novo resumo de mercado', 'Boletim e Mercado hoje publicados']
-  ];
-  return `<header class="topo">
-    <a class="link-mini" href="#/inicio" style="display:flex;align-items:center;gap:4px">${ic(I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Início</a>
-    <div><h1>Alertas</h1><div class="sub">Escolha o que você quer receber no celular</div></div>
-  </header>
-  <div class="em-breve"><span class="selo-breve">Em breve</span><span>Os alertas personalizados estão em preparação. Por enquanto, os avisos saem no grupo do WhatsApp.</span></div>
-  <section class="cartao" style="gap:0;padding:4px 16px">
-    ${tipos.map(([t, d]) => `<label class="alerta-linha"><span class="cresce"><b>${esc(t)}</b><small>${esc(d)}</small></span><input type="checkbox" disabled aria-label="${esc(t)}"><span class="chave" aria-hidden="true"></span></label>`).join('')}
-  </section>
-  ${grupo ? `<a class="btn btn-verde" href="${esc(grupo)}" target="_blank" rel="noopener" data-ev="grupo">${ic(I.grupo, 'style="width:20px;height:20px;stroke:#fff"')}Entrar no grupo do WhatsApp</a>` : ''}`;
 }
 
 // ---------- NÚMEROS (só para o Helder, com chave) ----------
@@ -200,30 +173,6 @@ export function desenharNumeros(dados, h) {
 }
 
 // ---------- MERCADO ----------
-export function blocoOfertaDemanda(D, h) {
-  const { esc } = h;
-  const od = D.mercado?.ofertaDemanda || [];
-  if (!od.length) return '';
-  const sust = od.filter((x) => x.efeito === 'alta').map((x) => x.nome.toLowerCase());
-  const press = od.filter((x) => x.efeito === 'baixa').map((x) => x.nome.toLowerCase());
-  return `<section class="cartao" id="sec-oferta">
-    <div class="cartao-cab"><span class="rotulo">Oferta e demanda</span></div>
-    <div class="od-lista">${od.map((x) => `
-      <details class="od-item">
-        <summary>
-          <span class="cresce"><b>${esc(x.nome)}</b><span class="od-efeito ${x.efeito}">${x.efeito === 'alta' ? 'sustenta o preço' : x.efeito === 'baixa' ? 'pressiona o preço' : 'neutro'}</span></span>
-          <span class="od-medidor">${x.escala.map((t, i) => `<span class="${i === x.nivel ? 'ativo ' + x.efeito : ''}">${esc(t)}</span>`).join('')}</span>
-        </summary>
-        <p>${esc(x.detalhe)}</p>
-      </details>`).join('')}
-    </div>
-    <div class="od-resumo">
-      ${sust.length ? `<span>${seta(h, 'alta')}<b>Sustentam:</b> ${esc(sust.join(', '))}</span>` : ''}
-      ${press.length ? `<span>${seta(h, 'baixa')}<b>Pressionam:</b> ${esc(press.join(', '))}</span>` : ''}
-    </div>
-  </section>`;
-}
-
 function barrasMensais(h, mensal) {
   const { numBr } = h;
   const W = 320, H = 130, padB = 18, padT = 6;
@@ -281,15 +230,17 @@ export function blocoMundo(D, h) {
   </section>`;
 }
 
-// Termômetro com fatores que abrem a explicação.
+// Termômetro com oferta e demanda e os fatores que abrem a explicação (um cartão só).
 export function cartaoTermometroDetalhe(D, h, medidor) {
   const { esc, ic, I } = h;
   const t = D.config.termometro;
+  const od = (D.mercado?.ofertaDemanda || []).filter((x) => !/disponibilidade/i.test(x.nome));
   return `<section class="cartao" id="sec-termometro">
     <div class="cartao-cab"><span class="rotulo">${esc(t.titulo || 'Termômetro do mercado')}</span>${t.atualizado ? `<span class="mini">${esc(t.atualizado)}</span>` : ''}</div>
     ${t.subtitulo ? `<span style="font-size:13px;color:var(--texto-3);margin-top:-6px">${esc(t.subtitulo)}</span>` : ''}
     ${medidor(t.status)}
     <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(t.resumo)}</p>
+    ${od.length ? `<div class="od-grade" id="sec-oferta">${od.map((x) => `<div class="od-cel ${x.efeito}"><span>${esc(x.nome.replace(/ de casca| industrial/i, ''))}</span><b>${esc(x.escala[x.nivel] || '')}</b><small>${x.efeito === 'alta' ? 'sustenta' : x.efeito === 'baixa' ? 'pressiona' : 'neutro'}</small></div>`).join('')}</div>` : ''}
     <div class="fatores">${(t.fatores || []).map((f) => `
       <details class="fator-det ${f.efeito === 'baixa' ? 'baixa' : 'alta'}">
         <summary class="fator ${f.efeito === 'baixa' ? 'baixa' : 'alta'}">${ic(f.efeito === 'baixa' ? I.cai : I.sobe, 'style="width:16px;height:16px;stroke-width:2.6"')}<span class="cresce">${esc(f.nome)}</span><b>${esc(f.valor)}</b></summary>
@@ -322,7 +273,7 @@ export function blocoPatrocinadores(D, h) {
   return `<section class="parceiros">
     <span class="rotulo">Patrocinadores</span>
     <div class="patro-grade">${lista.map((p) => {
-      if (p.exemplo || !p.logo) { const z = h.wa('Olá Helder, quero anunciar a minha empresa no app Amendoim Brasil.'); return z ? `<a class="parceiro vago" href="${z}" target="_blank" rel="noopener" data-ev="anunciar">Anuncie aqui</a>` : ''; }
+      if (p.exemplo || !p.logo) return '<a class="parceiro vago" href="#/anuncie" data-ev="anuncie-abrir">Anuncie aqui</a>';
       const href = linkSeguro(p.link);
       const img = `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
       return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${img}</a>` : `<span class="parceiro">${img}</span>`;

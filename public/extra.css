@@ -248,3 +248,45 @@ details.abre summary::after { margin-left: auto; }
 .prev-totais { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: -4px; font-size: 13px; color: var(--texto-3); }
 .prev-totais b { color: var(--azul); font-size: 14px; margin-left: 4px; }
 .fonte-clima { margin: -4px 4px 0; text-align: center; line-height: 1.45; }
+
+/* ===== Alertas, balcão, preço perto de você, termômetro com oferta e demanda ===== */
+.perto { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 10px; background: rgba(255,255,255,.14); font-size: 13px; font-weight: 600; }
+.perto small { font-size: 11px; opacity: .85; font-weight: 600; }
+.alerta-linha .chave { opacity: 1; transition: background .15s; }
+.alerta-linha .chave::after { transition: transform .15s; }
+.alerta-linha input:checked + .chave { background: var(--verde); }
+.alerta-linha input:checked + .chave::after { transform: translateX(18px); }
+.alerta-linha input:focus-visible + .chave { outline: 2px solid var(--verde); outline-offset: 2px; }
+.alerta-linha { cursor: pointer; }
+.alertas-on { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: var(--verde); color: #fff; font-size: 14px; font-weight: 700; }
+.alvo { display: flex; flex-direction: column; gap: 8px; }
+.aviso-instalar { gap: 8px; border-color: var(--amendoim-borda); background: var(--amendoim-fundo); }
+.aviso-instalar ol { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; color: var(--texto-2); }
+.btn-contorno { background: #fff; color: var(--texto-2); border: 1.5px solid var(--borda); }
+.od-grade { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.od-cel { display: flex; flex-direction: column; gap: 1px; padding: 9px 10px; border-radius: 10px; background: var(--fundo); border-top: 3px solid #CFC8B8; }
+.od-cel.alta { border-top-color: var(--verde); }
+.od-cel.baixa { border-top-color: #B3261E; }
+.od-cel span { font-size: 11px; font-weight: 700; color: var(--texto-3); }
+.od-cel b { font-size: 15px; font-weight: 800; }
+.od-cel small { font-size: 10px; font-weight: 700; color: var(--texto-3); }
+.od-cel.alta small { color: var(--verde-escuro); }
+.od-cel.baixa small { color: #B3261E; }
+.oferta-origem { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: var(--verde-escuro); }
+.opcoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.opcao { position: relative; }
+.opcao input { position: absolute; opacity: 0; pointer-events: none; }
+.opcao span { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--borda); background: #fff; font-size: 14px; font-weight: 700; color: var(--texto-2); cursor: pointer; }
+.opcao input:checked + span { border-color: var(--verde); background: var(--verde-fundo); color: var(--verde-escuro); }
+.opcao input:focus-visible + span { outline: 2px solid var(--verde); outline-offset: 1px; }
+.rotulo-campo { font-size: 13px; font-weight: 700; color: var(--texto-2); }
+.campo textarea { padding: 12px 14px; border-radius: 12px; border: 1px solid #D9D3C6; background: var(--fundo); font: inherit; font-size: 15px; color: var(--texto); width: 100%; resize: vertical; }
+.campo textarea:focus { outline: 2px solid var(--verde); outline-offset: 1px; }
+.form-anuncio .campo input { font-size: 15px; font-weight: 600; }
+.form-anuncio .campo label em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--verde-escuro); margin-left: 4px; }
+.campo-sep { display: flex; flex-direction: column; gap: 2px; padding-top: 12px; border-top: 1px solid var(--linha); font-size: 15px; }
+.escondido { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.formato { display: flex; flex-direction: column; gap: 3px; padding: 12px 0; border-bottom: 1px solid var(--linha); }
+.formato:last-child { border-bottom: 0; }
+.formato b { font-size: 15px; }
+.formato span { font-size: 13px; line-height: 1.45; color: var(--texto-2); }
