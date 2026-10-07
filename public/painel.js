@@ -216,6 +216,7 @@ export function blocoExportacao(D, h) {
       <span class="mini">Participação no volume de grão exportado em ${esc(e.periodo)}.</span>
     </details>
     ${e.fonte ? `<span class="mini">Fonte: ${h.linkSeguro(e.fonteLink) ? `<a class="link-mini" href="${esc(e.fonteLink)}" target="_blank" rel="noopener">${esc(e.fonte)}</a>` : esc(e.fonte)}</span>` : ''}
+    <a href="#/mercado/dados" data-ev="dados-abrir" class="trava trava-dados">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Dados de exportação completos</b><span class="mini">Mês a mês, destinos, preço por país, Argentina, EUA, Índia e China</span></span><span class="link-mini">Acessar</span></a>
     <a href="${h.wa('Olá Helder, quero assinar a consultoria para ver a paridade de exportação em R$/saca.') || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
   </section>`;
 }
