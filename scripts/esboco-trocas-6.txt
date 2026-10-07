@@ -1,0 +1,269 @@
+<<<<<<< public/esboco.js
+    if (id === 'esb-form-email') { entrar({ email: v('esb-email') }); return; }
+=======
+    if (id === 'esb-form-email') { if (emProducao()) { est.msg = 'A entrada por e-mail e senha chega junto com o pagamento. Por enquanto, use o código do WhatsApp.'; ctx.render(false); return; } entrar({ email: v('esb-email') }); return; }
+>>>>>>>
+<<<<<<< public/esboco.js
+      if (v('esb-cod') !== '123456') { est.msg = 'Código incorreto. No esboço, use 123456.'; ctx.render(false); return; }
+=======
+      const cod = v('esb-cod').replace(/\s/g, '');
+      if (emProducao()) {
+        est.msg = 'Conferindo…'; ctx.render(false);
+        fetch('/api/exportacao', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ codigo: cod }) })
+          .then((r) => { if (r.ok) { try { localStorage.setItem('ab-cod-consultoria', cod); } catch (er) { /* ignora */ } est.msg = ''; entrar({ celular: est.cel, status: 'cortesia', plano: 'empresa' }); } else { est.msg = r.status === 429 ? 'Muitas tentativas hoje. Fale com o Helder.' : 'Código não confere. Peça o seu código ao Helder no WhatsApp.'; ctx.render(false); } })
+          .catch(() => { est.msg = 'Sem conexão agora. Tente de novo.'; ctx.render(false); });
+        return;
+      }
+      if (cod !== '123456') { est.msg = 'Código incorreto. No esboço, use 123456.'; ctx.render(false); return; }
+>>>>>>>
+<<<<<<< public/esboco.js
+  ctx = { ...ctx, ...opcoes };
+=======
+  ctx = { ...ctx, ...opcoes };
+  if (!emProducao() && !document.querySelector('.es-faixa')) { const f = document.createElement('div'); f.className = 'es-faixa'; f.setAttribute('aria-hidden', 'true'); f.textContent = 'PRÉ-VISUALIZAÇÃO'; document.body.appendChild(f); }
+  ligarExportar();
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
+      <section class="cartao es-cadeado">
+        ${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
+        <b class="es-h1" style="text-align:center">Estimativas Amendoim Brasil</b>
+        <span class="es-txt" style="text-align:center">Área, produção e balanço de cada safra, com a leitura do Helder. Exclusivo para assinantes.</span>
+        <a class="btn btn-verde" href="#/conta/criar" style="width:100%">Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}</a>
+        <a class="btn btn-escuro" href="#/conta/entrar" style="width:100%">Já sou assinante</a>
+      </section>
+    </div>`;
+=======
+    ${cartaoExclusivo(h, 'Estimativas Amendoim Brasil', 'Quanto o Brasil vai plantar e colher, safra por safra, com a leitura do Helder.', ['Área, produtividade e produção de cada safra', 'Balanço de oferta e demanda do Brasil', 'Atualizado todo mês'], '#/conta/criar', `Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}`)}
+    <a class="btn btn-escuro" href="#/conta/entrar">Já sou assinante</a>`;
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="es-txt">1 alqueire paulista = 2,42 ha · saca de 25 kg em casca · produção = área ÷ 2,42 × sacas por alqueire.</span>
+=======
+    <span class="es-txt">1 alqueire paulista = 2,42 ha · saca de 25 kg em casca · produção = área ÷ 2,42 × sacas por alqueire · grão = casca × ${nf(b.rendimento)}%.</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${c.comentario ? `<section class="boletim" style="gap:8px"><span class="tag">${h.ic(h.I.doc, 'style="width:18px;height:18px"')}Leitura do Helder</span><p style="margin:0">${h.esc(c.comentario)}</p></section>` : ''}
+
+  <section class="cartao dx-cartao">
+    <div class="cartao-cab"><span class="rotulo">Balanço ${h.esc(ref.safra)} por exclusão</span><span class="mini">mil t em casca</span></div>
+    <div class="tabela-rolar"><table class="tabela dx-tabela es-balanco">
+      <tbody>
+        <tr class="dx-sub"><th>Produção ${h.esc(ref.safra)}</th><td class="num">${nf(tRef, 0)}</td></tr>
+        <tr><th>(−) Exportação amendoim<br><small>Comex Stat, grão convertido em casca</small></th><td class="num es-auto">automático</td></tr>
+        <tr><th>(−) Exportação de óleo<br><small>Comex Stat, em casca equivalente</small></th><td class="num es-auto">automático</td></tr>
+        <tr><th>(−) Consumo interno<br><small>${nf(b.consumoKgHab, 1)} kg/hab × ${nf(b.populacaoMi)} mi hab</small></th><td class="num">${nf(consumoCasca, 0)}</td></tr>
+        <tr><th>(−) Semente para ${h.esc(ult.safra)}<br><small>${nf(ult.areaMin)} mil ha × ${nf(b.sementeKgHa)} kg/ha</small></th><td class="num">${nf(semente, 0)}</td></tr>
+      </tbody>
+      <tfoot><tr><th>(=) Sobra para esmagamento e estoque</th><td class="num es-auto">automático</td></tr></tfoot>
+    </table></div>
+    <span class="mini dx-nota">Rendimento casca → grão de ${nf(b.rendimento)}%. As exportações entram sozinhas do Comex Stat na versão final (ano comercial de março a fevereiro). Os parâmetros você ajusta no painel.</span>
+=======
+  <section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Para onde vai a safra ${h.esc(ref.safra)}</span><span class="mini">mil t em casca</span></div>
+    <span class="es-txt">Conta por exclusão: da produção, tira-se o que sai do país, o que o brasileiro come e o que vira semente. O que sobra vai para esmagamento (óleo) e estoque.</span>
+    <div class="es-bal">
+      <div class="es-bal-linha es-bal-total"><span><b>Produção ${h.esc(ref.safra)}</b><small>${faixa(ref.areaMin, ref.areaMax)} mil ha × ${faixa(ref.prodMin, ref.prodMax)} sc/alq</small></span><b class="num">${nf(tRef, 0)}</b></div>
+      <div class="es-bal-linha"><span><b>− Exportação de amendoim</b><small>${nf(b.exportGrao, 0)} mil t de grão ÷ ${nf(b.rendimento)}% de rendimento${b.exportExemplo ? ' · <i>exemplo</i>' : ''}</small></span><b class="num">${nf(expGraoCasca, 0)}</b><i class="es-bal-barra" style="width:${pctRef(expGraoCasca)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Exportação de óleo</b><small>em casca equivalente${b.exportExemplo ? ' · <i>exemplo</i>' : ''}</small></span><b class="num">${nf(expOleo, 0)}</b><i class="es-bal-barra" style="width:${pctRef(expOleo)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Consumo interno</b><small>${nf(b.consumoKgHab, 1)} kg/hab × ${nf(b.populacaoMi)} mi hab ÷ ${nf(b.rendimento)}%</small></span><b class="num">${nf(consumoCasca, 0)}</b><i class="es-bal-barra" style="width:${pctRef(consumoCasca)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Semente para ${h.esc(ult.safra)}</b><small>${nf(ult.areaMin)} mil ha × ${nf(b.sementeKgHa)} kg/ha</small></span><b class="num">${nf(semente, 0)}</b><i class="es-bal-barra" style="width:${pctRef(semente)}%"></i></div>
+      <div class="es-bal-linha es-bal-sobra ${sobra < 0 ? 'neg' : ''}"><span><b>= Sobra para esmagamento e estoque</b><small>${sobra < 0 ? 'negativo: as saídas superam a produção estimada; revise os números' : `${nf(pctRef(sobra), 0)}% da safra`}</small></span><b class="num">${nf(sobra, 0)}</b><i class="es-bal-barra" style="width:${pctRef(Math.max(0, sobra))}%"></i></div>
+    </div>
+    <span class="mini dx-nota">Exportação: ${h.esc(b.exportFonte || 'Comex Stat')}${b.exportExemplo ? ' (valor de exemplo até você preencher no painel)' : ''}. Rendimento casca → grão de ${nf(b.rendimento)}%. Na versão final, a exportação entra sozinha do Comex Stat.</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+  <section class="cartao dx-cartao">
+    <div class="cartao-cab"><span class="rotulo">Área e produção por safra</span><span class="mini">casca · saca 25 kg</span></div>
+    <div class="tabela-rolar"><table class="tabela dx-tabela">
+      <thead><tr><th>Safra</th><th>Área<br>mil ha</th><th>Produtiv.<br>sc/alq</th><th>Produção<br>mi sc</th><th>Produção<br>mil t</th></tr></thead>
+      <tbody>${lista.map((e, i) => `<tr><th>${h.esc(e.safra)}${e.situacao === 'Preliminar' ? '*' : ''}</th><td class="num">${faixa(e.areaMin, e.areaMax)}</td><td class="num">${faixa(e.prodMin, e.prodMax)}</td><td class="num">${faixa(prods[i].scMin / 1e6, prods[i].scMax / 1e6, 1)}</td><td class="num">${faixa(Math.round(prods[i].tMin / 1000), Math.round(prods[i].tMax / 1000))}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="es-barras">${lista.map((e, i) => `<div class="es-barra-ano"><span>${h.esc(e.safra)}</span><div class="es-barra"><i style="width:${(prods[i].scMin / max) * 100}%"></i>${prods[i].scMax > prods[i].scMin ? `<i class="faixa" style="width:${((prods[i].scMax - prods[i].scMin) / max) * 100}%"></i>` : ''}</div><b class="num">${nf(prods[i].scMeio / 1e6, 1)}</b></div>`).join('')}</div>
+    <span class="mini dx-nota">*${h.esc(ult.safra)}: preliminar, com a produtividade média do Brasil. Em relação a ${h.esc(lista[0].safra)}, a produção cai ${nf((1 - pu.scMeio / p0.scMeio) * 100, 0)}%.</span>
+=======
+  <section class="cartao dx-cartao" style="gap:4px">
+    <div class="cartao-cab"><span class="rotulo">Safra por safra</span><span class="mini">de cima para baixo: da mais antiga para a atual</span></div>
+    ${lista.map((e, i) => { const ant = lista[i - 1], pAnt = prods[i - 1], p = prods[i]; return `<div class="es-safra ${i === lista.length - 1 ? 'atual' : ''}">
+      <div class="es-safra-cab"><b>Safra ${h.esc(e.safra)}</b><span class="mini">${h.esc(e.situacao)}${i === lista.length - 1 ? ' · a que está sendo plantada' : i === lista.length - 2 ? ' · a que está sendo vendida' : ''}</span></div>
+      <div class="es-safra-grade">
+        <div><small>Área</small><b>${faixa(e.areaMin, e.areaMax)}</b><span>mil ha</span>${ant ? vcSinal(var_(areaMeio(e), areaMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}</div>
+        <div><small>Produtividade</small><b>${faixa(e.prodMin, e.prodMax)}</b><span>sc/alq</span>${ant ? vcSinal(var_(prodMeio(e), prodMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}</div>
+        <div><small>Produção</small><b>${nf(p.scMeio / 1e6, 1)}</b><span>mi sacas</span>${pAnt ? vcSinal(var_(p.scMeio, pAnt.scMeio)) : '<span class="es-var es-var-neutro">base</span>'}</div>
+      </div>
+      <div class="es-safra-barra"><i style="width:${(p.scMeio / max) * 100}%"></i><b class="num">${nf(Math.round(p.tMeio / 1000))} mil t</b></div>
+    </div>`; }).join('')}
+    <span class="mini dx-nota">A barra é a produção em casca. De ${h.esc(lista[0].safra)} para ${h.esc(ult.safra)}, a produção ${quedaTotal > 0 ? 'cai' : 'sobe'} <b>${nf(Math.abs(quedaTotal), 0)}%</b>. ${ult.situacao === 'Preliminar' ? `${h.esc(ult.safra)} é preliminar, com a produtividade média do Brasil.` : ''}</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="dx-tile"><span>Área ${h.esc(ult.safra)}</span><b>${faixa(ult.areaMin, ult.areaMax)} mil ha</b><small>${vc(varArea)} vs ${h.esc(lista[lista.length - 2]?.safra || '')}</small></div>
+    <div class="dx-tile"><span>Produção ${h.esc(ult.safra)}</span><b>${nf(pu.scMeio / 1e6, 1)} mi sc</b><small>${vc(varProd)} vs ${h.esc(lista[lista.length - 2]?.safra || '')}</small></div>
+    <div class="dx-tile"><span>Produtividade</span><b>${faixa(ult.prodMin, ult.prodMax)} sc/alq</b><small>${h.esc(ult.situacao)}</small></div>
+=======
+    <div class="dx-tile"><span>Área ${h.esc(ult.safra)}</span><b>${faixa(ult.areaMin, ult.areaMax)} mil ha</b><small>${vcSinal(varArea)} vs ${h.esc(lista[lista.length - 2]?.safra || '')}</small></div>
+    <div class="dx-tile"><span>Produção ${h.esc(ult.safra)}</span><b>${nf(pu.scMeio / 1e6, 1)} mi sc</b><small>${vcSinal(varProd)} vs ${h.esc(lista[lista.length - 2]?.safra || '')}</small></div>
+    <div class="dx-tile"><span>Produtividade</span><b>${faixa(ult.prodMin, ult.prodMax)} sc/alq</b><small>${vcSinal(var_(prodMeio(ult), prodMeio(lista[lista.length - 2] || ult)))} vs ${h.esc(lista[lista.length - 2]?.safra || '')}</small></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="mini">Estimativa própria · atualizada em ${h.esc(c.atualizado)} · Helder Lamberti</span>
+  </section>
+=======
+    <span class="mini">Estimativa própria · atualizada em ${h.esc(c.atualizado)} · Helder Lamberti</span>
+  </section>
+
+  ${c.comentario ? `<section class="es-leitura-destaque"><span class="tag">${h.ic(h.I.doc, 'style="width:18px;height:18px"')}Leitura do Helder</span><p>${h.esc(c.comentario)}</p><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti · ${h.esc(c.atualizado)}</span></section>` : ''}
+
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="cartao-cab"><b class="es-h1" style="font-size:20px">Estimativas Amendoim Brasil</b></div>
+    <span class="mini">Estimativa própria · atualizada em ${h.esc(c.atualizado)} · Helder Lamberti</span>
+=======
+    <div class="cartao-cab"><b class="es-h1" style="font-size:20px">Estimativas Amendoim Brasil</b><span class="pilula pilula-verde">${h.esc(ult.situacao)}</span></div>
+    <span class="mini">Números da Amendoim Brasil · atualizado em ${h.esc(c.atualizado)} · Helder Lamberti</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+  const tRef = pRef.tMeio / 1000; // mil t
+
+=======
+  const tRef = pRef.tMeio / 1000; // mil t
+
+  // Variação de cada safra contra a anterior (área, produtividade e produção).
+  const var_ = (a, b) => (b ? ((a - b) / b) * 100 : null);
+  const prodMeio = (e) => (e.prodMin + e.prodMax) / 2;
+  const vcSinal = (v, d = 0) => (v == null ? '<span class="es-var es-var-neutro">—</span>' : `<span class="es-var ${v > 0.5 ? 'sobe' : v < -0.5 ? 'cai' : 'es-var-neutro'}">${v > 0.5 ? '▲ +' : v < -0.5 ? '▼ ' : '= '}${nf(v, d)}%</span>`);
+  const expGraoCasca = (b.exportGrao || 0) / rend; // mil t casca
+  const expOleo = b.exportOleo || 0;
+  const sobra = tRef - expGraoCasca - expOleo - consumoCasca - semente;
+  const pctRef = (v) => (tRef ? Math.max(0, Math.min(100, (v / tRef) * 100)) : 0);
+  const quedaTotal = (1 - pu.scMeio / p0.scMeio) * 100;
+
+>>>>>>>
+<<<<<<< public/esboco.js
+    <button class="chip" type="button" data-esb-rever-bv>Rever as boas-vindas</button>
+  </section>
+=======
+    <button class="chip" type="button" data-esb-rever-bv>Rever as boas-vindas</button>
+  </section>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+  <section class="cartao es-teste" style="gap:10px">
+    <span class="rotulo">Só no esboço: simular situação</span>
+=======
+  ${emProducao() ? '' : `<section class="cartao es-teste" style="gap:10px">
+    <span class="rotulo">Simular situação (só na pré-visualização)</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+  const c = conteudo(), p = c.planos[est.plano], v = p[est.periodo], s = sessao();
+=======
+  const c = conteudo(), p = c.planos[est.plano], v = p[est.periodo], s = sessao();
+  if (emProducao()) {
+    const zap = h.wa(`Olá Helder! Quero assinar o plano ${p.nome} (${est.periodo}) do app Amendoim Brasil. Meu nome: ${s?.nome || ''}.`);
+    return `${voltar('#/conta/planos', 'Planos')}${passos(3)}
+    <section class="cartao es-form" style="gap:12px">
+      <span class="pilula pilula-verde" style="align-self:flex-start">Plano ${h.esc(p.nome)} · ${est.periodo === 'anual' ? 'anual' : 'mensal'}</span>
+      <b class="es-h1">A cobrança automática está sendo ligada</b>
+      <span class="es-txt">Enquanto o pagamento pelo app não abre, o Helder libera o seu acesso direto pelo WhatsApp${c.diasTeste ? `, com os ${c.diasTeste} dias grátis` : ''}. Você recebe um código de acesso e entra em "Já sou assinante".</span>
+      ${zap ? `<a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener" data-ev="assinar-zap">${h.ic(h.I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Pedir meu acesso no WhatsApp</a>` : ''}
+      <a class="btn btn-escuro" href="#/conta/entrar">Já tenho o código</a>
+      <span class="mini">Valor do plano: <b class="num">${preco(v)}</b> ${est.periodo === 'anual' ? 'por ano' : 'por mês'}. Pix ou cartão, pelo Asaas, assim que a cobrança abrir.</span>
+    </section>`;
+  }
+>>>>>>>
+<<<<<<< public/esboco.js
+        <button class="btn btn-verde" type="submit">${h.ic(h.I.zap, 'style="stroke:#fff"')}Receber código no WhatsApp</button>
+        <span class="mini" style="text-align:center">Sem senha para lembrar. O código vale por 10 minutos.</span>
+=======
+        <button class="btn btn-verde" type="submit">${h.ic(h.I.zap, 'style="stroke:#fff"')}${emProducao() ? 'Continuar' : 'Receber código no WhatsApp'}</button>
+        <span class="mini" style="text-align:center">${emProducao() ? 'Assinante e cliente da consultoria: o Helder envia o seu código de acesso pelo WhatsApp.' : 'Sem senha para lembrar. O código vale por 10 minutos.'}</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+        <span class="es-txt">Mandamos um código de 6 números para o WhatsApp <b>${h.esc(est.cel)}</b>.</span>
+        <div class="campo"><label for="esb-cod">Código</label><input id="esb-cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="es-codigo" required></div>
+        ${aviso('Esboço: nenhuma mensagem é enviada. Use o código <b>123456</b>.')}
+=======
+        <span class="es-txt">${emProducao() ? `Digite o código de acesso que o Helder enviou no seu WhatsApp (<b>${h.esc(est.cel)}</b>).` : `Mandamos um código de 6 números para o WhatsApp <b>${h.esc(est.cel)}</b>.`}</span>
+        <div class="campo"><label for="esb-cod">Código</label><input id="esb-cod" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="000000" class="es-codigo" required></div>
+        ${emProducao() ? '' : aviso('Esboço: nenhuma mensagem é enviada. Use o código <b>123456</b>.')}
+>>>>>>>
+<<<<<<< public/esboco.js
+  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · 2 meses grátis']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
+  ${cartao('produtor', ['Estimativas Amendoim Brasil', 'Dados de exportação completos', 'Histórico de preço e sazonalidade'])}
+  ${cartao('empresa', ['Tudo do Produtor', 'Paridade de exportação', 'Alertas avançados e relatório mensal', 'Até 3 pessoas da empresa'])}`;
+=======
+  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · mais barato']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
+  ${cartao('produtor', ['Estimativas Amendoim Brasil todo mês', 'Leitura semanal do mercado', 'Agenda do mercado com lembretes', 'Histórico de 5 anos e alerta de preço-alvo'])}
+  ${cartao('empresa', ['Tudo do Produtor', 'Preço por destino: Argélia, Rússia, África do Sul…', 'Exportação completa e paridade', 'Relatório mensal e até 3 pessoas'])}`;
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card(empresa ? '#/alertas' : '#/conta/planos', sinoMais, 'Alertas avançados', empresa ? 'Exportação, destino e preço por país' : 'Plano Empresa', !empresa)}
+=======
+  ${card(empresa ? '#/alertas' : '#/conta/planos', sinoMais, 'Alertas avançados', empresa ? 'Exportação, destino e preço por país' : 'Plano Empresa', !empresa)}
+  ${cartaoExportar(h)}
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/estimativas', grafico, 'Estimativas Amendoim Brasil', 'Área, produção e balanço por safra')}
+=======
+  ${card('#/estimativas', grafico, 'Estimativas Amendoim Brasil', 'Área, produção e balanço por safra')}
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do amendoim', 'Eventos, feiras e relatórios, com lembrete')}
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
+>>>>>>>
+<<<<<<< public/esboco.js
+
+  <a class="cartao es-previa" href="#/estimativas">
+    <div class="cartao-cab"><span class="rotulo">Estimativa de safra ${h.esc(c.estimativas[c.estimativas.length - 1].safra)}</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#7A4A08"')}</div>
+    <div class="es-borrado" aria-hidden="true"><div class="dx-tiles">
+      <div class="dx-tile"><span>Área</span><b>${nf(c.estimativas[c.estimativas.length - 1].areaMin)} mil ha</b></div>
+      <div class="dx-tile"><span>Produção</span><b>${nf(p.scMeio / 1e6, 1)} mi sc</b></div>
+      <div class="dx-tile"><span>Variação</span><b>−00%</b></div>
+    </div></div>
+    <span class="mini">Toque para ver o que tem dentro</span>
+  </a>
+=======
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${c.diasTeste ? `<span class="mini" style="text-align:center">${c.diasTeste} dias grátis para conhecer · cancele quando quiser</span>` : ''}
+=======
+    <span class="mini" style="text-align:center">Depois: R$ ${nf(c.planos.produtor.mensal, 2)} por mês, ou R$ ${nf(c.planos.produtor.anual / 12, 2)}/mês no plano anual</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">Criar conta e assinar</a>
+=======
+    ${c.diasTeste ? `<div class="es-teste"><b>${c.diasTeste} dias grátis para conhecer</b><span>Use tudo durante ${c.diasTeste} dias. Se não gostar, cancele antes e não paga nada.</span></div>` : ''}
+    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">${c.diasTeste ? `Começar meus ${c.diasTeste} dias grátis` : 'Criar conta e assinar'}</a>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="pilula pilula-amendoim" style="align-self:flex-start">EXCLUSIVO ASSINANTES</span>
+    <b class="es-h1">Informação na ponta do lápis para vender e comprar melhor</b>
+    <span class="es-txt">Estimativas próprias da Amendoim Brasil, dados de exportação completos e histórico de preço, atualizados por quem está no mercado.</span>
+    <div class="es-lista">
+      ${item('Estimativas Amendoim Brasil: área, produção e balanço')}
+      ${item('Exportação mês a mês, destinos e preço por país')}
+      ${item('Histórico de preço de 1 e 5 anos e sazonalidade')}
+      ${item('Empresa: paridade de exportação e alertas avançados')}
+=======
+    <span class="pilula pilula-verde" style="align-self:flex-start">ÁREA DO ASSINANTE</span>
+    <b class="es-h1">Venda e compre amendoim sabendo para onde o preço vai</b>
+    <span class="es-txt">O que o Helder acompanha todo dia no mercado, direto no seu celular. Informação que não está no grupo de WhatsApp nem no jornal.</span>
+    <div class="es-benef">
+      ${benef('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>', 'Saber a safra antes da Conab', 'A estimativa da Amendoim Brasil sai antes dos números oficiais e é feita com quem está no campo. Quem sabe que a área caiu 30% não vende barato.')}
+      ${benef(h.I.doc, 'Toda segunda: segurar ou vender?', 'A leitura da semana em 5 minutos: o que a indústria está fazendo, como está a exportação e para onde o preço tende a ir.')}
+      ${benef('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', 'O app avisa quando chegar no seu preço', 'Você define o alvo (ex.: R$ 82) e recebe o aviso no celular. Com o histórico de 5 anos para ver a melhor época de vender.')}
+      ${benef('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Nenhuma data pega você de surpresa', 'Eventos do amendoim, feiras e relatórios na agenda, com lembrete um dia antes.')}
+      ${benef('<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>', 'Leve tudo para a sua planilha', 'Excel e PDF com estimativas, cotações e histórico, gerados na hora.')}
+>>>>>>>
+<<<<<<< public/esboco.js
+  return `<header class="topo"><a class="link-mini" href="${href}" ${extra} style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}${texto}</a></header>`;
+}
+=======
+  return `<header class="topo"><a class="link-mini" href="${href}" ${extra} style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}${texto}</a></header>`;
+}
+const benef = (icone, titulo, txt) => `<div class="es-benef-item"><span class="es-benef-ic">${h.ic(icone, 'style="width:20px;height:20px;stroke:#007731"')}</span><span><b>${titulo}</b><span>${txt}</span></span></div>`;
+>>>>>>>
+<<<<<<< public/esboco.js
+import { conteudo, sessao, salvarSessao, assinante, producao } from '/esboco-dados.js';
+=======
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao } from '/esboco-dados.js';
+import { cartaoExclusivo } from '/esboco3.js';
+import { cartaoExportar, ligarExportar } from '/esboco-export.js';
+>>>>>>>
