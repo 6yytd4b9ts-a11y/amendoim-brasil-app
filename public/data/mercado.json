@@ -1,13 +1,13 @@
 {
-  "atualizado": "06/10/2026",
+  "atualizado": "07/10/2026",
   "hoje": [
     {
       "id": "fisico",
       "rotulo": "Preço da casca",
-      "valor": "R$ 77,00",
-      "nota": "IEA · Tupã · 05/10",
-      "efeito": "neutro",
-      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP). A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
+      "valor": "R$ 80,00",
+      "nota": "IEA · Tupã · 06/10 · +R$ 3,00",
+      "efeito": "alta",
+      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP): R$ 80,00 em 06/10, R$ 3,00 acima do dia anterior. No mesmo boletim, Marília R$ 79,00, Ribeirão Preto R$ 77,00 e Jaboticabal R$ 75,00. A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
       "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
     },
     {
@@ -44,8 +44,8 @@
     }
   ],
   "fato": {
-    "titulo": "Conab divulga o 1º levantamento da safra 26/27 em 15/10",
-    "texto": "O mercado espera a confirmação oficial de área menor. Se vier abaixo de 25%, reforça a firmeza do preço."
+    "titulo": "Argentina deve plantar 8% menos amendoim na safra 26/27",
+    "texto": "Primeiro levantamento argentino aponta área 8% menor. Menos amendoim argentino reduz a concorrência com o Brasil na Europa e ajuda a sustentar o preço da casca aqui."
   },
   "ofertaDemanda": [
     {
