@@ -1,8 +1,10 @@
 // Só no ramo do ESBOÇO: liga as telas de teste (assinantes, conta, estimativas, agenda, clima, painel) aos arquivos do app na hora do build.
 // Formato de esboco-trocas.txt: "<<<<<<< arquivo" / trecho antigo / "=======" / trecho novo / ">>>>>>>".
 // Cada trecho antigo precisa aparecer exatamente uma vez; se não, o build para (nada quebrado vai ao ar).
-import { readFileSync, writeFileSync } from 'node:fs';
-const txt = readFileSync(new URL('./esboco-trocas.txt', import.meta.url), 'utf8');
+// As trocas podem vir em mais de um arquivo (esboco-trocas.txt, esboco-trocas-2.txt…), lidos em ordem.
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+const pasta = new URL('./', import.meta.url);
+const txt = readdirSync(pasta).filter((n) => /^esboco-trocas(-\d+)?\.txt$/.test(n)).sort().map((n) => readFileSync(new URL(n, pasta), 'utf8')).join('');
 const blocos = txt.split(/^<<<<<<< /m).filter(Boolean);
 const arquivos = {};
 for (const b of blocos) {

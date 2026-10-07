@@ -65,7 +65,7 @@ const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patr
 <<<<<<< public/app.js
   const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Consultoria']];
 =======
-  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', '★ Assinante']];
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
 >>>>>>>
 <<<<<<< public/app.js
     ${c.referencias.map((r) => {
@@ -178,7 +178,7 @@ document.addEventListener('click', (e) => {
 const VERSAO = 'ab-v9';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 =======
-const VERSAO = 'ab-v12';
+const VERSAO = 'ab-v13';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 >>>>>>>
 <<<<<<< public/painel-admin.js
@@ -257,6 +257,14 @@ const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
   <section class="cartao" style="gap:14px" id="ferr" data-ferr-k="${k}">
 >>>>>>>
 <<<<<<< public/esboco.js
+
+let h = null;
+=======
+import { cartaoExclusivo } from '/esboco3.js';
+
+let h = null;
+>>>>>>>
+<<<<<<< public/esboco.js
       ${item('Estimativas Amendoim Brasil: área, produção e balanço')}
       ${item('Exportação mês a mês, destinos e preço por país')}
       ${item('Histórico de preço de 1 e 5 anos e sazonalidade')}
@@ -267,6 +275,19 @@ const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
       ${item('<b>Agenda do mercado</b> com lembretes: USDA, Conab, feiras e eventos')}
       ${item('<b>Histórico de 5 anos</b>, sazonalidade e alerta de preço-alvo')}
       ${item('<b>Empresa</b>: preço por destino, exportação completa e paridade')}
+>>>>>>>
+<<<<<<< public/esboco.js
+
+  <a class="cartao es-previa" href="#/estimativas">
+    <div class="cartao-cab"><span class="rotulo">Estimativa de safra ${h.esc(c.estimativas[c.estimativas.length - 1].safra)}</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#7A4A08"')}</div>
+    <div class="es-borrado" aria-hidden="true"><div class="dx-tiles">
+      <div class="dx-tile"><span>Área</span><b>${nf(c.estimativas[c.estimativas.length - 1].areaMin)} mil ha</b></div>
+      <div class="dx-tile"><span>Produção</span><b>${nf(p.scMeio / 1e6, 1)} mi sc</b></div>
+      <div class="dx-tile"><span>Variação</span><b>−00%</b></div>
+    </div></div>
+    <span class="mini">Toque para ver o que tem dentro</span>
+  </a>
+=======
 >>>>>>>
 <<<<<<< public/esboco.js
   ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
@@ -285,18 +306,55 @@ const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
   ${cartao('produtor', ['Estimativas Amendoim Brasil todo mês', 'Leitura semanal do mercado', 'Agenda do mercado com lembretes', 'Histórico de 5 anos e alerta de preço-alvo'])}
   ${cartao('empresa', ['Tudo do Produtor', 'Preço por destino: Argélia, Rússia, África do Sul…', 'Exportação completa e paridade', 'Relatório mensal e até 3 pessoas'])}`;
 >>>>>>>
+<<<<<<< public/esboco.js
+    <div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
+      <section class="cartao es-cadeado">
+        ${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
+        <b class="es-h1" style="text-align:center">Estimativas Amendoim Brasil</b>
+        <span class="es-txt" style="text-align:center">Área, produção e balanço de cada safra, com a leitura do Helder. Exclusivo para assinantes.</span>
+        <a class="btn btn-verde" href="#/conta/criar" style="width:100%">Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}</a>
+        <a class="btn btn-escuro" href="#/conta/entrar" style="width:100%">Já sou assinante</a>
+      </section>
+    </div>`;
+=======
+    ${cartaoExclusivo(h, 'Estimativas Amendoim Brasil', 'Quanto o Brasil vai plantar e colher, safra por safra, com a leitura do Helder.', ['Área, produtividade e produção de cada safra', 'Balanço de oferta e demanda do Brasil', 'Atualizado todo mês'], '#/conta/criar', `Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}`)}
+    <a class="btn btn-escuro" href="#/conta/entrar">Já sou assinante</a>`;
+>>>>>>>
+<<<<<<< public/esboco2.js
+
+let h = null;
+=======
+import { cartaoExclusivo } from '/esboco3.js';
+
+let h = null;
+>>>>>>>
 <<<<<<< public/esboco2.js
 const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], safra: ['Safra', 'es-t-safra'], evento: ['Evento', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
 =======
 const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira internacional', 'es-t-feira'], safra: ['Safra', 'es-t-safra'], evento: ['Evento no Brasil', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
 >>>>>>>
 <<<<<<< public/esboco2.js
+  return `<a class="es-faixa-ass" href="#/mercado/consultoria" data-ev="esb-faixa">
+    <span class="es-faixa-ic">${h.ic(estrela, 'style="width:20px;height:20px;stroke:#5C3A06;fill:#F4AD46"')}</span>
+    <span class="cresce"><b>${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])} · sua área` : 'Área do Assinante'}</b>
+      <small>${ok ? `Novo: estimativa ${h.esc(ult.safra)} e balanço do mês` : `Quanto o Brasil vai colher em ${h.esc(ult.safra)}? Estimativas e relatórios`}</small></span>
+    <span class="es-faixa-btn">${ok ? 'Abrir' : 'Conhecer'}</span>
+=======
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="esb-faixa">
+    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--verde-claro)">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#007731"')}</span>
+    <span class="cresce"><b style="font-size:15px;display:block">${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}` : 'Área do assinante'}</b>
+      <span class="mini">${ok ? `Novo na sua área: estimativa ${h.esc(ult.safra)}` : 'Estimativas de safra, relatórios e agenda do mercado'}</span></span>
+    ${h.ic(h.I.seta, 'style="width:18px;height:18px;stroke:#5F5B52"')}
+>>>>>>>
+<<<<<<< public/esboco2.js
+  if (!prox.length && !agora) return '';
   return `<a class="cartao es-agenda-inicio" href="#/agenda" data-ev="esb-agenda-inicio">
     <div class="cartao-cab"><span class="rotulo">Agenda do amendoim</span><span class="link-mini">ver tudo ›</span></div>
     ${prox.map((e) => `<div class="es-ag-linha">${dataBloco(e)}<span class="cresce"><b>${h.esc(e.titulo)}</b><small>${h.esc(quando(e, hoje))}${e.aConfirmar ? ' · data aproximada' : ''}</small></span></div>`).join('')}
     ${agora ? `<span class="mini" style="display:flex;align-items:center;gap:6px"><i class="es-ponto-vivo"></i>Agora: ${h.esc(agora.titulo.split(' · ')[0])}</span>` : ''}
 =======
-  const travado = !assinante();
+  if ((!prox.length && !agora) || !assinante()) return '';
+  const travado = false;
   return `<a class="cartao es-agenda-inicio ${travado ? 'es-ag-travada' : ''}" href="#/agenda" data-ev="esb-agenda-inicio">
     <div class="cartao-cab"><span class="rotulo">Agenda do mercado</span>${travado ? `<span class="pilula pilula-amendoim" style="font-size:11px">★ ASSINANTE</span>` : '<span class="link-mini">ver tudo ›</span>'}</div>
     ${travado ? `<span class="mini" style="font-weight:700;color:var(--texto-2)">${prox.length} datas que mexem no preço nas próximas semanas</span>` : ''}
@@ -312,12 +370,8 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
 <<<<<<< public/esboco2.js
   <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['safra', 'Safra'], ['evento', 'Eventos'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
 =======
-  ${!assinante() ? `<section class="cartao es-cadeado-linha">
-    ${h.ic(h.I.cadeado, 'style="width:22px;height:22px;stroke:#7A4A08;flex-shrink:0"')}
-    <span class="cresce"><b style="font-size:15px;display:block">Exclusivo para assinantes</b><span class="mini">Veja as datas e receba o lembrete no celular</span></span>
-    <a class="btn btn-verde btn-pequeno" href="#/conta/planos">Assinar</a>
-  </section>` : ''}
-  <div class="${!assinante() ? 'es-borrado' : ''}">
+  ${!assinante() ? cartaoExclusivo(h, 'Nunca perca uma data importante', 'As datas que mexem no preço do amendoim, com lembrete no celular um dia antes.', ['Relatórios do USDA e levantamentos da Conab', 'Feiras internacionais: SIAL, Gulfood, Congresso INC', 'Eventos do amendoim no Brasil e da Câmara Setorial']) : ''}
+  <div ${!assinante() ? 'hidden' : ''}>
   <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['feira', 'Feiras'], ['evento', 'Eventos'], ['safra', 'Safra'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
 >>>>>>>
 <<<<<<< public/esboco2.js
@@ -361,7 +415,7 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
     { pais: 'Reino Unido', comex: 1390, min: 1350, max: 1400, tend: 'cai' },
     { pais: 'Polônia', comex: 1300, min: 1270, max: 1320, tend: 'estavel' }
   ] },
-  enquete: { pergunta: 'Você vai plantar mais, igual ou menos amendoim em 26/27?', base: { mais: 12, igual: 41, menos: 133 }, exemplo: true },
+  enquete: null, // o Helder lança pelo painel: { id, pergunta, opcoes: [...], dias, inicio }
   chuvaExemplo: [
     { municipio: 'Tupã', mm: 22, n: 3 }, { municipio: 'Presidente Prudente', mm: 8, n: 2 }, { municipio: 'Jaboticabal', mm: 35, n: 4 },
     { municipio: 'Rancharia', mm: 15, n: 1 }, { municipio: 'Glória de Dourados', mm: 0, n: 2 }
@@ -378,71 +432,4 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
     { id: 'e14', data: null, tipo: 'evento', titulo: 'Feira Nacional do Amendoim 2027', local: 'Jaboticabal/SP · agosto, data a confirmar', detalhe: 'Maior evento técnico do amendoim no Brasil (Unesp Jaboticabal): palestras, dia de campo e feira de negócios. Em 2026 foi de 12 a 14 de agosto.' },
     { id: 'e15', data: null, tipo: 'evento', titulo: 'Festa do Amendoim 2027', local: 'Quintana/SP · setembro, data a confirmar', detalhe: 'Festa tradicional do amendoim na Alta Paulista. Em 2026 foi em 5 e 6 de setembro.' },
     { id: 'e16', data: null, tipo: 'evento', titulo: 'Evento da Turma do Amendoim', local: 'Data a confirmar', detalhe: 'Aguardando a data com a organização.' }
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-let redesenhar = () => {};
-=======
-const lerLista = (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
-let redesenhar = () => {};
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-    <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe o que o mercado está pagando de verdade:</span>
-    <div class="pe-grade"><div class="campo"><label>Alta Paulista (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 82,00"></div><div class="campo"><label>Mogiana (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 84,00"></div></div>
-    <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-feito="fisico">Publicar</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
-=======
-    <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe a faixa que o mercado está pagando de verdade (R$/saca):</span>
-    ${(conteudo().fisico?.regioes || []).map((r, i) => `<div class="pe-fis"><span>${esc(r.nome)}</span><input id="pe-fmin-${i}" inputmode="decimal" value="${esc(String(r.min).replace('.', ','))}" aria-label="mínimo"><span>a</span><input id="pe-fmax-${i}" inputmode="decimal" value="${esc(String(r.max).replace('.', ','))}" aria-label="máximo"></div>`).join('')}
-    <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-fisico>Publicar no app</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
-  <section class="cartao" style="gap:10px">
-    <b style="font-size:15px">Termômetro do preço</b>
-    <div class="chips">${['Fraco', 'Fraco a estável', 'Estável', 'Estável a firme', 'Firme'].map((t) => `<button class="chip" data-pe-termo="${t}" aria-pressed="${conteudo().termometro === t}">${t}</button>`).join('')}</div>
-    <span class="mini">Muda na hora o ponteiro do termômetro no app.</span>
-  </section>
-  ${(() => { const l = lerLista('ab-esboco-contesta'); return `<section class="cartao" style="gap:8px">
-    <div class="cartao-cab"><b style="font-size:15px">Preços informados pelos produtores</b><span class="mini">${l.length}</span></div>
-    ${l.length ? l.slice(0, 8).map((x) => `<div class="lista-linha"><span class="cresce"><b style="font-size:14px;display:block">R$ ${esc(x.preco)} · ${esc(x.municipio)}</b><span class="mini">${esc(x.obs || 'sem detalhe')} · ${new Date(x.quando).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span></span></div>`).join('') : '<span class="mini">Quando um produtor tocar em "Esse preço está diferente na sua região?", o preço que ele viu aparece aqui.</span>'}
-  </section>`; })()}
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-  <div class="es-botoes"><button class="btn btn-escuro btn-pequeno" data-pe-csv>Baixar planilha (CSV)</button></div>
-=======
-  ${(() => { const e = conteudo().enquete; if (!e) return ''; const voto = (() => { try { return JSON.parse(localStorage.getItem('ab-esboco-voto') || 'null'); } catch (er) { return null; } })(); const c = { ...e.base }; if (voto) c[voto.v] = (c[voto.v] || 0) + 1; const tot = (c.mais || 0) + (c.igual || 0) + (c.menos || 0) || 1; return `<section class="cartao" style="gap:8px">
-    <div class="cartao-cab"><span class="rotulo">Enquete da safra 26/27</span><span class="mini">${nf(tot)} respostas${e.exemplo ? ' · exemplo' : ''}</span></div>
-    <div class="pn-tiles pn-tiles-3">${tile('Mais', nf((c.mais / tot) * 100) + '%')}${tile('Igual', nf((c.igual / tot) * 100) + '%')}${tile('Menos', nf((c.menos / tot) * 100) + '%')}</div>
-    <span class="mini">Sinal de intenção de plantio para a sua estimativa. Na versão final, separado por região.</span>
-  </section>`; })()}
-  ${(() => { const l = lerLista('ab-esboco-chuva'); return `<section class="cartao" style="gap:8px">
-    <div class="cartao-cab"><span class="rotulo">Chuva informada pelos produtores</span><span class="mini">${l.length}</span></div>
-    ${l.length ? l.slice(0, 6).map((x) => `<div class="lista-linha"><span class="cresce">${esc(x.municipio)} · ${x.dia.split('-').reverse().join('/')}</span><b class="num">${nf(x.mm)} mm</b></div>`).join('') : '<span class="mini">Quando os produtores informarem a chuva na aba Clima, aparece aqui.</span>'}
-  </section>`; })()}
-  <div class="es-botoes"><button class="btn btn-escuro btn-pequeno" data-pe-csv>Baixar planilha (CSV)</button></div>
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-    <section class="cartao" style="gap:12px">
-=======
-    <section class="cartao" style="gap:10px">
-      <div class="cartao-cab"><span class="rotulo">Preço por destino (plano Empresa)</span><span class="mini">US$/t</span></div>
-      <div class="pe-dest pe-dest-cab"><span>Destino</span><span>Comex</span><span>Mín.</span><span>Máx.</span></div>
-      ${(c.destinos?.lista || []).map((x, i) => `<div class="pe-dest"><input id="pd-p-${i}" value="${esc(x.pais)}"><input id="pd-c-${i}" inputmode="numeric" value="${esc(x.comex)}"><input id="pd-a-${i}" inputmode="numeric" value="${esc(x.min)}"><input id="pd-b-${i}" inputmode="numeric" value="${esc(x.max)}"></div>`).join('')}
-      <span class="mini">Comex entra sozinho na versão final; a faixa da semana você digita aqui.</span>
-    </section>
-    <section class="cartao" style="gap:12px">
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-    if ((x = q('[data-pe-desfazer]'))) { const j = lerFeito(); delete j.itens[x.dataset.peDesfazer]; gravarFeito(j); redesenhar(); return; }
-=======
-    if ((x = q('[data-pe-termo]'))) { const c = conteudo(); c.termometro = x.dataset.peTermo; salvarConteudo(c); redesenhar(); return; }
-    if (q('[data-pe-fisico]')) {
-      const c = conteudo(), num = (id) => { const v = parseFloat(t(id).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : null; };
-      const agora = new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-      c.fisico = { ...c.fisico, exemplo: false, atualizado: agora.replace(',', ' ·'), regioes: (c.fisico?.regioes || []).map((r, i) => ({ ...r, min: num(`pe-fmin-${i}`) ?? r.min, max: num(`pe-fmax-${i}`) ?? r.max })) };
-      salvarConteudo(c); const j = lerFeito(); j.itens.fisico = true; gravarFeito(j); redesenhar(); return;
-    }
-    if ((x = q('[data-pe-desfazer]'))) { const j = lerFeito(); delete j.itens[x.dataset.peDesfazer]; gravarFeito(j); redesenhar(); return; }
->>>>>>>
-<<<<<<< public/painel-esboco2.js
-    salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
-=======
-    if (c.destinos?.lista) c.destinos = { ...c.destinos, exemplo: false, semana: new Date().toLocaleDateString('pt-BR'), lista: c.destinos.lista.map((x, i) => ({ ...x, pais: t(`pd-p-${i}`) || x.pais, comex: n(`pd-c-${i}`), min: n(`pd-a-${i}`), max: n(`pd-b-${i}`) })) };
-    salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
 >>>>>>>
