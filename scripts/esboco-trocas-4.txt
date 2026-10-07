@@ -1,0 +1,43 @@
+<<<<<<< public/app.js
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, ligarEsboco3 } from '/esboco3.js';
+=======
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoBiblioteca, ligarEsboco3 } from '/esboco3.js';
+>>>>>>>
+<<<<<<< public/app.js
+
+  ${faixaAssinante(H())}
+=======
+>>>>>>>
+<<<<<<< public/app.js
+  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
+=======
+  ${cartaoBiblioteca(H())}
+
+  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
+>>>>>>>
+<<<<<<< public/app.js
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'ferramentas' };
+=======
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado' };
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const dolar = D.dolar;
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (itens.length < 3 && dolar) linha(bola('#5F5B52'), `Dólar hoje: <b>R$ ${nf(dolar.bid, 2)}</b> (${dolar.pct > 0 ? '+' : ''}${nf(dolar.pct, 1)}%)`, '#/mercado');
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+    <a class="link-mini" href="#/ferramentas" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Ferramentas</a>
+=======
+    <a class="link-mini" href="#/mercado/analises" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Análises</a>
+>>>>>>>
+<<<<<<< public/ferramentas.js
+import { cartaoBiblioteca } from '/esboco3.js';
+=======
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  ${cartaoBiblioteca(h)}
+=======
+>>>>>>>
