@@ -44,7 +44,7 @@ export default async (req, context) => {
     };
     await l.setJSON(id, anuncio);
     try {
-      await avisar((insc) => (insc.admin ? { titulo: 'Novo anúncio no balcão', corpo: `${lado === 'Venda' ? 'VENDA' : 'COMPRA'} · ${CATEGORIAS[categoria]} · ${volume} · ${regiao}. Toque para aprovar.`, url: '/#/balcao-admin', tag: 'balcao-admin', urgencia: 'high' } : null));
+      await avisar((insc) => (insc.admin ? { titulo: 'Novo anúncio no balcão', corpo: `${lado === 'Venda' ? 'VENDA' : 'COMPRA'} · ${CATEGORIAS[categoria]} · ${volume} · ${regiao}. Toque para aprovar.`, url: '/painel#balcao', tag: 'balcao-admin', urgencia: 'high' } : null));
     } catch (e) { /* o aviso nunca impede o anúncio */ }
     return json({ ok: true, id });
   }

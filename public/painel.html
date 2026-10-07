@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel · Amendoim Brasil</title>
+  <meta name="theme-color" content="#007731">
+  <link rel="icon" type="image/png" href="/icons/icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/extra.css">
+  <link rel="stylesheet" href="/visual.css">
+  <style>
+    [hidden] { display: none !important; }
+    .pn { max-width: 980px; margin: 0 auto; padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
+    .pn-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .pn-topo .marca { display: flex; align-items: center; gap: 10px; }
+    .pn-topo img { height: 34px; }
+    .pn-topo h1 { margin: 0; font-size: 18px; font-weight: 800; }
+    .pn-topo small { display: block; font-size: 12px; color: var(--texto-3); font-weight: 600; }
+    #pn-entrar { max-width: 420px; }
+    #pn-entrar input { flex: 1; min-height: 44px; border: 1px solid var(--borda); border-radius: 12px; padding: 0 12px; font: inherit; font-size: 15px; }
+    #pn-corpo { display: flex; flex-direction: column; gap: 14px; }
+    .pn-abas { position: sticky; top: 0; z-index: 5; overflow-x: auto; scrollbar-width: none; }
+    .pn-abas button { white-space: nowrap; padding: 0 10px; flex: 1 0 auto; font-size: 13px; }
+    .pn-tabela thead th:first-child { text-align: left; }
+    .pn-periodo { margin-top: -4px; }
+    .pn-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .pn-tiles-3 { grid-template-columns: repeat(3, 1fr); }
+    .pn-tiles-4 { grid-template-columns: repeat(4, 1fr); }
+    .pn-tile { background: var(--cartao); border: 1px solid var(--borda); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .pn-tile span { font-size: 12px; font-weight: 700; color: var(--texto-3); }
+    .pn-tile b { font-size: 24px; font-weight: 800; color: var(--texto); line-height: 1.2; }
+    .pn-tile small { font-size: 11px; color: var(--texto-3); line-height: 1.3; }
+    .pn-tile a { color: var(--verde); font-weight: 700; }
+    .pn-grafico svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+    .pn-grafico .eixo { font-size: 10px; fill: var(--texto-3); font-family: inherit; }
+    .pn-grafico rect[data-dia] { cursor: pointer; }
+    .pn-leitura { font-size: 13px; font-weight: 700; color: var(--texto-2); min-height: 20px; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+    .pn-destaques > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--linha); font-size: 14px; }
+    .pn-destaques > div:last-child { border-bottom: 0; }
+    .pn-destaques span { color: var(--texto-3); }
+    .pn-destaques b { text-align: right; }
+    .pn-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; align-items: start; }
+    .pn-rank { gap: 8px; }
+    .pn-linha { display: grid; grid-template-columns: minmax(120px, 1.5fr) 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
+    .pn-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texto-2); font-weight: 600; }
+    .pn-barra { height: 10px; background: var(--linha); border-radius: 5px; overflow: hidden; }
+    .pn-barra i { display: block; height: 100%; background: var(--verde); border-radius: 5px; }
+    .pn-linha b { min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+    .pn-nota { margin: 0 4px; }
+    .pn-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pn-chips .pilula { background: var(--amendoim-claro); color: var(--marrom); }
+    .pn-tabela th:first-child { white-space: normal; }
+    .pn-aviso { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .pn-aviso > div { display: flex; flex-direction: column; gap: 2px; }
+    .pn-aviso #pn-avisos-msg { flex-basis: 100%; }
+    .btn-contorno { background: #fff; border: 1px solid var(--borda); color: var(--texto-2); }
+    .pn-acoes-rel { display: flex; gap: 8px; justify-content: space-between; margin-bottom: 12px; }
+    .pn-folha { background: #fff; border: 1px solid var(--borda); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+    .pn-folha header { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 3px solid var(--verde); }
+    .pn-folha header img { height: 48px; }
+    .pn-folha header b { display: block; font-size: 20px; font-weight: 800; }
+    .pn-folha header span { font-size: 14px; color: var(--texto-3); font-weight: 600; }
+    .pn-folha h3 { margin: 4px 0 0; font-size: 14px; font-weight: 800; color: var(--verde-escuro); }
+    .pn-duas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .pn-duas > div { display: flex; flex-direction: column; gap: 8px; }
+    .pn-sobre { font-size: 12px; color: var(--texto-2); line-height: 1.5; margin: 0; background: var(--verde-fundo); padding: 12px 14px; border-radius: 12px; }
+    .pn-folha footer { font-size: 11px; color: var(--texto-3); border-top: 1px solid var(--linha); padding-top: 10px; }
+    @media (max-width: 560px) {
+      .pn-tiles-3, .pn-tiles-4 { grid-template-columns: 1fr 1fr; }
+      .pn-duas { grid-template-columns: 1fr; }
+      .pn-folha { padding: 18px; }
+      .pn-tile b { font-size: 21px; }
+    }
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      body { background: #fff; }
+      .pn-topo, .pn-acoes-rel, #pn-entrar { display: none !important; }
+      .pn { padding: 0; max-width: none; }
+      .pn-folha { border: 0; padding: 0; }
+      .pn-tiles-4 { grid-template-columns: repeat(4, 1fr); }
+      .pn-duas { grid-template-columns: 1fr 1fr; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pn">
+    <div class="pn-topo">
+      <div class="marca"><img src="/img/logo.png" alt=""><div><h1>Painel do app</h1><small>Amendoim Brasil · acesso restrito</small></div></div>
+      <button class="btn btn-pequeno btn-contorno" id="pn-sair" hidden>Sair</button>
+    </div>
+    <form id="pn-entrar" class="cartao" style="gap:10px" hidden>
+      <label class="rotulo" for="pn-chave">Chave de acesso</label>
+      <div style="display:flex;gap:8px"><input id="pn-chave" type="password" autocomplete="current-password"><button class="btn btn-verde btn-pequeno" type="submit">Entrar</button></div>
+      <span class="mini">A chave fica salva só neste aparelho.</span>
+    </form>
+    <div id="pn-corpo"></div>
+  </div>
+  <script type="module" src="/painel-admin.js"></script>
+</body>
+</html>

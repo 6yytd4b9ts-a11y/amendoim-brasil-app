@@ -3,6 +3,7 @@
 // h = utilitários do app (esc, ic, I, brl, numBr, pct, wa, linkSeguro).
 import { listaOfertas } from '/balcao.js';
 import { bandeira, NOME_CURTO } from '/bandeiras.js';
+import { slug } from '/medicao.js';
 
 function seta(h, efeito) {
   const { I } = h;
@@ -124,18 +125,13 @@ export function blocoPanoramaCompacto(D, h) {
 
 // ---------- NÚMEROS (só para o Helder, com chave) ----------
 export function telaNumeros(h) {
-  const { esc, ic, I } = h;
-  let k = '';
-  try { k = localStorage.getItem('ab-chave-numeros') || ''; } catch (e) { /* sem armazenamento */ }
+  const { ic, I } = h;
   return `<header class="topo">
     <a class="link-mini" href="#/inicio" style="display:flex;align-items:center;gap:4px">${ic(I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Início</a>
-    <div><h1>Números do app</h1><div class="sub">Acessos e cliques por dia (sem dados pessoais)</div></div>
+    <div><h1>Painel do app</h1><div class="sub">Uso do app, patrocinadores e balcão</div></div>
   </header>
-  <form id="form-numeros" class="cartao" style="gap:10px">
-    <label class="rotulo" for="chave-numeros">Chave de acesso</label>
-    <div style="display:flex;gap:8px"><input id="chave-numeros" type="password" autocomplete="off" value="${esc(k)}" style="flex:1"><button class="btn btn-verde btn-pequeno" type="submit">Ver</button></div>
-  </form>
-  <div id="numeros-saida"></div>`;
+  <a class="btn btn-verde" href="/painel">Abrir o painel</a>
+  <span class="mini" style="text-align:center">Acesso só com a chave.</span>`;
 }
 
 const COLUNAS = [
@@ -268,8 +264,9 @@ export function seloPatrocinio(D, local, h) {
   if (!p) return '';
   if (p.exemplo || !p.logo) return '';
   const href = linkSeguro(p.link);
+  const id = slug(p.nome, 20); // usado na medição de impressões e cliques do patrocinador
   const dentro = `<span>Oferecimento</span><img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
-  return href ? `<a class="patrocinio" href="${esc(href)}" target="_blank" rel="noopener sponsored">${dentro}</a>` : `<div class="patrocinio">${dentro}</div>`;
+  return href ? `<a class="patrocinio" href="${esc(href)}" target="_blank" rel="noopener sponsored" data-patro="${id}" data-local="${esc(local)}" data-ev="patro-clique-${id}-${esc(local)}">${dentro}</a>` : `<div class="patrocinio" data-patro="${id}" data-local="${esc(local)}">${dentro}</div>`;
 }
 
 export function blocoPatrocinadores(D, h) {
@@ -281,8 +278,9 @@ export function blocoPatrocinadores(D, h) {
     <div class="patro-grade">${lista.map((p) => {
       if (p.exemplo || !p.logo) return '<a class="parceiro vago" href="#/anuncie" data-ev="anuncie-abrir">Anuncie aqui</a>';
       const href = linkSeguro(p.link);
+      const id = slug(p.nome, 20);
       const img = `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
-      return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${img}</a>` : `<span class="parceiro">${img}</span>`;
+      return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored" data-patro="${id}" data-local="rodape" data-ev="patro-clique-${id}-rodape">${img}</a>` : `<span class="parceiro" data-patro="${id}" data-local="rodape">${img}</span>`;
     }).join('')}</div>
   </section>`;
 }

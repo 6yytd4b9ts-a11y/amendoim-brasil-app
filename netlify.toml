@@ -13,6 +13,18 @@
   to = "/index.html"
   status = 200
 
+# Painel privado (só abre com a chave; fora do Google)
+[[redirects]]
+  from = "/painel"
+  to = "/painel.html"
+  status = 200
+
+[[headers]]
+  for = "/painel*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+
 [[headers]]
   for = "/data/*"
   [headers.values]
