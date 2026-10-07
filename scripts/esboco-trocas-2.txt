@@ -1,3 +1,91 @@
+<<<<<<< public/esboco.js
+
+let h = null;
+=======
+import { cartaoExclusivo } from '/esboco3.js';
+
+let h = null;
+>>>>>>>
+<<<<<<< public/esboco.js
+const item = (t, bloqueado = false) => `<div class="es-item">${h.ic(bloqueado ? h.I.cadeado : ok, `style="width:18px;height:18px;stroke:${bloqueado ? '#7A4A08' : '#007731'};stroke-width:2.4;flex-shrink:0"`)}<span>${t}</span></div>`;
+=======
+const benef = (icone, titulo, txt) => `<div class="es-benef-item"><span class="es-benef-ic">${h.ic(icone, 'style="width:20px;height:20px;stroke:#007731"')}</span><span><b>${titulo}</b><span>${txt}</span></span></div>`;
+const item = (t, bloqueado = false) => `<div class="es-item">${h.ic(bloqueado ? h.I.cadeado : ok, `style="width:18px;height:18px;stroke:${bloqueado ? '#7A4A08' : '#007731'};stroke-width:2.4;flex-shrink:0"`)}<span>${t}</span></div>`;
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="pilula pilula-amendoim" style="align-self:flex-start">EXCLUSIVO ASSINANTES</span>
+    <b class="es-h1">Informação na ponta do lápis para vender e comprar melhor</b>
+    <span class="es-txt">Estimativas próprias da Amendoim Brasil, dados de exportação completos e histórico de preço, atualizados por quem está no mercado.</span>
+    <div class="es-lista">
+      ${item('Estimativas Amendoim Brasil: área, produção e balanço')}
+      ${item('Exportação mês a mês, destinos e preço por país')}
+      ${item('Histórico de preço de 1 e 5 anos e sazonalidade')}
+      ${item('Empresa: paridade de exportação e alertas avançados')}
+=======
+    <span class="pilula pilula-verde" style="align-self:flex-start">ÁREA DO ASSINANTE</span>
+    <b class="es-h1">Venda e compre amendoim sabendo para onde o preço vai</b>
+    <span class="es-txt">O que o Helder acompanha todo dia no mercado, direto no seu celular. Informação que não está no grupo de WhatsApp nem no jornal.</span>
+    <div class="es-benef">
+      ${benef('<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>', 'Quanto o Brasil vai colher', 'Estimativa própria de área e produção, atualizada todo mês, para comparar com os números oficiais.')}
+      ${benef(h.I.doc, 'Segurar ou vender?', 'Toda segunda, a leitura da semana: indústrias, exportação e para onde o preço tende a ir.')}
+      ${benef('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>', 'Aviso no preço que você quer', 'Escolha o preço-alvo e o app avisa quando chegar. Com histórico de 5 anos e a melhor época de vender.')}
+      ${benef('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'As datas que mexem no preço', 'USDA, Conab e feiras internacionais, com lembrete um dia antes.')}
+>>>>>>>
+<<<<<<< public/esboco.js
+    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">Criar conta e assinar</a>
+=======
+    ${c.diasTeste ? `<div class="es-teste"><b>${c.diasTeste} dias grátis para conhecer</b><span>Use tudo durante ${c.diasTeste} dias. Se não gostar, cancele antes e não paga nada.</span></div>` : ''}
+    <a class="btn btn-verde" href="#/conta/criar" data-ev="esb-criar">${c.diasTeste ? `Começar meus ${c.diasTeste} dias grátis` : 'Criar conta e assinar'}</a>
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${c.diasTeste ? `<span class="mini" style="text-align:center">${c.diasTeste} dias grátis para conhecer · cancele quando quiser</span>` : ''}
+=======
+    <span class="mini" style="text-align:center">Depois: R$ ${nf(c.planos.produtor.mensal, 2)} por mês, ou R$ ${nf(c.planos.produtor.anual / 12, 2)}/mês no plano anual</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+
+  <a class="cartao es-previa" href="#/estimativas">
+    <div class="cartao-cab"><span class="rotulo">Estimativa de safra ${h.esc(c.estimativas[c.estimativas.length - 1].safra)}</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#7A4A08"')}</div>
+    <div class="es-borrado" aria-hidden="true"><div class="dx-tiles">
+      <div class="dx-tile"><span>Área</span><b>${nf(c.estimativas[c.estimativas.length - 1].areaMin)} mil ha</b></div>
+      <div class="dx-tile"><span>Produção</span><b>${nf(p.scMeio / 1e6, 1)} mi sc</b></div>
+      <div class="dx-tile"><span>Variação</span><b>−00%</b></div>
+    </div></div>
+    <span class="mini">Toque para ver o que tem dentro</span>
+  </a>
+=======
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
+=======
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do mercado', 'USDA, Conab, feiras e eventos, com lembrete')}
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
+  ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
+>>>>>>>
+<<<<<<< public/esboco.js
+  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · 2 meses grátis']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
+  ${cartao('produtor', ['Estimativas Amendoim Brasil', 'Dados de exportação completos', 'Histórico de preço e sazonalidade'])}
+  ${cartao('empresa', ['Tudo do Produtor', 'Paridade de exportação', 'Alertas avançados e relatório mensal', 'Até 3 pessoas da empresa'])}`;
+=======
+  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · mais barato']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
+  ${cartao('produtor', ['Estimativas Amendoim Brasil todo mês', 'Leitura semanal do mercado', 'Agenda do mercado com lembretes', 'Histórico de 5 anos e alerta de preço-alvo'])}
+  ${cartao('empresa', ['Tudo do Produtor', 'Preço por destino: Argélia, Rússia, África do Sul…', 'Exportação completa e paridade', 'Relatório mensal e até 3 pessoas'])}`;
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
+      <section class="cartao es-cadeado">
+        ${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
+        <b class="es-h1" style="text-align:center">Estimativas Amendoim Brasil</b>
+        <span class="es-txt" style="text-align:center">Área, produção e balanço de cada safra, com a leitura do Helder. Exclusivo para assinantes.</span>
+        <a class="btn btn-verde" href="#/conta/criar" style="width:100%">Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}</a>
+        <a class="btn btn-escuro" href="#/conta/entrar" style="width:100%">Já sou assinante</a>
+      </section>
+    </div>`;
+=======
+    ${cartaoExclusivo(h, 'Estimativas Amendoim Brasil', 'Quanto o Brasil vai plantar e colher, safra por safra, com a leitura do Helder.', ['Área, produtividade e produção de cada safra', 'Balanço de oferta e demanda do Brasil', 'Atualizado todo mês'], '#/conta/criar', `Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}`)}
+    <a class="btn btn-escuro" href="#/conta/entrar">Já sou assinante</a>`;
+>>>>>>>
 <<<<<<< public/painel-esboco2.js
 let redesenhar = () => {};
 =======
@@ -5,22 +93,26 @@ const lerLista = (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]
 let redesenhar = () => {};
 >>>>>>>
 <<<<<<< public/painel-esboco2.js
+  const pendentes = ['notificacao', 'fisico', 'fato'].filter((k) => !feito[k]).length;
+=======
+  const pendentes = ['notificacao', 'fato'].filter((k) => !feito[k]).length;
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    ${tile('Para você hoje', `${pendentes} de 3`, pendentes ? 'tarefas esperando' : 'tudo em dia')}
+=======
+    ${tile('Para você hoje', `${pendentes} de 2`, pendentes ? 'tarefas esperando' : 'tudo em dia')}
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+  ${item('fisico', 'Preço do mercado físico', `
     <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe o que o mercado está pagando de verdade:</span>
     <div class="pe-grade"><div class="campo"><label>Alta Paulista (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 82,00"></div><div class="campo"><label>Mogiana (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 84,00"></div></div>
     <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-feito="fisico">Publicar</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
 =======
-    <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe a faixa que o mercado está pagando de verdade (R$/saca):</span>
-    ${(conteudo().fisico?.regioes || []).map((r, i) => `<div class="pe-fis"><span>${esc(r.nome)}</span><input id="pe-fmin-${i}" inputmode="decimal" value="${esc(String(r.min).replace('.', ','))}" aria-label="mínimo"><span>a</span><input id="pe-fmax-${i}" inputmode="decimal" value="${esc(String(r.max).replace('.', ','))}" aria-label="máximo"></div>`).join('')}
-    <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-fisico>Publicar no app</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
   <section class="cartao" style="gap:10px">
     <b style="font-size:15px">Termômetro do preço</b>
     <div class="chips">${['Fraco', 'Fraco a estável', 'Estável', 'Estável a firme', 'Firme'].map((t) => `<button class="chip" data-pe-termo="${t}" aria-pressed="${conteudo().termometro === t}">${t}</button>`).join('')}</div>
     <span class="mini">Muda na hora o ponteiro do termômetro no app.</span>
   </section>
-  ${(() => { const l = lerLista('ab-esboco-contesta'); return `<section class="cartao" style="gap:8px">
-    <div class="cartao-cab"><b style="font-size:15px">Preços informados pelos produtores</b><span class="mini">${l.length}</span></div>
-    ${l.length ? l.slice(0, 8).map((x) => `<div class="lista-linha"><span class="cresce"><b style="font-size:14px;display:block">R$ ${esc(x.preco)} · ${esc(x.municipio)}</b><span class="mini">${esc(x.obs || 'sem detalhe')} · ${new Date(x.quando).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span></span></div>`).join('') : '<span class="mini">Quando um produtor tocar em "Esse preço está diferente na sua região?", o preço que ele viu aparece aqui.</span>'}
-  </section>`; })()}
 >>>>>>>
 <<<<<<< public/painel-esboco2.js
   <div class="es-botoes"><button class="btn btn-escuro btn-pequeno" data-pe-csv>Baixar planilha (CSV)</button></div>
@@ -251,6 +343,39 @@ export function enqueteAtiva() {
     ${e.opcoes.map((t, k) => { const pc = (cont[k] / tot) * 100; return `<div class="es-enq-res ${voto === k ? 'meu' : ''}"><span>${h.esc(t)}${voto === k ? ' · você' : ''}</span><span class="es-enq-barra"><i style="width:${pc}%"></i></span><b class="num">${nf(pc)}%</b></div>`; }).join('')}
 >>>>>>>
 <<<<<<< public/esboco3.js
+  const f = conteudo().fisico || { regioes: [] };
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const zap = h.wa(`Olá, boa tarde! Gostaria de saber os preços do amendoim em casca na minha região${local?.nome && !local.gps ? ` (${local.nome})` : ''}.`);
+  return `<section class="cartao es-fisico" id="sec-fisico">
+    <div class="cartao-cab"><span class="rotulo">Mercado físico · quanto está pagando hoje</span>${f.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : `<span class="pilula pilula-verde">${h.esc(f.atualizado || 'hoje')}</span>`}</div>
+    <div class="es-fis-lista">${(f.regioes || []).map((r) => `<div class="es-fis-linha"><span class="cresce">${h.esc(r.nome)}</span><b class="num">${brl(r.min).replace(',00', '')} a ${brl(r.max).replace(',00', '')}</b></div>`).join('')}</div>
+    <span class="mini">R$ por saca de 25 kg, casca · faixa de negócio levantada pela Amendoim Brasil</span>
+    <details class="abre"><summary>Por que é diferente do preço oficial?</summary><p class="es-txt" style="margin:0 0 10px">Conab e IEA mostram médias oficiais, sempre com alguns dias de atraso. O negócio de hoje muda conforme o comprador, a qualidade (aflatoxina, umidade), o volume e o frete. A faixa acima é o que está rodando de verdade.</p></details>
+    ${zap ? `<a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener" data-ev="fisico">${h.ic(h.I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Pedir o preço da minha região</a>` : ''}
+    ${est.contestar ? `<form id="fis-form" class="es-campos es-contestar">
+      <b style="font-size:14px">Qual preço você viu na sua região?</b>
+      <div class="es-duas"><div class="campo"><label for="fis-preco">R$ por saca</label><input id="fis-preco" inputmode="decimal" placeholder="ex.: 81,00" required></div>
+      <div class="campo"><label for="fis-mun">Município</label><input id="fis-mun" value="${h.esc(local?.gps ? '' : local?.nome || '')}" required></div></div>
+      <div class="campo"><label for="fis-obs">Detalhe <span style="font-weight:500">(opcional: comprador, qualidade)</span></label><input id="fis-obs"></div>
+      <button class="btn btn-escuro btn-pequeno" type="submit">Enviar para o Helder</button>
+    </form>` : `<button class="link-mini es-contestar-btn" type="button" data-fis-contestar>Esse preço está diferente na sua região? Me conta</button>`}
+    ${est.msgFisico ? `<span class="mini" role="status" style="text-align:center;font-weight:700;color:var(--verde-escuro)">${h.esc(est.msgFisico)}</span>` : ''}
+=======
+  const hr = +new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hourCycle: 'h23' }).format(new Date());
+  const ola = hr < 12 ? 'bom dia' : hr < 18 ? 'boa tarde' : 'boa noite';
+  const zap = h.wa(`Olá, ${ola}! Gostaria de saber os preços do mercado físico hoje${local?.nome && !local.gps ? ` (região de ${local.nome})` : ''}.`);
+  if (!zap) return '';
+  return `<section class="cartao es-fisico2" id="sec-fisico">
+    <div class="es-fis2-topo">
+      <span class="sigla" style="width:42px;height:42px;border-radius:12px;background:var(--verde-claro)">${h.ic(h.I.zap, 'style="stroke:#007731"')}</span>
+      <span class="cresce"><b style="font-size:15px;display:block">Mercado físico hoje</b><span class="mini">Quanto está pagando no negócio da sua região</span></span>
+    </div>
+    <span class="es-fis2-txt">Conab e IEA são médias oficiais e saem com alguns dias de atraso. No físico o preço muda todo dia, conforme o comprador, a qualidade e o volume.</span>
+    <a class="btn btn-verde btn-pequeno" href="${zap}" target="_blank" rel="noopener" data-ev="fisico">Perguntar o preço de hoje</a>
+>>>>>>>
+<<<<<<< public/esboco3.js
   return `${voltar}<div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
     <section class="cartao es-cadeado">${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
       <b class="es-h1" style="text-align:center">Plano Empresa</b>
@@ -275,176 +400,4 @@ export function enqueteAtiva() {
       est.enqueteCel = false; ctx.render(false);
     }
 =======
->>>>>>>
-<<<<<<< public/esboco-clima.js
-// Chuva nas regiões: o que choveu nos últimos 7 dias e o previsto (ECMWF) para os próximos 7.
-=======
-// Chuva nas regiões: o que choveu nos últimos 7 dias e ontem (fonte: Open-Meteo), por município.
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    const [passado, futuro] = await Promise.all([
-      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`),
-      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&forecast_days=7&models=ecmwf_ifs025&timezone=${tz}`).catch(() => null)
-    ]);
-    const lp = Array.isArray(passado) ? passado : [passado], lf = futuro ? (Array.isArray(futuro) ? futuro : [futuro]) : [];
-=======
-    const passado = await getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`);
-    const lp = Array.isArray(passado) ? passado : [passado];
->>>>>>>
-<<<<<<< public/esboco-clima.js
-      const prev7 = lf[k] ? lf[k].daily.precipitation_sum.reduce((s, v) => s + (v || 0), 0) : null;
-      return { ...m, choveu7, prev7, seco };
-=======
-      return { ...m, choveu7, ontem: mm[i - 1] ?? null, seco };
->>>>>>>
-<<<<<<< public/esboco-clima.js
-export function telaClimaNova(D, h) {
-=======
-const linhaPluvio = (r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${escH(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numH(r.mm)} mm</b><small>${r.meu ? '' : r.fonte ? 'estimado' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`;
-let escH = (v) => v, numH = (v) => v;
-
-export function telaClimaNova(D, h) {
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const { esc, ic, I, numBr } = h;
-=======
-  escH = h.esc; numH = h.numBr;
-  const { esc, ic, I, numBr } = h;
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const fase = D.config.faseSafra || 'Plantio';
-=======
-  const proxChuva = diasTodos.slice(hoje && (hoje.mm || 0) >= 5 ? 1 : 0).find((d) => (d.mm || 0) >= 5);
-  const fase = D.config.faseSafra || 'Plantio';
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const maxReg = Math.max(10, ...regs.map((r) => Math.max(r.prev7 || 0, r.choveu7 || 0)));
-  const linhaReg = (r) => `<div class="es-reg2">
-      <span class="es-reg-nome">${esc(r.nome)}</span>
-      <span class="es-reg-num"><small>choveu</small><b class="num">${numBr(r.choveu7)}</b></span>
-      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.prev7 || 0) / maxReg) * 100)}%"></i></span>
-      <span class="es-reg-num prev"><small>previsto</small><b class="num">${r.prev7 == null ? '—' : numBr(r.prev7)}</b></span>
-      ${r.seco >= 7 ? `<span class="es-reg-seco">${r.seco} dias sem chuva</span>` : ''}
-=======
-  const maxReg = Math.max(10, ...regs.map((r) => r.choveu7 || 0));
-  const linhaReg = (r) => `<div class="es-reg3">
-      <span class="es-reg-nome">${esc(r.nome)}${r.seco >= 7 ? `<small class="es-reg-seco">${r.seco} dias sem chuva</small>` : ''}</span>
-      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.choveu7 || 0) / maxReg) * 100)}%"></i></span>
-      <b class="num">${numBr(r.choveu7)} mm</b>
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
-=======
-  // Pluviômetro: vale o que os produtores informaram; onde ninguém informou, entra o valor da fonte (estimado).
-  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
->>>>>>>
-<<<<<<< public/esboco-clima.js
-
-  return `<header class="topo">
-=======
-  const comRelato = new Set(relatos.map((r) => r.municipio));
-  const daFonte = regs.filter((r) => r.ontem != null && !comRelato.has(r.nome)).map((r) => ({ municipio: r.nome, mm: r.ontem, fonte: true }));
-  const pluvio = [...relatos, ...daFonte];
-
-  return `<header class="topo">
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <div class="es-clima-resumo">
-      <div><span>Previsto 7 dias</span><b class="num">${mm(total7)}</b></div>
-      <div><span>Dias com chuva</span><b class="num">${comChuva} de 7</b></div>
-      <div><span>Sem chuva há</span><b class="num">${numBr(a.semChuva)} dias</b></div>
-=======
-    <div class="es-clima-info">
-      <div>${icone(h, 'chuva', 20)}<span>Próxima chuva</span><b>${proxChuva ? `${esc(proxChuva.dia)}, ${dataCurta(proxChuva.data)} · ${numBr(proxChuva.mm)} mm` : 'sem chuva boa em 15 dias'}</b></div>
-      <div>${icone(h, 'garoa', 20)}<span>Próximos 7 dias</span><b>${total7 < 1 ? 'sem chuva' : `${mm(total7)} em ${comChuva} ${comChuva === 1 ? 'dia' : 'dias'}`}</b></div>
-      <div>${icone(h, 'sol', 20)}<span>Última chuva</span><b>${a.semChuva == null ? '—' : a.semChuva === 0 ? 'ontem' : `há ${numBr(a.semChuva + 1)} dias`}</b></div>
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <a class="es-radar" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
-      <span class="cresce"><b>Radar ao vivo · IPMet/Unesp</b><small>Bauru e Presidente Prudente · onde está chovendo agora</small></span>
-      <span class="es-radar-escala" aria-hidden="true"><i style="background:#7FD8F5"></i><i style="background:#2FBF4A"></i><i style="background:#F5E33A"></i><i style="background:#F59A23"></i><i style="background:#E5322B"></i><i style="background:#D63AC8"></i></span>
-=======
-    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
-      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
-      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
-      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <span class="es-radar-leg"><span>fraca</span><span>moderada</span><span>forte</span><span>granizo</span></span>
-=======
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">mm · 7 dias</span></div>
-    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} municípios</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
-    <span class="mini">Choveu: últimos 7 dias · barra azul: previsto para os próximos 7 dias (ECMWF)</span>
-=======
-    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias</span></div>
-    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} ${l.length === 1 ? 'município' : 'municípios'}</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <div class="cartao-cab"><span class="rotulo">Pluviômetro dos produtores</span><span class="mini">hoje</span></div>
-=======
-    <div class="cartao-cab"><span class="rotulo">Pluviômetro</span><span class="mini">chuva de ontem</span></div>
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <div>${relatos.map((r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${esc(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numBr(r.mm)} mm</b><small>${r.meu ? '' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`).join('')}</div>
-    <span class="mini">Chuva medida de verdade, no pluviômetro de quem planta${(conteudo().chuvaExemplo || []).length ? ' · relatos de exemplo' : ''}</span>
-=======
-    <div>${pluvio.slice(0, 6).map(linhaPluvio).join('')}</div>
-    ${pluvio.length > 6 ? `<details class="abre"><summary>Ver todos os municípios (${pluvio.length})</summary>${pluvio.slice(6).map(linhaPluvio).join('')}</details>` : ''}
-    <span class="mini">Produtor: medido no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (relatos de exemplo)' : ''} · Estimado: fonte Open-Meteo, quando ninguém informou</span>
->>>>>>>
-<<<<<<< public/esboco3.css
-.es-btn-estrela { background: #FBE7C6 !important; border-color: var(--amendoim-borda) !important; }
-.es-btn-estrela svg { width: 24px; height: 24px; }
-=======
->>>>>>>
-<<<<<<< public/esboco3.css
-.es-enq-res { display: grid; grid-template-columns: 92px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
-=======
-.es-enq-res { display: grid; grid-template-columns: minmax(0, 1fr) 38% 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
->>>>>>>
-<<<<<<< public/esboco3.css
-.es-radar { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); border-radius: 14px; padding: 10px 12px; color: #fff; text-decoration: none; }
-.es-radar b { display: block; font-size: 14px; }
-.es-radar small { display: block; font-size: 11px; opacity: .88; }
-.es-radar-escala { display: flex; height: 12px; border-radius: 6px; overflow: hidden; width: 90px; flex-shrink: 0; }
-.es-radar-escala i { flex: 1; }
-.es-radar-leg { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; opacity: .85; margin: -8px 2px 0 auto; width: 150px; }
-=======
->>>>>>>
-<<<<<<< public/esboco3.css
-.es-reg-num { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
-.es-reg-num small { font-size: 9px; color: var(--texto-3); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
-.es-reg-num b { font-size: 14px; }
-.es-reg-num.prev b { color: #2F5F8A; }
-=======
->>>>>>>
-<<<<<<< public/esboco3.css
-.segmento a[href="#/mercado/consultoria"] { color: #7A4A08; font-weight: 800; }
-.segmento a[href="#/mercado/consultoria"]:not([aria-current="page"]) { background: #FBE7C6; }
-=======
-
-/* v4: perfil no topo, faixa do assinante no estilo do app, cartão de exclusivo sem borrado */
-.es-btn-perfil { color: var(--verde); text-decoration: none; }
-.es-btn-perfil b { font-size: 15px; font-weight: 800; color: var(--verde); letter-spacing: .02em; }
-.es-faixa-ass2 { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; text-decoration: none; color: inherit; }
-.es-exclusivo { gap: 12px; }
-.es-enq-ops.col2 { grid-template-columns: 1fr 1fr; }
-.es-enq-op { padding: 8px; line-height: 1.25; }
-/* v4: clima mais limpo */
-.es-clima-info { background: rgba(255, 255, 255, .14); border-radius: 16px; padding: 4px 12px; display: flex; flex-direction: column; }
-.es-clima-info div { display: grid; grid-template-columns: 26px auto 1fr; align-items: center; gap: 8px; padding: 9px 0; font-size: 14px; }
-.es-clima-info div + div { border-top: 1px solid rgba(255, 255, 255, .2); }
-.es-clima-info div > svg { stroke: #fff !important; }
-.es-clima-info span { opacity: .9; }
-.es-clima-info b { text-align: right; font-weight: 800; }
-.es-radar2 { display: flex; align-items: center; gap: 12px; background: #fff; color: #1F4E78; border-radius: 16px; padding: 12px 14px; text-decoration: none; }
-.es-radar2 b { display: block; font-size: 15px; font-weight: 800; }
-.es-radar2 small { display: block; font-size: 12px; color: #4A6683; margin-top: 1px; }
-.es-radar2-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--azul-claro); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.es-reg3 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 62px; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--linha); font-size: 14px; }
-.es-reg3 .es-reg-nome { font-weight: 700; color: var(--texto-2); display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.es-reg3 .es-reg-seco { align-self: flex-start; font-size: 10px; }
-.es-reg3 b { text-align: right; }
 >>>>>>>
