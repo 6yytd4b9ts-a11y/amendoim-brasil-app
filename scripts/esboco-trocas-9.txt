@@ -1,0 +1,269 @@
+<<<<<<< public/esboco.js
+      <span class="es-txt">Use a área do assinante por ${dias} dias, sem pagar nada e sem cartão. Depois do teste, o Helder libera a assinatura pelo WhatsApp até a cobrança automática abrir.${est.plano === 'empresa' ? ' O plano Empresa é liberado pelo Helder no WhatsApp; o teste é do plano Produtor.' : ''}</span>
+=======
+      <span class="es-txt">Use a área do assinante por ${dias} dias, sem pagar nada e sem cartão. Depois do teste, o Helder libera a assinatura pelo WhatsApp até a cobrança automática abrir.</span>
+      <span class="mini">Plano do teste: <b>${h.esc(p.nome)}</b>. Você pode trocar de plano a qualquer momento em Minha conta.</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+      <span class="mini">Depois do teste: <b class="num">${preco(c.planos.produtor[est.periodo])}</b> ${est.periodo === 'anual' ? 'por ano' : 'por mês'} no plano Produtor.</span>
+=======
+      <span class="mini">Depois do teste: <b class="num">${preco(v)}</b> ${est.periodo === 'anual' ? 'por ano' : 'por mês'} no plano ${h.esc(p.nome)}.</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+  </section>
+  ${emProducao() ? '' : `<section class="cartao es-teste" style="gap:10px">
+=======
+  </section>
+  ${emProducao() && s.teste && s.status === 'ativo' ? `<section class="cartao" style="gap:10px">
+    <span class="rotulo">Plano do teste</span>
+    <span class="es-txt">Durante o teste você pode experimentar cada plano. Toque para trocar.</span>
+    <div class="chips">${[['produtor', 'Produtor'], ['empresa', 'Empresa']].map(([k, t]) => `<button class="chip" type="button" data-esb-plano-teste="${k}" aria-pressed="${(s.plano || 'produtor') === k}">${t}</button>`).join('')}</div>
+  </section>` : ''}
+  ${emProducao() ? '' : `<section class="cartao es-teste" style="gap:10px">
+>>>>>>>
+<<<<<<< public/esboco.js
+      salvarSessao({ ...s0, status: 'ativo', plano: 'produtor', periodo: est.periodo, forma: 'teste', teste: true, testeAte: ate.toISOString().slice(0, 10), vence: ate.toLocaleDateString('pt-BR') });
+=======
+      salvarSessao({ ...s0, status: 'ativo', plano: est.plano, periodo: est.periodo, forma: 'teste', teste: true, testeAte: ate.toISOString().slice(0, 10), vence: ate.toLocaleDateString('pt-BR') });
+>>>>>>>
+<<<<<<< public/esboco.js
+    }
+    if (q('[data-esb-rever-bv]')) { mostrarBoasVindas(h); return; }
+=======
+    }
+    if ((x = q('[data-esb-plano-teste]'))) { const s = sessao(); if (s && s.teste) { salvarSessao({ ...s, plano: x.dataset.esbPlanoTeste === 'empresa' ? 'empresa' : 'produtor' }); ctx.render(false); } return; }
+    if (q('[data-esb-rever-bv]')) { mostrarBoasVindas(h); return; }
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const raio = (mm) => 3.2 + Math.min(3.6, Math.sqrt(mm || 0) * 0.55);
+=======
+  const raio = (mm) => 2 + Math.min(2.2, Math.sqrt(mm || 0) * 0.36);
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    nome: 'Barter', desc: 'Quantas sacas pagam o pacote de insumos',
+=======
+    nome: 'Barter', desc: 'Quantas sacas pagam os insumos e se compensa',
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['pacote', 'Valor do pacote', 'brl', 'R$/{u}', 'porArea', 'ex.: 9.000,00'],
+=======
+      ['pacote', 'Valor do pacote de insumos', 'brl', 'R$/{u}', 'porArea', 'ex.: 9.000,00'],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['mercado', 'Preço de mercado hoje · opcional', 'brl', 'R$/sc', ''],
+      ['prod', 'Produtividade esperada · opcional', 'int', 'sc/{u}', 'porArea'],
+=======
+      ['mercado', 'Preço da saca no mercado hoje · opcional', 'brl', 'R$/sc', '', 'ex.: 78,00'],
+      ['avista', 'Valor do mesmo pacote à vista · opcional', 'brl', 'R$/{u}', 'porArea', 'ex.: 8.200,00'],
+      ['prod', 'Produtividade esperada · opcional', 'int', 'sc/{u}', 'porArea', 'ex.: 450'],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    nome: 'Arrendamento', desc: 'O valor da terra em sacas',
+=======
+    nome: 'Arrendamento', desc: 'A conta da terra fecha? Veja em sacas e em lucro',
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['valor', 'Arrendamento', 'brl', 'R$/{u}', 'porArea'],
+      ['preco', 'Preço da saca', 'brl', 'R$/sc', ''],
+=======
+      ['valor', 'Valor do arrendamento', 'brl', 'R$/{u}', 'porArea', 'ex.: 3.000,00'],
+      ['preco', 'Preço da saca de amendoim', 'brl', 'R$/sc', '', 'ex.: 78,00'],
+      ['prod', 'Produtividade esperada · opcional', 'int', 'sc/{u}', 'porArea', 'ex.: 450'],
+      ['custo', 'Custo de produção sem a terra · opcional', 'brl', 'R$/{u}', 'porArea', 'ex.: 22.000,00'],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'rendimento', 'dolar', 'arrendamento', 'barter'];
+=======
+const ORDEM = ['custo', 'arrendamento', 'barter', 'avista', 'armazenar'];
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  ['Vender melhor', ['avista', 'armazenar', 'frete']],
+  ['Conversões', ['dolar', 'rendimento']]
+=======
+  ['Vender melhor', ['avista', 'armazenar']]
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  if (!FERR[qual]) return telaHub(h);
+=======
+  if (!ORDEM.includes(qual)) return telaHub(h);
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    if (v.pacote == null || !v.precoBarter) return vazio();
+=======
+    if (v.pacote == null || !v.precoBarter) return vazio('Preencha o valor do pacote e o preço da saca no barter');
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    const vant = v.mercado ? v.precoBarter - v.mercado : null;
+=======
+    const base = v.avista || v.pacote; // pacote que você pagaria em dinheiro
+    const scMercado = v.mercado ? base / v.mercado : null;
+    const dif = scMercado != null ? sc - scMercado : null; // sacas a mais (+) ou a menos (−) no barter
+    const preco = v.mercado ? v.precoBarter - v.mercado : null;
+    const ruim = dif != null && dif > 0.05, bom = dif != null && dif < -0.05;
+>>>>>>>
+<<<<<<< public/ferramentas.js
+        ${bloco(`Sacas por ${u}`, numBr(sc, 1) + ' sc')}
+=======
+        ${bloco(`Você entrega por ${u}`, numBr(sc, 1) + ' sc')}
+>>>>>>>
+<<<<<<< public/ferramentas.js
+        ${v.area ? linha('Total de sacas no contrato', numBr(sc * v.area) + ' sc') + linha('Valor total do pacote', brl(v.pacote * v.area)) : linha('Total de sacas', '<small>informe a área</small>')}
+        ${vant != null ? '<hr>' + linha('Barter vs vender hoje', (vant > 0 ? '+' : '') + brl(vant) + '/sc', sinal(vant)) + linha(`Diferença em sacas por ${u}`, numBr(v.pacote / v.mercado - sc, 1) + ' sc') : ''}
+=======
+        ${v.area ? linha('Total de sacas no contrato', numBr(sc * v.area) + ' sc') + linha('Valor total do pacote', brl(v.pacote * v.area)) : ''}
+        ${v.mercado ? linha('Saca no barter vs mercado', (preco > 0 ? '+' : '') + brl(preco) + '/sc', sinal(preco)) : ''}
+        ${scMercado != null ? linha(`Sacas se pagasse ${v.avista ? 'o pacote à vista' : 'o mesmo pacote'} vendendo no mercado`, numBr(scMercado, 1) + ' sc') : ''}
+        ${dif != null ? '<hr>' + linha(`O barter ${ruim ? 'custa a mais' : bom ? 'custa a menos' : 'empata'}, por ${u}`, (dif > 0 ? '+' : '') + numBr(dif, 1) + ' sc', ruim ? 'neg' : bom ? 'pos' : '') : ''}
+        ${dif != null && v.area ? linha('No contrato todo', (dif > 0 ? '+' : '') + numBr(dif * v.area) + ' sc', ruim ? 'neg' : bom ? 'pos' : '') : ''}
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ${vant != null ? `<span class="mini">${vant >= 0 ? 'O barter paga mais que o mercado hoje: você entrega menos sacas.' : 'O mercado hoje paga mais que o barter. Compare com comprar à vista e vender depois.'}</span>` : ''}`;
+=======
+      <span class="mini">${dif == null ? 'Coloque o preço de mercado de hoje para ver se o barter compensa. Se tiver o valor do pacote à vista, a comparação fica mais justa.' : ruim ? 'Pelos seus números, você entrega mais sacas no barter do que precisaria vendendo no mercado e pagando o pacote. Veja se o prazo e a segurança de preço valem essa diferença.' : bom ? 'Pelos seus números, o barter pede menos sacas do que vender no mercado para pagar o pacote. Confira também o risco de o preço da saca subir até a entrega.' : 'Barter e mercado dão praticamente o mesmo resultado hoje.'}</span>`;
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    if (v.valor == null || !v.preco) return vazio();
+=======
+    if (v.valor == null || !v.preco) return vazio('Preencha o valor do arrendamento e o preço da saca');
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    return `<div class="placares">${bloco(`Sacas por ${u}`, numBr(sc, 1) + ' sc')}${bloco('Total na área', v.area ? numBr(sc * v.area) + ' sc' : '—')}</div>
+      ${v.area ? `<div class="resultado">${linha('Valor total do arrendamento', brl(v.valor * v.area))}</div>` : ''}`;
+=======
+    const rec = v.prod ? v.prod * v.preco : null;
+    const sobra = rec != null && v.custo != null ? rec - v.custo - v.valor : null;
+    const eq = v.custo != null ? (v.custo + v.valor) / v.preco : null; // produtividade mínima para fechar a conta
+    return `<div class="placares">
+        ${bloco(`Arrendamento por ${u}`, numBr(sc, 1) + ' sc')}
+        ${bloco('Pesa na produção', v.prod ? numBr((sc / v.prod) * 100, 1) + '%' : '—')}
+      </div>
+      <div class="resultado">
+        ${v.area ? linha('Total do arrendamento', brl(v.valor * v.area) + ' · ' + numBr(sc * v.area) + ' sc') : ''}
+        ${eq != null ? linha('Produtividade mínima para fechar a conta', numBr(eq, 1) + ` sc/${u}`) : ''}
+        ${rec != null ? linha(`Receita por ${u}`, brl(rec)) : ''}
+        ${sobra != null ? '<hr>' + linha(`Sobra por ${u} depois de pagar tudo`, brl(sobra), sinal(sobra)) + (v.area ? linha('Sobra na área toda', brl(sobra * v.area), sinal(sobra)) : '') + linha('Sobra por saca', brl(sobra / v.prod), sinal(sobra)) : ''}
+      </div>
+      <span class="mini">${sobra != null ? (sobra >= 0 ? 'A conta fecha com esses números. Teste uma produtividade menor ou um preço mais baixo para ver até onde ela aguenta.' : 'Com esses números a conta não fecha. Veja o que pesa mais: produtividade, preço da saca ou valor do arrendamento.') : 'Para ver se a conta fecha, preencha também a produtividade e o custo de produção sem a terra.'}</span>`;
+>>>>>>>
+<<<<<<< public/exportacao.js
+import { bandeira } from '/bandeiras.js';
+
+=======
+import { bandeira } from '/bandeiras.js';
+import { conteudo, producao as producaoEst } from '/esboco-dados.js';
+
+>>>>>>>
+<<<<<<< public/exportacao.js
+function cartaoBrasil(b, anos) {
+=======
+// Produção estimada pela Amendoim Brasil (área × produtividade), em mil t em casca, por ano de início da safra.
+function estAB(anos) {
+  const out = {};
+  try {
+    for (const e of conteudo().estimativas || []) { const a = 2000 + Number(String(e.safra).slice(0, 2)); if (anos.includes(a)) out[a] = Math.round(producaoEst(e).tMeio / 1000) * 1; }
+  } catch (er) { /* sem estimativa */ }
+  return out;
+}
+function cartaoBrasil(b, anos, usda) {
+>>>>>>>
+<<<<<<< public/exportacao.js
+  const vprod = CONAB[ult] && CONAB[pen] ? varia(CONAB[ult], CONAB[pen]) : null;
+=======
+  const ab = estAB(anos);
+  const us = Object.fromEntries(anos.map((a) => [a, usda?.anos?.[a]?.producao ?? null]));
+  const vr = (o) => (o[ult] && o[pen] ? vc(varia(o[ult], o[pen])) : '');
+>>>>>>>
+<<<<<<< public/exportacao.js
+  const ate = b ? MESES[b.mes - 1].toLowerCase() : '';
+  return `<section class="cartao dx-cartao">
+=======
+  const ate = b ? MESES[b.mes - 1].toLowerCase() : '';
+  const linhaProd = (rot, o) => `<tr><th>${rot}</th>${anos.map((a) => `<td>${o[a] != null ? nf(o[a]) : '–'}</td>`).join('')}<td class="dx-var">${vr(o)}</td></tr>`;
+  return `<section class="cartao dx-cartao">
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <tr><th>Produção</th>${anos.map((a) => `<td>${a in CONAB ? nf(CONAB[a]) : '–'}</td>`).join('')}<td class="dx-var">${vc(vprod)}</td></tr>
+=======
+      ${linhaProd('Produção · Amendoim Brasil', ab)}
+      ${linhaProd('Produção · Conab', CONAB)}
+      ${linhaProd('Produção · USDA', us)}
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <tr><th>Exportado da safra</th>${anos.map((a) => `<td>${ex[a] && a in CONAB && ex[a].meses === 12 ? nf((ex[a].mil / CONAB[a]) * 100) + '%' : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+=======
+      <tr><th>Exportado da safra</th>${anos.map((a) => `<td>${ex[a] && ab[a] && ex[a].meses === 12 ? nf((ex[a].mil / ab[a]) * 100) + '%' : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+>>>>>>>
+<<<<<<< public/exportacao.js
+    </tbody></table>
+    ${parcial.length ? `<span class="mini">* Parcial: ${parcial.map((a) => `${safra(a)} de março até ${ate}/${b.ano} (${ex[a].meses} meses)`).join('; ')}. A safra comercial vai de março a fevereiro.</span>` : ''}
+=======
+    </tbody></table>
+    <span class="mini">Conab e USDA ainda mostram a safra 25/26 acima da 24/25. A estimativa da Amendoim Brasil já considera a queda de área e é a referência deste painel.</span>
+    ${parcial.length ? `<span class="mini">* Parcial: ${parcial.map((a) => `${safra(a)} de março até ${ate}/${b.ano} (${ex[a].meses} meses)`).join('; ')}. A safra comercial vai de março a fevereiro.</span>` : ''}
+>>>>>>>
+<<<<<<< public/exportacao.js
+    ${FONTE_PEQ('Fonte: Conab (produção, ' + CONAB_FONTE + ') e Comex Stat/MDIC (exportação, grão ÷ 0,70)')}
+=======
+    ${FONTE_PEQ('Fontes: Amendoim Brasil (estimativa), Conab (' + CONAB_FONTE + '), USDA e Comex Stat/MDIC (exportação, grão ÷ 0,70)')}
+>>>>>>>
+<<<<<<< public/exportacao.js
+  return `<p class="mini dx-nota">Balanço anual por ano-safra. Brasil: Conab e Comex Stat; os demais países: USDA. A última coluna é projeção e muda a cada relatório.</p>
+    ${ordem.map((c) => (c === 'BR' ? cartaoBrasil(b, anos) : cartaoPais(c, m.paises[c], anos))).join('')}
+=======
+  return `<p class="mini dx-nota">Balanço anual por ano-safra. Brasil: estimativa Amendoim Brasil, Conab, USDA e Comex Stat; os demais países: USDA. A última coluna é projeção e muda a cada relatório.</p>
+    ${ordem.map((c) => (c === 'BR' ? cartaoBrasil(b, anos, m.paises.BR) : cartaoPais(c, m.paises[c], anos))).join('')}
+>>>>>>>
+<<<<<<< public/balcao.js
+    <div><b style="font-size:17px;display:block">${esc(o.produto)}</b>${o.detalhe ? `<span style="font-size:13px;color:var(--texto-3)">${esc(o.detalhe)}</span>` : ''}</div>
+=======
+    <div><b style="font-size:17px;display:block">${esc(o.produto)}</b>${o.classificacao ? `<span class="pilula pilula-verde" style="margin:4px 0 2px;display:inline-block">Tipo: ${esc(o.classificacao)}</span><br>` : ''}${o.detalhe ? `<span style="font-size:13px;color:var(--texto-3)">${esc(o.detalhe)}</span>` : ''}</div>
+>>>>>>>
+<<<<<<< public/balcao.js
+    <div class="campo"><span class="rotulo-campo">Produto</span><div class="opcoes">${opc('categoria', PRODUTOS, 'Casca')}</div></div>
+    <div class="campos-2">
+=======
+    <div class="campo"><span class="rotulo-campo">Produto</span><div class="opcoes">${opc('categoria', PRODUTOS, 'Casca')}</div></div>
+    <div class="campo" id="an-class" style="display:none"><label for="an-classif">Tipo / classificação</label>
+      <select id="an-classif" name="classificacao"><option value="">Não informar</option>${['38/42', '40/50', 'Banda', 'Miúdo', 'Blancheado', 'Outro (escreva em detalhes)'].map((t) => `<option>${t}</option>`).join('')}</select></div>
+    <div class="campos-2">
+>>>>>>>
+<<<<<<< public/balcao.js
+  });
+  // Quantidade e preço ganham o ponto de milhar quando a pessoa sai do campo (50000 → 50.000).
+=======
+  });
+  // Tipo/classificação só aparece para amendoim debulhado ou blancheado.
+  document.addEventListener('change', (e) => {
+    if (e.target.name !== 'categoria') return;
+    const caixa = document.getElementById('an-class');
+    if (caixa) caixa.style.display = ['Debulhado', 'Blancheado'].includes(e.target.value) ? '' : 'none';
+  });
+  // Quantidade e preço ganham o ponto de milhar quando a pessoa sai do campo (50000 → 50.000).
+>>>>>>>
+<<<<<<< public/balcao.js
+    dados.aceite = f.aceite.checked;
+    if (String(dados.whatsapp || '').replace(/\D/g, '').length < 10) { msg.textContent = 'Confira o WhatsApp com DDD.'; return; }
+=======
+    dados.aceite = f.aceite.checked;
+    if (!['Debulhado', 'Blancheado'].includes(dados.categoria)) delete dados.classificacao;
+    if (String(dados.whatsapp || '').replace(/\D/g, '').length < 10) { msg.textContent = 'Confira o WhatsApp com DDD.'; return; }
+>>>>>>>
+<<<<<<< public/data/ofertas.json
+  { "lado": "Venda", "categoria": "Casca", "produto": "Amendoim em casca", "detalhe": "Cultivar e classificação sob consulta", "volume": "lotes", "preco": "Em breve", "entrega": "Imediata", "regiao": "Oeste Paulista" },
+  { "lado": "Compra", "categoria": "Debulhado", "produto": "Amendoim debulhado", "detalhe": "Tipo e peneira sob consulta", "volume": "cargas", "preco": "Em breve", "entrega": "A combinar", "regiao": "Alta Paulista" },
+  { "lado": "Venda", "categoria": "Semente", "produto": "Semente certificada", "detalhe": "Cultivar e germinação sob consulta", "volume": "sob consulta", "preco": "R$ 10,00/kg", "entrega": "A combinar", "regiao": "São Paulo" }
+=======
+  { "lado": "Venda", "categoria": "Casca", "produto": "Amendoim em casca", "detalhe": "Cultivar e classificação sob consulta", "volume": "30.000 sacas", "preco": "R$ 78,00/sc", "entrega": "Imediata", "regiao": "Alta Paulista" },
+  { "lado": "Compra", "categoria": "Debulhado", "produto": "Amendoim debulhado", "classificacao": "Sob consulta", "detalhe": "Peneira e umidade sob consulta", "volume": "10.000 kg", "preco": "A combinar", "entrega": "A combinar", "regiao": "Alta Paulista" },
+  { "lado": "Venda", "categoria": "Semente", "produto": "Semente certificada", "detalhe": "Cultivar e germinação sob consulta", "volume": "sob consulta", "preco": "R$ 10,00/kg", "entrega": "Imediata", "regiao": "Oeste Paulista" }
+>>>>>>>
+<<<<<<< netlify/functions/balcao.mjs
+      publico: { lado, categoria, produto: CATEGORIAS[categoria], volume, preco: milhar(txt(b.preco, 30)) || 'A combinar', entrega: txt(b.entrega, 30) || 'A combinar', regiao, detalhe: txt(b.detalhe, 200) },
+=======
+      publico: { lado, categoria, produto: CATEGORIAS[categoria], volume, ...(['Debulhado', 'Blancheado'].includes(categoria) && txt(b.classificacao, 30) ? { classificacao: txt(b.classificacao, 30) } : {}), preco: milhar(txt(b.preco, 30)) || 'A combinar', entrega: txt(b.entrega, 30) || 'A combinar', regiao, detalhe: txt(b.detalhe, 200) },
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v18';
+=======
+const VERSAO = 'ab-v19';
+>>>>>>>
