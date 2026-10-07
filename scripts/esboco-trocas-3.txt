@@ -1,94 +1,61 @@
 <<<<<<< public/esboco-clima.js
-// Chuva nas regiões: o que choveu nos últimos 7 dias e o previsto (ECMWF) para os próximos 7.
+    est.msgChuva = 'Obrigado! Sua chuva entrou no mapa da região.';
 =======
-// Chuva nas regiões: o que choveu nos últimos 7 dias e ontem (fonte: Open-Meteo), por município.
+    est.msgChuva = `Obrigado! ${String(v).replace('.', ',')} mm em ${dia.slice(8, 10)}/${dia.slice(5, 7)} anotados. Aparece na chuva da sua região.`;
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-    const [passado, futuro] = await Promise.all([
-      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`),
-      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&forecast_days=7&models=ecmwf_ifs025&timezone=${tz}`).catch(() => null)
-    ]);
-    const lp = Array.isArray(passado) ? passado : [passado], lf = futuro ? (Array.isArray(futuro) ? futuro : [futuro]) : [];
+    const l = lerChuva().filter((x) => x.dia !== hojeISO());
+    l.unshift({ dia: hojeISO(), mm: v, municipio: m?.gps ? (m.perto || 'Sua região') : m?.nome || '' });
 =======
-    const passado = await getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`);
-    const lp = Array.isArray(passado) ? passado : [passado];
+    const dia = document.getElementById('chuva-dia')?.value || hojeISO();
+    const l = lerChuva().filter((x) => x.dia !== dia);
+    l.unshift({ dia, mm: v, municipio: m?.gps ? (m.perto || 'Sua região') : m?.nome || '' });
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-      const prev7 = lf[k] ? lf[k].daily.precipitation_sum.reduce((s, v) => s + (v || 0), 0) : null;
-      return { ...m, choveu7, prev7, seco };
+  <details class="cartao es-enso">
+    <summary>${ic(I.globo, 'style="width:22px;height:22px;stroke:#2F5F8A;flex-shrink:0"')}<span class="cresce"><b>El Niño e La Niña</b><small>O que está acontecendo no Pacífico e o que muda para o amendoim</small></span></summary>
+    ${c.enso ? `<p><b>Agora:</b> ${esc(c.enso)}</p>` : ''}
+    <p><b>El Niño</b> (Pacífico mais quente) costuma trazer mais chuva para o Sul do Brasil e chuva mais irregular, com veranicos, em partes do Sudeste e do Centro-Oeste.</p>
+    <p><b>La Niña</b> (Pacífico mais frio) costuma ter efeito contrário: Sul mais seco e chuva mais regular no Centro-Oeste.</p>
+    <p>Para o amendoim, o que mais pesa é a regularidade da chuva no plantio e na florada. Acompanhe a previsão de 15 dias e a leitura da semana.</p>
+    ${c.ensoLinkPermanente || c.ensoLink ? `<a class="link-mini" href="${esc(c.ensoLinkPermanente || c.ensoLink)}" target="_blank" rel="noopener">Acompanhar no CPTEC/INPE</a>` : ''}
+  </details>
 =======
-      return { ...m, choveu7, ontem: mm[i - 1] ?? null, seco };
+  ${(() => { const e = conteudo().enso || {}; const regioes = e.regioes || []; return `<section class="cartao es-enso2">
+    <div class="cartao-cab"><span class="rotulo" style="color:#2F5F8A">El Niño agora</span>${e.selo ? `<span class="pilula" style="background:#FCE4E0;color:#9A2F1E">${esc(e.selo)}</span>` : ''}</div>
+    <b style="font-size:16px;line-height:1.3">${esc(e.titulo || 'El Niño em andamento')}</b>
+    <p class="es-txt" style="margin:0">${esc(c.enso || e.resumo || '')}</p>
+    ${regioes.length ? `<div class="es-enso-reg">${regioes.map((r) => `<div><b>${esc(r.nome)}</b><span>${esc(r.texto)}</span></div>`).join('')}</div>` : ''}
+    <span class="mini">${esc(c.ensoFonte || 'Fonte: INPE / NOAA')}${c.ensoLinkPermanente || c.ensoLink ? ` · <a class="link-mini" href="${esc(c.ensoLinkPermanente || c.ensoLink)}" target="_blank" rel="noopener">acompanhar</a>` : ''}</span>
+  </section>`; })()}
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-export function telaClimaNova(D, h) {
+  <section class="cartao es-pluvio" style="gap:10px">
+    <div class="cartao-cab"><span class="rotulo">Pluviômetro dos produtores</span><span class="mini">hoje</span></div>
+    <b style="font-size:16px;line-height:1.3">Quanto choveu na sua propriedade?</b>
+    <form id="chuva-form" class="es-chuva-form"><input id="chuva-mm" inputmode="decimal" placeholder="mm" aria-label="Milímetros de chuva" required><button class="btn btn-verde btn-pequeno" type="submit">Informar</button></form>
+    ${est.msgChuva ? `<span class="mini" style="font-weight:700;color:var(--verde-escuro)">${esc(est.msgChuva)}</span>` : ''}
+    <div>${relatos.map((r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${esc(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numBr(r.mm)} mm</b><small>${r.meu ? '' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`).join('')}</div>
+    <span class="mini">Chuva medida de verdade, no pluviômetro de quem planta${(conteudo().chuvaExemplo || []).length ? ' · relatos de exemplo' : ''}</span>
 =======
-const SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-const diaMenos = (n) => { const d = new Date(hojeISO() + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - n); return d.toISOString().slice(0, 10); };
-const linhaPluvio = (r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${escH(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numH(r.mm)} mm</b><small>${r.meu ? '' : r.fonte ? 'estimado' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`;
-let escH = (v) => v, numH = (v) => v;
-
-export function telaClimaNova(D, h) {
+  <section class="cartao es-pluvio2">
+    <div class="cartao-cab"><b style="font-size:15px">Choveu na sua propriedade?</b><span class="mini">pluviômetro</span></div>
+    <form id="chuva-form" class="es-chuva-form2">
+      <select id="chuva-dia" aria-label="Dia da chuva">${[1, 0, 2, 3, 4, 5, 6].map((n) => { const d = diaMenos(n); return `<option value="${d}">${n === 0 ? 'Hoje' : n === 1 ? 'Ontem' : `${SEMANA[new Date(d + 'T12:00:00Z').getUTCDay()]} ${dataCurta(d)}`}</option>`; }).join('')}</select>
+      <input id="chuva-mm" inputmode="decimal" placeholder="mm" aria-label="Milímetros de chuva" required>
+      <button class="btn btn-verde btn-pequeno" type="submit">Enviar</button>
+    </form>
+    ${est.msgChuva ? `<span class="mini" role="status" style="font-weight:700;color:var(--verde-escuro)">${esc(est.msgChuva)}</span>` : ''}
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-  const { esc, ic, I, numBr } = h;
+    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">mm · 7 dias</span></div>
+    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} municípios</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
+    <span class="mini">Choveu: últimos 7 dias · barra azul: previsto para os próximos 7 dias (ECMWF)</span>
 =======
-  escH = h.esc; numH = h.numBr;
-  const { esc, ic, I, numBr } = h;
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const fase = D.config.faseSafra || 'Plantio';
-=======
-  const escalaMm = Math.max(20, ...dias.map((d) => d.mm || 0));
-  const proxChuva = diasTodos.slice(hoje && (hoje.mm || 0) >= 5 ? 1 : 0).find((d) => (d.mm || 0) >= 5);
-  const fase = D.config.faseSafra || 'Plantio';
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const maxReg = Math.max(10, ...regs.map((r) => Math.max(r.prev7 || 0, r.choveu7 || 0)));
-  const linhaReg = (r) => `<div class="es-reg2">
-      <span class="es-reg-nome">${esc(r.nome)}</span>
-      <span class="es-reg-num"><small>choveu</small><b class="num">${numBr(r.choveu7)}</b></span>
-      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.prev7 || 0) / maxReg) * 100)}%"></i></span>
-      <span class="es-reg-num prev"><small>previsto</small><b class="num">${r.prev7 == null ? '—' : numBr(r.prev7)}</b></span>
-      ${r.seco >= 7 ? `<span class="es-reg-seco">${r.seco} dias sem chuva</span>` : ''}
-=======
-  const maxReg = Math.max(10, ...regs.map((r) => r.choveu7 || 0));
-  const linhaReg = (r) => `<div class="es-reg3">
-      <span class="es-reg-nome">${esc(r.nome)}${medido[r.nome] ? `<small class="es-reg-prod">Pluviômetro: ${numBr(medido[r.nome].mm)} mm ${medido[r.nome].dia === hojeISO() ? 'hoje' : 'ontem'} · ${medido[r.nome].n} ${medido[r.nome].n === 1 ? 'produtor' : 'produtores'}</small>` : r.seco >= 7 ? `<small class="es-reg-seco">${r.seco} dias sem chuva</small>` : ''}</span>
-      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.choveu7 || 0) / maxReg) * 100)}%"></i></span>
-      <b class="num">${numBr(r.choveu7)} mm</b>
->>>>>>>
-<<<<<<< public/esboco-clima.js
-  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
-=======
-  // Pluviômetro: o que os produtores mediram aparece junto da região (exemplo + o que foi enviado deste aparelho).
-  const medido = {};
-  (conteudo().chuvaExemplo || []).forEach((r) => { medido[r.municipio] = { mm: r.mm, n: r.n, dia: diaMenos(1) }; });
-  lerChuva().filter((x) => x.dia >= diaMenos(1)).forEach((x) => { const m = medido[x.municipio] || { mm: 0, n: 0 }; medido[x.municipio] = { mm: x.mm, n: m.n + 1, dia: x.dia }; });
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <div class="es-clima-resumo">
-      <div><span>Previsto 7 dias</span><b class="num">${mm(total7)}</b></div>
-      <div><span>Dias com chuva</span><b class="num">${comChuva} de 7</b></div>
-      <div><span>Sem chuva há</span><b class="num">${numBr(a.semChuva)} dias</b></div>
-=======
-    <div class="es-clima-info">
-      <div>${icone(h, 'chuva', 20)}<span>Próxima chuva</span><b>${proxChuva ? `${esc(proxChuva.dia)}, ${dataCurta(proxChuva.data)} · ${numBr(proxChuva.mm)} mm` : 'sem chuva boa em 15 dias'}</b></div>
-      <div>${icone(h, 'garoa', 20)}<span>Próximos 7 dias</span><b>${total7 < 1 ? 'sem chuva' : `${mm(total7)} em ${comChuva} ${comChuva === 1 ? 'dia' : 'dias'}`}</b></div>
-      <div>${icone(h, 'sol', 20)}<span>Última chuva</span><b>${a.semChuva == null ? '—' : a.semChuva === 0 ? 'ontem' : `há ${numBr(a.semChuva + 1)} dias`}</b></div>
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <a class="es-radar" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
-      <span class="cresce"><b>Radar ao vivo · IPMet/Unesp</b><small>Bauru e Presidente Prudente · onde está chovendo agora</small></span>
-      <span class="es-radar-escala" aria-hidden="true"><i style="background:#7FD8F5"></i><i style="background:#2FBF4A"></i><i style="background:#F5E33A"></i><i style="background:#F59A23"></i><i style="background:#E5322B"></i><i style="background:#D63AC8"></i></span>
-=======
-    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
-      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
-      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
-      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
->>>>>>>
-<<<<<<< public/esboco-clima.js
-    <span class="es-radar-leg"><span>fraca</span><span>moderada</span><span>forte</span><span>granizo</span></span>
-=======
+    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias</span></div>
+    ${regs.length ? mapaChuva(regs, esc, numBr) : ''}
+    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} ${l.length === 1 ? 'município' : 'municípios'}</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
+    <span class="mini">Barra: chuva dos últimos 7 dias (Open-Meteo) · em verde: o que os produtores mediram no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (exemplo)' : ''}</span>
 >>>>>>>
 <<<<<<< public/esboco-clima.js
     <div class="es-dias">${dias.map((d) => `<div class="es-dia es-dia-${tempo(d)}">
@@ -111,83 +78,172 @@ export function telaClimaNova(D, h) {
     <span class="mini">Barra azul = milímetros de chuva · % = chance de chover${est.prev === 15 ? ' · arraste para o lado' : ''} · ${usaECMWF ? 'modelo europeu (ECMWF)' : 'conjunto de modelos'}</span>
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">mm · 7 dias</span></div>
-    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} municípios</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
-    <span class="mini">Choveu: últimos 7 dias · barra azul: previsto para os próximos 7 dias (ECMWF)</span>
+    <span class="es-radar-leg"><span>fraca</span><span>moderada</span><span>forte</span><span>granizo</span></span>
 =======
-    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias</span></div>
-    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} ${l.length === 1 ? 'município' : 'municípios'}</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
-    <span class="mini">Barra: chuva dos últimos 7 dias (Open-Meteo) · em verde: o que os produtores mediram no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (exemplo)' : ''}</span>
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-  <section class="cartao es-pluvio" style="gap:10px">
-    <div class="cartao-cab"><span class="rotulo">Pluviômetro dos produtores</span><span class="mini">hoje</span></div>
-    <b style="font-size:16px;line-height:1.3">Quanto choveu na sua propriedade?</b>
-    <form id="chuva-form" class="es-chuva-form"><input id="chuva-mm" inputmode="decimal" placeholder="mm" aria-label="Milímetros de chuva" required><button class="btn btn-verde btn-pequeno" type="submit">Informar</button></form>
-    ${est.msgChuva ? `<span class="mini" style="font-weight:700;color:var(--verde-escuro)">${esc(est.msgChuva)}</span>` : ''}
-    <div>${relatos.map((r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${esc(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numBr(r.mm)} mm</b><small>${r.meu ? '' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`).join('')}</div>
-    <span class="mini">Chuva medida de verdade, no pluviômetro de quem planta${(conteudo().chuvaExemplo || []).length ? ' · relatos de exemplo' : ''}</span>
+    <a class="es-radar" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="cresce"><b>Radar ao vivo · IPMet/Unesp</b><small>Bauru e Presidente Prudente · onde está chovendo agora</small></span>
+      <span class="es-radar-escala" aria-hidden="true"><i style="background:#7FD8F5"></i><i style="background:#2FBF4A"></i><i style="background:#F5E33A"></i><i style="background:#F59A23"></i><i style="background:#E5322B"></i><i style="background:#D63AC8"></i></span>
 =======
-  <section class="cartao es-pluvio2">
-    <div class="cartao-cab"><b style="font-size:15px">Choveu na sua propriedade?</b><span class="mini">pluviômetro</span></div>
-    <form id="chuva-form" class="es-chuva-form2">
-      <select id="chuva-dia" aria-label="Dia da chuva">${[1, 0, 2, 3, 4, 5, 6].map((n) => { const d = diaMenos(n); return `<option value="${d}">${n === 0 ? 'Hoje' : n === 1 ? 'Ontem' : `${SEMANA[new Date(d + 'T12:00:00Z').getUTCDay()]} ${dataCurta(d)}`}</option>`; }).join('')}</select>
-      <input id="chuva-mm" inputmode="decimal" placeholder="mm" aria-label="Milímetros de chuva" required>
-      <button class="btn btn-verde btn-pequeno" type="submit">Enviar</button>
-    </form>
-    ${est.msgChuva ? `<span class="mini" role="status" style="font-weight:700;color:var(--verde-escuro)">${esc(est.msgChuva)}</span>` : ''}
+    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
+      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
+      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-    const l = lerChuva().filter((x) => x.dia !== hojeISO());
-    l.unshift({ dia: hojeISO(), mm: v, municipio: m?.gps ? (m.perto || 'Sua região') : m?.nome || '' });
+    <div class="es-clima-resumo">
+      <div><span>Previsto 7 dias</span><b class="num">${mm(total7)}</b></div>
+      <div><span>Dias com chuva</span><b class="num">${comChuva} de 7</b></div>
+      <div><span>Sem chuva há</span><b class="num">${numBr(a.semChuva)} dias</b></div>
 =======
-    const dia = document.getElementById('chuva-dia')?.value || hojeISO();
-    const l = lerChuva().filter((x) => x.dia !== dia);
-    l.unshift({ dia, mm: v, municipio: m?.gps ? (m.perto || 'Sua região') : m?.nome || '' });
+    <div class="es-clima-info">
+      <div>${icone(h, 'chuva', 20)}<span>Próxima chuva</span><b>${proxChuva ? `${esc(proxChuva.dia)}, ${dataCurta(proxChuva.data)} · ${numBr(proxChuva.mm)} mm` : 'sem chuva boa em 15 dias'}</b></div>
+      <div>${icone(h, 'garoa', 20)}<span>Próximos 7 dias</span><b>${total7 < 1 ? 'sem chuva' : `${mm(total7)} em ${comChuva} ${comChuva === 1 ? 'dia' : 'dias'}`}</b></div>
+      <div>${icone(h, 'sol', 20)}<span>Última chuva</span><b>${a.semChuva == null ? '—' : a.semChuva === 0 ? 'ontem' : `há ${numBr(a.semChuva + 1)} dias`}</b></div>
 >>>>>>>
 <<<<<<< public/esboco-clima.js
-    est.msgChuva = 'Obrigado! Sua chuva entrou no mapa da região.';
+      <span class="es-clima-desc">Hoje · ${ICONES[ceu][2]}${(hoje.mm || 0) >= 0.5 ? ` · ${numBr(hoje.mm)} mm` : ''}${hoje.prob != null ? ` · ${hoje.prob}% de chance` : ''}</span></div>
 =======
-    est.msgChuva = `Obrigado! ${String(v).replace('.', ',')} mm em ${dia.slice(8, 10)}/${dia.slice(5, 7)} anotados. Aparece na chuva da sua região.`;
+      <span class="es-clima-desc">Hoje · ${ICONES[ceu][2]}${(hoje.mm || 0) >= 0.5 ? ` · ${numBr(hoje.mm)} mm · ${hoje.prob != null ? hoje.prob + '% de chance' : ''}` : hoje.tmax != null && hoje.tmax >= 33 ? ' · calor forte' : ' · sem chuva'}</span></div>
 >>>>>>>
-<<<<<<< public/esboco3.css
-.es-btn-estrela { background: #FBE7C6 !important; border-color: var(--amendoim-borda) !important; }
-.es-btn-estrela svg { width: 24px; height: 24px; }
+<<<<<<< public/esboco-clima.js
+  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
 =======
+  // Pluviômetro: o que os produtores mediram aparece junto da região (exemplo + o que foi enviado deste aparelho).
+  const medido = {};
+  (conteudo().chuvaExemplo || []).forEach((r) => { medido[r.municipio] = { mm: r.mm, n: r.n, dia: diaMenos(1) }; });
+  lerChuva().filter((x) => x.dia >= diaMenos(1)).forEach((x) => { const m = medido[x.municipio] || { mm: 0, n: 0 }; medido[x.municipio] = { mm: x.mm, n: m.n + 1, dia: x.dia }; });
 >>>>>>>
-<<<<<<< public/esboco3.css
-.es-enq-res { display: grid; grid-template-columns: 92px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+<<<<<<< public/esboco-clima.js
+  const maxReg = Math.max(10, ...regs.map((r) => Math.max(r.prev7 || 0, r.choveu7 || 0)));
+  const linhaReg = (r) => `<div class="es-reg2">
+      <span class="es-reg-nome">${esc(r.nome)}</span>
+      <span class="es-reg-num"><small>choveu</small><b class="num">${numBr(r.choveu7)}</b></span>
+      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.prev7 || 0) / maxReg) * 100)}%"></i></span>
+      <span class="es-reg-num prev"><small>previsto</small><b class="num">${r.prev7 == null ? '—' : numBr(r.prev7)}</b></span>
+      ${r.seco >= 7 ? `<span class="es-reg-seco">${r.seco} dias sem chuva</span>` : ''}
 =======
-.es-enq-res { display: grid; grid-template-columns: minmax(0, 1fr) 38% 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+  const maxReg = Math.max(10, ...regs.map((r) => r.choveu7 || 0));
+  const linhaReg = (r) => `<div class="es-reg3">
+      <span class="es-reg-nome">${esc(r.nome)}${medido[r.nome] ? `<small class="es-reg-prod">Pluviômetro: ${numBr(medido[r.nome].mm)} mm ${medido[r.nome].dia === hojeISO() ? 'hoje' : 'ontem'} · ${medido[r.nome].n} ${medido[r.nome].n === 1 ? 'produtor' : 'produtores'}</small>` : r.seco >= 7 ? `<small class="es-reg-seco">${r.seco} dias sem chuva</small>` : ''}</span>
+      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.choveu7 || 0) / maxReg) * 100)}%"></i></span>
+      <b class="num">${numBr(r.choveu7)} mm</b>
 >>>>>>>
-<<<<<<< public/esboco3.css
-.es-clima-hero.es-ceu-sol { background: linear-gradient(160deg, #F2A43A 0%, #3E88C8 72%); }
-.es-clima-hero.es-ceu-solNuvem { background: linear-gradient(160deg, #8DB3D6 0%, #3B6E9F 80%); }
-.es-clima-hero.es-ceu-nuvem { background: linear-gradient(160deg, #8796A5 0%, #4A5968 85%); }
-.es-clima-hero.es-ceu-garoa { background: linear-gradient(160deg, #6A90B5 0%, #33577D 85%); }
-.es-clima-hero.es-ceu-chuva { background: linear-gradient(160deg, #2F6FA3 0%, #1B4570 100%); }
+<<<<<<< public/esboco-clima.js
+  const comChuva = diasTodos.slice(0, 7).filter((d) => (d.mm || 0) >= 1).length;
 =======
-.es-clima-hero.es-ceu-sol { background: linear-gradient(160deg, #3F93DA 0%, #1C5C9E 100%); }
-.es-clima-hero.es-ceu-solNuvem { background: linear-gradient(160deg, #3A86C8 0%, #1D5490 100%); }
-.es-clima-hero.es-ceu-nuvem { background: linear-gradient(160deg, #4E7AA6 0%, #24476E 100%); }
-.es-clima-hero.es-ceu-garoa { background: linear-gradient(160deg, #3772AE 0%, #1B4474 100%); }
-.es-clima-hero.es-ceu-chuva { background: linear-gradient(160deg, #2D66A6 0%, #163B66 100%); }
+  const comChuva = diasTodos.slice(0, 7).filter((d) => (d.mm || 0) >= 1).length;
+  const escalaMm = Math.max(20, ...dias.map((d) => d.mm || 0));
+  const proxChuva = diasTodos.slice(hoje && (hoje.mm || 0) >= 5 ? 1 : 0).find((d) => (d.mm || 0) >= 5);
 >>>>>>>
-<<<<<<< public/esboco3.css
-.es-radar { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); border-radius: 14px; padding: 10px 12px; color: #fff; text-decoration: none; }
-.es-radar b { display: block; font-size: 14px; }
-.es-radar small { display: block; font-size: 11px; opacity: .88; }
-.es-radar-escala { display: flex; height: 12px; border-radius: 6px; overflow: hidden; width: 90px; flex-shrink: 0; }
-.es-radar-escala i { flex: 1; }
-.es-radar-leg { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; opacity: .85; margin: -8px 2px 0 auto; width: 150px; }
+<<<<<<< public/esboco-clima.js
+  if (atual?.lat) buscarECMWF(atual);
+  const eu = est.ecmwf[atual?.lat + ',' + atual?.lon];
+  const usaECMWF = !!eu?.mapa;
+  const diasTodos = (a?.dias || []).map((d) => (usaECMWF && eu.mapa[d.data] && eu.mapa[d.data].mm != null ? { ...d, ...eu.mapa[d.data] } : d));
 =======
+  const { usaECMWF, dias: diasTodos } = diasUnificados(a);
 >>>>>>>
-<<<<<<< public/esboco3.css
-.es-reg-num { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
-.es-reg-num small { font-size: 9px; color: var(--texto-3); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
-.es-reg-num b { font-size: 14px; }
-.es-reg-num.prev b { color: #2F5F8A; }
+<<<<<<< public/esboco-clima.js
+export function telaClimaNova(D, h) {
 =======
+export function telaClimaNova(D, h) {
+  escH = h.esc; numH = h.numBr;
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+const lerChuva = () => { try { return JSON.parse(localStorage.getItem('ab-esboco-chuva') || '[]'); } catch (e) { return []; } };
+
+=======
+const lerChuva = () => { try { return JSON.parse(localStorage.getItem('ab-esboco-chuva') || '[]'); } catch (e) { return []; } };
+
+// Mapa de chuva: bolhas nas regiões produtoras, posição real (lat/lon), tamanho e cor pelos milímetros dos últimos 7 dias.
+function mapaChuva(regs, esc, numBr) {
+  const lats = regs.map((r) => r.lat), lons = regs.map((r) => r.lon);
+  const la0 = Math.min(...lats) - 0.6, la1 = Math.max(...lats) + 0.9, lo0 = Math.min(...lons) - 0.9, lo1 = Math.max(...lons) + 0.9;
+  const W = 340, H = 330;
+  const X = (lon) => 18 + ((lon - lo0) / (lo1 - lo0)) * (W - 36), Y = (lat) => 16 + ((la1 - lat) / (la1 - la0)) * (H - 40);
+  const cor = (mm) => (mm >= 40 ? '#1F4E78' : mm >= 20 ? '#2F6FA3' : mm >= 5 ? '#7FAED6' : mm >= 1 ? '#C9DCEC' : '#E9E4D8');
+  const raio = (mm) => 8 + Math.min(12, Math.sqrt(mm || 0) * 1.8);
+  // posição real; bolhas que se encostam são afastadas um pouco para não se cobrirem
+  const pts = regs.map((r) => ({ r, x: X(r.lon), y: Y(r.lat), rr: raio(r.choveu7 || 0) }));
+  for (let it = 0; it < 60; it++) {
+    for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) {
+      const p = pts[a], q = pts[b], dx = q.x - p.x, dy = q.y - p.y, d = Math.hypot(dx, dy) || 0.01, min = p.rr + q.rr + 3;
+      if (d < min) { const f = (min - d) / 2, ux = dx / d, uy = dy / d; p.x -= ux * f; p.y -= uy * f; q.x += ux * f; q.y += uy * f; }
+    }
+    pts.forEach((p) => { p.x = Math.min(W - p.rr - 4, Math.max(p.rr + 4, p.x)); p.y = Math.min(H - p.rr - 16, Math.max(p.rr + 14, p.y)); });
+  }
+  const ufs = {};
+  pts.forEach((p) => { (ufs[p.r.uf] = ufs[p.r.uf] || []).push(p); });
+  const rotUF = Object.entries(ufs).map(([uf, l]) => { const x = l.reduce((s, p) => s + p.x, 0) / l.length, y = Math.min(...l.map((p) => p.y - p.rr)) - 6; return `<text x="${x.toFixed(0)}" y="${Math.max(11, y).toFixed(0)}" class="mc-uf">${uf}</text>`; }).join('');
+  const curto = (n) => n.replace('Presidente ', 'Pres. ').replace('Glória de ', 'Gl. ').replace('Chapadão do Sul', 'Chapadão').replace('Campo Grande', 'C. Grande').replace('Campo Verde', 'C. Verde');
+  // nome só quando cabe: a bolha mais próxima abaixo está a mais de 16px
+  const bolhas = [...pts].sort((a, b) => (b.r.choveu7 || 0) - (a.r.choveu7 || 0)).map((p) => {
+    const mm = p.r.choveu7 || 0, claro = mm < 5;
+    const livre = !pts.some((q) => q !== p && ((Math.abs(q.x - p.x) < 34 && q.y > p.y && q.y - p.y < p.rr + 18) || (Math.abs(q.x - p.x) < 46 && Math.abs(q.y - p.y) < 26 && (q.r.choveu7 || 0) > mm)));
+    return `<g><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.rr.toFixed(1)}" fill="${cor(mm)}"/><text x="${p.x.toFixed(1)}" y="${(p.y + 3.5).toFixed(1)}" class="mc-mm ${claro ? 'escuro' : ''}">${numBr(mm)}</text>${livre ? `<text x="${p.x.toFixed(1)}" y="${(p.y + p.rr + 10).toFixed(1)}" class="mc-nome">${esc(curto(p.r.nome))}</text>` : ''}</g>`;
+  }).join('');
+  return `<div class="es-mapa"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa de chuva dos últimos 7 dias nas regiões produtoras">${rotUF}${bolhas}</svg>
+    <div class="es-mapa-leg"><span><i style="background:#E9E4D8"></i>seco</span><span><i style="background:#7FAED6"></i>5–20 mm</span><span><i style="background:#2F6FA3"></i>20–40</span><span><i style="background:#1F4E78"></i>40+</span></div></div>`;
+}
+const SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const diaMenos = (n) => { const d = new Date(hojeISO() + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - n); return d.toISOString().slice(0, 10); };
+const linhaPluvio = (r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${escH(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numH(r.mm)} mm</b><small>${r.meu ? '' : r.fonte ? 'estimado' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`;
+let escH = (v) => v, numH = (v) => v;
+
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  est.buscando = false;
+  if (location.hash.startsWith('#/clima')) ctx.render(false);
+}
+
+=======
+  est.buscando = false;
+  if (location.hash.startsWith('#/clima')) ctx.render(false);
+}
+
+// Dias da previsão com o ECMWF por cima (quando já carregou). Início e Clima usam esta mesma conta.
+function diasUnificados(a) {
+  const atual = municipioAtual();
+  if (atual?.lat) buscarECMWF(atual);
+  const eu = est.ecmwf[atual?.lat + ',' + atual?.lon];
+  const usaECMWF = !!eu?.mapa;
+  return { usaECMWF, dias: (a?.dias || []).map((d) => (usaECMWF && eu.mapa[d.data] && eu.mapa[d.data].mm != null ? { ...d, ...eu.mapa[d.data] } : d)) };
+}
+export function chuva7Unificada(a) {
+  if (!a?.dias?.length) return a?.total7 ?? null;
+  return diasUnificados(a).dias.slice(0, 7).reduce((s, d) => s + (d.mm || 0), 0);
+}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+      const prev7 = lf[k] ? lf[k].daily.precipitation_sum.reduce((s, v) => s + (v || 0), 0) : null;
+      return { ...m, choveu7, prev7, seco };
+=======
+      return { ...m, choveu7, ontem: mm[i - 1] ?? null, seco };
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    const [passado, futuro] = await Promise.all([
+      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`),
+      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&forecast_days=7&models=ecmwf_ifs025&timezone=${tz}`).catch(() => null)
+    ]);
+    const lp = Array.isArray(passado) ? passado : [passado], lf = futuro ? (Array.isArray(futuro) ? futuro : [futuro]) : [];
+=======
+    const passado = await getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`);
+    const lp = Array.isArray(passado) ? passado : [passado];
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+// Chuva nas regiões: o que choveu nos últimos 7 dias e o previsto (ECMWF) para os próximos 7.
+=======
+// Chuva nas regiões: o que choveu nos últimos 7 dias e ontem (fonte: Open-Meteo), por município.
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  } catch (e) { est.ecmwf[k] = { erro: true }; }
+  if (location.hash.startsWith('#/clima')) ctx.render(false);
+=======
+  } catch (e) { est.ecmwf[k] = { erro: true }; }
+  const hs = location.hash;
+  if (!hs || hs === '#/' || hs.startsWith('#/clima') || hs.startsWith('#/inicio')) ctx.render(false);
 >>>>>>>
 <<<<<<< public/esboco3.css
 .segmento a[href="#/mercado/consultoria"] { color: #7A4A08; font-weight: 800; }
@@ -254,4 +310,81 @@ export function telaClimaNova(D, h) {
 .es-chuva-form2 input { font-size: 17px; font-weight: 800; }
 .es-reg3 .es-reg-prod { font-size: 11px; font-weight: 700; color: var(--verde-escuro); line-height: 1.3; white-space: normal; }
 .es-reg3 .es-reg-nome { white-space: normal; }
+
+/* v6: IEA no destaque, físico em destaque, notícias do dia, fato, El Niño agora, mapa de chuva, exportar, painel no celular */
+.es-hero-iea { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .14); border-radius: 14px; padding: 10px 12px; color: #fff; text-decoration: none; margin-top: 2px; }
+.es-hero-iea b { font-size: 14px; display: block; } .es-hero-iea > b.num { font-size: 18px; }
+.es-hero-iea small { display: block; font-size: 11px; opacity: .85; }
+.es-hero-var { font-size: 12px; font-weight: 800; padding: 2px 7px; border-radius: 8px; background: rgba(255, 255, 255, .22); }
+.es-hero-var.cai { background: rgba(179, 38, 30, .45); }
+.es-fisico3 { gap: 10px; border: 2px solid var(--verde); background: var(--verde-fundo); }
+.es-fis3-tit { font-size: 18px; line-height: 1.25; letter-spacing: -0.01em; }
+.es-fis3-txt { font-size: 14px; line-height: 1.5; color: var(--texto-2); }
+.es-noticias { gap: 4px; }
+.es-not { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-top: 1px solid var(--linha); text-decoration: none; color: inherit; }
+.es-not:first-of-type { border-top: 0; }
+.es-not b { display: block; font-size: 15px; line-height: 1.35; }
+.es-not small { display: block; font-size: 12px; color: var(--texto-3); margin-top: 2px; line-height: 1.35; }
+.es-not-ponto { width: 8px; height: 8px; border-radius: 4px; background: var(--verde); margin-top: 7px; flex-shrink: 0; }
+.es-noticias .link-enviar { margin-top: 4px; }
+.es-fato { padding: 0; overflow: hidden; border: 0; background: transparent; box-shadow: none; }
+.es-fato .fato { margin: 0; }
+.es-enso2 { gap: 10px; border-color: #D5E3F0; }
+.es-enso-reg { display: flex; flex-direction: column; gap: 8px; }
+.es-enso-reg div { display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; background: var(--azul-claro); border-radius: 12px; }
+.es-enso-reg b { font-size: 13px; color: #1F4E78; }
+.es-enso-reg span { font-size: 13px; line-height: 1.45; color: var(--texto-2); }
+.es-mapa { background: #F6F3EB; border: 1px solid var(--linha); border-radius: 16px; padding: 6px 6px 4px; }
+.es-mapa svg { width: 100%; height: auto; display: block; }
+.es-mapa .mc-uf { font-size: 11px; font-weight: 800; fill: #A8A193; text-anchor: middle; letter-spacing: .06em; }
+.es-mapa .mc-mm { font-size: 10px; font-weight: 800; fill: #fff; text-anchor: middle; }
+.es-mapa .mc-mm.escuro { fill: #5F5B52; }
+.es-mapa .mc-nome { font-size: 8.5px; font-weight: 700; fill: #5F5B52; text-anchor: middle; }
+.es-mapa-leg { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; font-size: 11px; color: var(--texto-3); font-weight: 700; padding: 4px 0 2px; }
+.es-mapa-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 4px; vertical-align: -1px; }
+.es-export { gap: 10px; border: 1px solid #C2E2CC; }
+.es-export .es-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.es-export .btn { gap: 6px; }
+@media (max-width: 480px) {
+  .pn-topo h1 { font-size: 15px; } .pn-topo small { display: none; } .pn-topo img { height: 28px; } .pn-topo .btn { padding: 0 10px; min-height: 38px; font-size: 13px; }
+}
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-reg-num { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.es-reg-num small { font-size: 9px; color: var(--texto-3); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+.es-reg-num b { font-size: 14px; }
+.es-reg-num.prev b { color: #2F5F8A; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-radar { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); border-radius: 14px; padding: 10px 12px; color: #fff; text-decoration: none; }
+.es-radar b { display: block; font-size: 14px; }
+.es-radar small { display: block; font-size: 11px; opacity: .88; }
+.es-radar-escala { display: flex; height: 12px; border-radius: 6px; overflow: hidden; width: 90px; flex-shrink: 0; }
+.es-radar-escala i { flex: 1; }
+.es-radar-leg { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; opacity: .85; margin: -8px 2px 0 auto; width: 150px; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-clima-hero.es-ceu-sol { background: linear-gradient(160deg, #F2A43A 0%, #3E88C8 72%); }
+.es-clima-hero.es-ceu-solNuvem { background: linear-gradient(160deg, #8DB3D6 0%, #3B6E9F 80%); }
+.es-clima-hero.es-ceu-nuvem { background: linear-gradient(160deg, #8796A5 0%, #4A5968 85%); }
+.es-clima-hero.es-ceu-garoa { background: linear-gradient(160deg, #6A90B5 0%, #33577D 85%); }
+.es-clima-hero.es-ceu-chuva { background: linear-gradient(160deg, #2F6FA3 0%, #1B4570 100%); }
+=======
+.es-clima-hero.es-ceu-sol { background: linear-gradient(160deg, #3F93DA 0%, #1C5C9E 100%); }
+.es-clima-hero.es-ceu-solNuvem { background: linear-gradient(160deg, #3A86C8 0%, #1D5490 100%); }
+.es-clima-hero.es-ceu-nuvem { background: linear-gradient(160deg, #4E7AA6 0%, #24476E 100%); }
+.es-clima-hero.es-ceu-garoa { background: linear-gradient(160deg, #3772AE 0%, #1B4474 100%); }
+.es-clima-hero.es-ceu-chuva { background: linear-gradient(160deg, #2D66A6 0%, #163B66 100%); }
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-enq-res { display: grid; grid-template-columns: 92px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+=======
+.es-enq-res { display: grid; grid-template-columns: minmax(0, 1fr) 38% 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-btn-estrela { background: #FBE7C6 !important; border-color: var(--amendoim-borda) !important; }
+.es-btn-estrela svg { width: 24px; height: 24px; }
+=======
 >>>>>>>
