@@ -19,3 +19,4 @@
 .radar-linha { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; text-decoration: none; color: var(--texto); }
 .radar-linha b { display: block; font-size: 15px; }
 .leitura h2 .bandeira { margin-right: 2px; }
+.topo-inicio img { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
