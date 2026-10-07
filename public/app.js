@@ -6,6 +6,7 @@ import { telaNegociar, telaAnunciar, telaBalcaoAdmin, telaAnuncie, ligarBalcao, 
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 import { bandeira } from '/bandeiras.js';
 import { evento, eventoAbertura, registrarRegiao, observarPatrocinios, slug } from '/medicao.js';
+import { telaDados, ligarDados } from '/exportacao.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
 const D = {};
@@ -403,6 +404,7 @@ function telaConsultoria() {
       <button class="btn btn-verde" type="submit">Pedir acesso no WhatsApp</button>
     </form>
     <div id="msg-login" role="status" class="mini"></div>
+    <a class="btn btn-escuro" href="#/mercado/dados" data-ev="dados-abrir">${ic(I.cadeado, 'style="width:18px;height:18px;stroke:#fff"')}Dados de exportação (clientes)</a>
     ${zap ? `<a class="link-mini" style="text-align:center" href="${zap}" target="_blank" rel="noopener">Ainda não é cliente? Fale com o Helder</a>` : ''}
   </section>
   <section class="cartao" style="opacity:.85">
@@ -415,7 +417,7 @@ function telaConsultoria() {
 // ---------- roteador ----------
 const ROTAS = {
   inicio: () => telaInicio(),
-  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : sub === 'dados' ? telaDados(D, H()) : telaCotacoes(),
   alertas: () => telaAlertas(D, H()),
   anuncie: () => telaAnuncie(D, H()),
   'balcao-admin': () => telaBalcaoAdmin(D, H()),
@@ -562,6 +564,7 @@ document.addEventListener('click', (e) => {
 // Eventos delegados (filtros, gráfico, login)
 ligarFerramentas({ esc, ic, I, brl, numBr, render });
 ligarAlertas(render, evento);
+ligarDados(render, evento);
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-periodo],[data-boletim],[data-prev]');
   if (!t) return;
