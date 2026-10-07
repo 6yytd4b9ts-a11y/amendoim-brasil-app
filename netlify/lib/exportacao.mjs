@@ -14,53 +14,61 @@ const ATRIBUTOS = {
   'Beginning Stocks': 'estoqueInicial', 'Ending Stocks': 'estoqueFinal'
 };
 
+const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+// A API do Comex Stat limita pedidos seguidos (429): tenta de novo com intervalo.
 async function comex(corpo) {
-  const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(15000) });
-  if (!r.ok) throw new Error('comex ' + r.status);
-  const j = await r.json();
-  return j?.data?.list || [];
+  for (let tentativa = 0; tentativa < 4; tentativa++) {
+    if (tentativa) await espera(4000 * tentativa);
+    const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(15000) });
+    if (r.status === 429) continue;
+    if (!r.ok) throw new Error('comex ' + r.status);
+    const j = await r.json();
+    return j?.data?.list || [];
+  }
+  throw new Error('comex 429');
 }
 const t = (kg) => Math.round(Number(kg || 0) / 1000); // kg → toneladas
-
-// Série mensal (toneladas e US$ FOB) de um produto, dos últimos 5 anos.
-async function serieMensal(heading, anoIni, anoFim) {
-  const linhas = await comex({ monthDetail: true, period: { from: `${anoIni}-01`, to: `${anoFim}-12` }, filters: [{ filter: 'heading', values: [heading] }], details: [] });
-  const anos = {};
-  for (const l of linhas) {
-    const a = (anos[l.year] = anos[l.year] || { t: Array(12).fill(null), usd: Array(12).fill(null) });
-    const m = Number(l.monthNumber) - 1;
-    a.t[m] = (a.t[m] || 0) + t(l.metricKG);
-    a.usd[m] = (a.usd[m] || 0) + Number(l.metricFOB || 0);
-  }
-  return anos;
-}
-
-// Destinos de um período (toneladas, US$ FOB e preço médio US$/t).
-async function destinos(heading, ano, ateMes) {
-  const mm = String(ateMes).padStart(2, '0');
-  const linhas = await comex({ monthDetail: false, period: { from: `${ano}-01`, to: `${ano}-${mm}` }, filters: [{ filter: 'heading', values: [heading] }], details: ['country'] });
-  return linhas.map((l) => ({ pais: l.country, t: t(l.metricKG), usd: Number(l.metricFOB || 0) })).filter((x) => x.t > 0).sort((a, b) => b.t - a.t);
-}
+const produtoDe = (l) => (/1508|óleo|oleo/i.test(Object.values(l).join('|')) ? 'oleo' : 'grao');
 
 export async function coletarBrasil() {
   const upd = await fetch('https://api-comexstat.mdic.gov.br/general/dates/updated', { signal: AbortSignal.timeout(10000) }).then((r) => r.json()).catch(() => null);
   const ano = Number(upd?.data?.year) || new Date().getFullYear();
   const mes = Number(upd?.data?.monthNumber) || 12;
-  const series = {};
-  for (const [nome, cod] of Object.entries(PRODUTOS)) series[nome] = await serieMensal(cod, ano - 4, ano);
-  const destAtual = await destinos(PRODUTOS.grao, ano, mes);
-  const destAnterior = await destinos(PRODUTOS.grao, ano - 1, mes);
-  const oleoDest = await destinos(PRODUTOS.oleo, ano, mes);
-  const antes = Object.fromEntries(destAnterior.map((d) => [d.pais, d]));
-  const totalT = destAtual.reduce((s, d) => s + d.t, 0) || 1;
-  const destinosGrao = destAtual.map((d) => ({
+  const filtro = [{ filter: 'heading', values: Object.values(PRODUTOS) }];
+
+  // 1) Série mensal dos últimos 5 anos (toneladas e US$ FOB), grão e óleo num pedido só.
+  await espera(1500);
+  const mensal = await comex({ monthDetail: true, period: { from: `${ano - 4}-01`, to: `${ano}-12` }, filters: filtro, details: ['heading'] });
+  const series = { grao: {}, oleo: {} };
+  for (const l of mensal) {
+    const s = series[produtoDe(l)];
+    const a = (s[l.year] = s[l.year] || { t: Array(12).fill(null), usd: Array(12).fill(null) });
+    const m = Number(l.monthNumber) - 1;
+    a.t[m] = (a.t[m] || 0) + t(l.metricKG);
+    a.usd[m] = (a.usd[m] || 0) + Number(l.metricFOB || 0);
+  }
+
+  // 2) Destinos: este ano e o mesmo período do ano passado, por mês (para comparar só os meses já publicados).
+  await espera(3000);
+  const porPais = await comex({ monthDetail: true, period: { from: `${ano - 1}-01`, to: `${ano}-${String(mes).padStart(2, '0')}` }, filters: filtro, details: ['heading', 'country'] });
+  const soma = {};
+  for (const l of porPais) {
+    if (Number(l.monthNumber) > mes) continue;
+    const chave = `${produtoDe(l)}|${l.year}|${l.country}`;
+    const x = (soma[chave] = soma[chave] || { t: 0, usd: 0 });
+    x.t += Number(l.metricKG || 0) / 1000; x.usd += Number(l.metricFOB || 0);
+  }
+  const lista = (prod, a) => Object.entries(soma).filter(([k]) => k.startsWith(`${prod}|${a}|`)).map(([k, v]) => ({ pais: k.split('|')[2], t: Math.round(v.t), usd: v.usd })).filter((x) => x.t > 0).sort((p, q) => q.t - p.t);
+  const atual = lista('grao', ano), anterior = Object.fromEntries(lista('grao', ano - 1).map((d) => [d.pais, d]));
+  const totalT = atual.reduce((s, d) => s + d.t, 0) || 1;
+  const destinosGrao = atual.map((d) => ({
     pais: d.pais, t: d.t, part: +((d.t / totalT) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null,
-    tAnt: antes[d.pais]?.t ?? 0, precoAnt: antes[d.pais]?.t ? Math.round(antes[d.pais].usd / antes[d.pais].t) : null
+    tAnt: anterior[d.pais]?.t ?? 0, precoAnt: anterior[d.pais]?.t ? Math.round(anterior[d.pais].usd / anterior[d.pais].t) : null
   }));
-  const totalOleo = oleoDest.reduce((s, d) => s + d.t, 0) || 1;
+  const oleo = lista('oleo', ano), totalOleo = oleo.reduce((s, d) => s + d.t, 0) || 1;
   return {
-    fonte: 'Comex Stat/MDIC', atualizadoFonte: upd?.data?.updated || null, ano, mes, series,
-    destinosGrao, destinosOleo: oleoDest.slice(0, 8).map((d) => ({ pais: d.pais, t: d.t, part: +((d.t / totalOleo) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null }))
+    fonte: 'Comex Stat/MDIC', atualizadoFonte: upd?.data?.updated || null, ano, mes, series, destinosGrao,
+    destinosOleo: oleo.slice(0, 8).map((d) => ({ pais: d.pais, t: d.t, part: +((d.t / totalOleo) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null }))
   };
 }
 
