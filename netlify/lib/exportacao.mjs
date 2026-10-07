@@ -17,9 +17,9 @@ const ATRIBUTOS = {
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 // A API do Comex Stat limita pedidos seguidos (429): tenta de novo com intervalo.
 async function comex(corpo) {
-  for (let tentativa = 0; tentativa < 4; tentativa++) {
-    if (tentativa) await espera(4000 * tentativa);
-    const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(15000) });
+  for (let tentativa = 0; tentativa < 3; tentativa++) {
+    if (tentativa) await espera(3000 * tentativa);
+    const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(12000) });
     if (r.status === 429) continue;
     if (!r.ok) throw new Error('comex ' + r.status);
     const j = await r.json();
@@ -30,29 +30,34 @@ async function comex(corpo) {
 const t = (kg) => Math.round(Number(kg || 0) / 1000); // kg → toneladas
 const produtoDe = (l) => (/1508|óleo|oleo/i.test(Object.values(l).join('|')) ? 'oleo' : 'grao');
 
-export async function coletarBrasil() {
-  const upd = await fetch('https://api-comexstat.mdic.gov.br/general/dates/updated', { signal: AbortSignal.timeout(10000) }).then((r) => r.json()).catch(() => null);
-  const ano = Number(upd?.data?.year) || new Date().getFullYear();
-  const mes = Number(upd?.data?.monthNumber) || 12;
-  const filtro = [{ filter: 'heading', values: Object.values(PRODUTOS) }];
+async function quandoAtualizou() {
+  const upd = await fetch('https://api-comexstat.mdic.gov.br/general/dates/updated', { signal: AbortSignal.timeout(8000) }).then((r) => r.json()).catch(() => null);
+  return { ano: Number(upd?.data?.year) || new Date().getFullYear(), mes: Number(upd?.data?.monthNumber) || 12, atualizadoFonte: upd?.data?.updated || null };
+}
+const FILTRO = [{ filter: 'heading', values: Object.values(PRODUTOS) }];
 
-  // 1) Série mensal dos últimos 5 anos (toneladas e US$ FOB), grão e óleo num pedido só.
-  await espera(1500);
-  const mensal = await comex({ monthDetail: true, period: { from: `${ano - 4}-01`, to: `${ano}-12` }, filters: filtro, details: ['heading'] });
+// Parte 1: série mensal dos últimos 5 anos (toneladas e US$ FOB), grão e óleo num pedido só.
+export async function coletarMensal() {
+  const ref = await quandoAtualizou();
+  const linhas = await comex({ monthDetail: true, period: { from: `${ref.ano - 4}-01`, to: `${ref.ano}-12` }, filters: FILTRO, details: ['heading'] });
   const series = { grao: {}, oleo: {} };
-  for (const l of mensal) {
+  for (const l of linhas) {
     const s = series[produtoDe(l)];
     const a = (s[l.year] = s[l.year] || { t: Array(12).fill(null), usd: Array(12).fill(null) });
     const m = Number(l.monthNumber) - 1;
     a.t[m] = (a.t[m] || 0) + t(l.metricKG);
     a.usd[m] = (a.usd[m] || 0) + Number(l.metricFOB || 0);
   }
+  if (!Object.keys(series.grao).length) throw new Error('comex vazio');
+  return { fonte: 'Comex Stat/MDIC', ...ref, series };
+}
 
-  // 2) Destinos: este ano e o mesmo período do ano passado, por mês (para comparar só os meses já publicados).
-  await espera(3000);
-  const porPais = await comex({ monthDetail: true, period: { from: `${ano - 1}-01`, to: `${ano}-${String(mes).padStart(2, '0')}` }, filters: filtro, details: ['heading', 'country'] });
+// Parte 2: destinos deste ano e do mesmo período do ano passado (só os meses já publicados), com preço médio.
+export async function coletarDestinos() {
+  const { ano, mes } = await quandoAtualizou();
+  const linhas = await comex({ monthDetail: true, period: { from: `${ano - 1}-01`, to: `${ano}-${String(mes).padStart(2, '0')}` }, filters: FILTRO, details: ['heading', 'country'] });
   const soma = {};
-  for (const l of porPais) {
+  for (const l of linhas) {
     if (Number(l.monthNumber) > mes) continue;
     const chave = `${produtoDe(l)}|${l.year}|${l.country}`;
     const x = (soma[chave] = soma[chave] || { t: 0, usd: 0 });
@@ -60,15 +65,16 @@ export async function coletarBrasil() {
   }
   const lista = (prod, a) => Object.entries(soma).filter(([k]) => k.startsWith(`${prod}|${a}|`)).map(([k, v]) => ({ pais: k.split('|')[2], t: Math.round(v.t), usd: v.usd })).filter((x) => x.t > 0).sort((p, q) => q.t - p.t);
   const atual = lista('grao', ano), anterior = Object.fromEntries(lista('grao', ano - 1).map((d) => [d.pais, d]));
+  if (!atual.length) throw new Error('comex vazio');
   const totalT = atual.reduce((s, d) => s + d.t, 0) || 1;
-  const destinosGrao = atual.map((d) => ({
-    pais: d.pais, t: d.t, part: +((d.t / totalT) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null,
-    tAnt: anterior[d.pais]?.t ?? 0, precoAnt: anterior[d.pais]?.t ? Math.round(anterior[d.pais].usd / anterior[d.pais].t) : null
-  }));
   const oleo = lista('oleo', ano), totalOleo = oleo.reduce((s, d) => s + d.t, 0) || 1;
   return {
-    fonte: 'Comex Stat/MDIC', atualizadoFonte: upd?.data?.updated || null, ano, mes, series, destinosGrao,
-    destinosOleo: oleo.slice(0, 8).map((d) => ({ pais: d.pais, t: d.t, part: +((d.t / totalOleo) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null }))
+    ano, mes,
+    grao: atual.map((d) => ({
+      pais: d.pais, t: d.t, part: +((d.t / totalT) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null,
+      tAnt: anterior[d.pais]?.t ?? 0, precoAnt: anterior[d.pais]?.t ? Math.round(anterior[d.pais].usd / anterior[d.pais].t) : null
+    })),
+    oleo: oleo.slice(0, 8).map((d) => ({ pais: d.pais, t: d.t, part: +((d.t / totalOleo) * 100).toFixed(1), preco: d.t ? Math.round(d.usd / d.t) : null }))
   };
 }
 
@@ -142,13 +148,39 @@ export async function coletarMundo() {
   return lerPSD(csv.dados().toString('utf8'));
 }
 
-// Atualiza o que der; se uma fonte falhar, mantém o último dado bom dela.
-export async function atualizarExportacao() {
+// Cada parte é atualizada numa execução separada (a API do Comex Stat recusa pedidos em sequência).
+const PARTES = { mensal: coletarMensal, destinos: coletarDestinos, mundo: coletarMundo };
+const VALIDADE = 20 * 3600 * 1000; // uma vez por dia basta: as fontes mudam no máximo uma vez por mês
+
+export async function atualizarParte(parte) {
+  if (!PARTES[parte]) return { erro: 'parte' };
   const l = loja('exportacao');
-  const antigo = (await l.get('dados', { type: 'json' })) || {};
-  const novo = { ...antigo, atualizado: new Date().toISOString(), erros: {} };
-  try { novo.brasil = await coletarBrasil(); } catch (e) { novo.erros.brasil = String(e.message || e); }
-  try { novo.mundo = await coletarMundo(); } catch (e) { novo.erros.mundo = String(e.message || e); }
-  await l.setJSON('dados', novo);
-  return novo;
+  const reg = (await l.get('partes', { type: 'json' })) || {};
+  try {
+    const dados = await PARTES[parte]();
+    await l.setJSON(parte, dados);
+    reg[parte] = { ok: new Date().toISOString() };
+  } catch (e) {
+    reg[parte] = { ...(reg[parte] || {}), erro: String(e.message || e), quando: new Date().toISOString() };
+  }
+  await l.setJSON('partes', reg);
+  return reg[parte];
+}
+
+// Escolhe a parte mais antiga (ou com erro) e atualiza só ela.
+export async function proximaParte() {
+  const reg = (await loja('exportacao').get('partes', { type: 'json' })) || {};
+  const idade = (p) => { const r = reg[p]; if (!r?.ok) return Infinity; const a = Date.now() - new Date(r.ok).getTime(); return r.erro && r.quando > r.ok ? Math.max(a, VALIDADE) : a; };
+  const parte = Object.keys(PARTES).sort((a, b) => idade(b) - idade(a))[0];
+  if (idade(parte) < VALIDADE) return { parte: null };
+  return { parte, ...(await atualizarParte(parte)) };
+}
+
+// Monta o pacote que o app recebe.
+export async function lerExportacao() {
+  const l = loja('exportacao');
+  const [mensal, destinos, mundo, partes] = await Promise.all(['mensal', 'destinos', 'mundo', 'partes'].map((k) => l.get(k, { type: 'json' })));
+  const brasil = mensal ? { ...mensal, destinosGrao: destinos?.grao || [], destinosOleo: destinos?.oleo || [] } : null;
+  const datas = Object.values(partes || {}).map((p) => p.ok).filter(Boolean).sort();
+  return { atualizado: datas[datas.length - 1] || null, partes, brasil, mundo };
 }

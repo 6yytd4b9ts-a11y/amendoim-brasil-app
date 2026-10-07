@@ -1,9 +1,9 @@
-// Atualiza os dados de exportação todo dia às 9h20 de Brasília (Comex Stat sai no início do mês; USDA, perto do dia 10).
-import { atualizarExportacao } from '../lib/exportacao.mjs';
+// Mantém os dados de exportação em dia: a cada 30 minutos atualiza a parte mais antiga (uma por vez).
+// Cada parte vale por um dia; Comex Stat publica no início do mês e o USDA perto do dia 10.
+import { proximaParte } from '../lib/exportacao.mjs';
 
 export default async () => {
-  const d = await atualizarExportacao();
-  console.log('exportacao', JSON.stringify({ erros: d.erros, ano: d.brasil?.ano, mes: d.brasil?.mes, psd: d.mundo?.publicado }));
+  console.log('exportacao', JSON.stringify(await proximaParte()));
 };
 
-export const config = { schedule: '20 12 * * *' };
+export const config = { schedule: '*/30 * * * *' };
