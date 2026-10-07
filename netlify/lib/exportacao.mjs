@@ -15,11 +15,11 @@ const ATRIBUTOS = {
 };
 
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-// A API do Comex Stat limita pedidos seguidos (429): tenta de novo com intervalo.
+// A API do Comex Stat limita pedidos por endereço (429: "tente novamente em 10 segundos"): espera e tenta de novo.
 async function comex(corpo) {
   for (let tentativa = 0; tentativa < 3; tentativa++) {
-    if (tentativa) await espera(3000 * tentativa);
-    const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(12000) });
+    if (tentativa) await espera(10500);
+    const r = await fetch(COMEX, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ flow: 'export', metrics: ['metricFOB', 'metricKG'], ...corpo }), signal: AbortSignal.timeout(9000) });
     if (r.status === 429) continue;
     if (!r.ok) throw new Error('comex ' + r.status);
     const j = await r.json();
@@ -30,16 +30,20 @@ async function comex(corpo) {
 const t = (kg) => Math.round(Number(kg || 0) / 1000); // kg → toneladas
 const produtoDe = (l) => (/1508|óleo|oleo/i.test(Object.values(l).join('|')) ? 'oleo' : 'grao');
 
-async function quandoAtualizou() {
-  const upd = await fetch('https://api-comexstat.mdic.gov.br/general/dates/updated', { signal: AbortSignal.timeout(8000) }).then((r) => r.json()).catch(() => null);
-  return { ano: Number(upd?.data?.year) || new Date().getFullYear(), mes: Number(upd?.data?.monthNumber) || 12, atualizadoFonte: upd?.data?.updated || null };
+const anoBR = () => Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric' }).format(new Date()));
+// Último mês publicado: o mais recente que já tem dado no ano.
+function ultimoMes(linhas) {
+  let ano = 0, mes = 0;
+  for (const l of linhas) { const a = Number(l.year), m = Number(l.monthNumber); if (a > ano || (a === ano && m > mes)) { ano = a; mes = m; } }
+  return { ano, mes };
 }
 const FILTRO = [{ filter: 'heading', values: Object.values(PRODUTOS) }];
 
 // Parte 1: série mensal dos últimos 5 anos (toneladas e US$ FOB), grão e óleo num pedido só.
 export async function coletarMensal() {
-  const ref = await quandoAtualizou();
-  const linhas = await comex({ monthDetail: true, period: { from: `${ref.ano - 4}-01`, to: `${ref.ano}-12` }, filters: FILTRO, details: ['heading'] });
+  const hoje = anoBR();
+  const linhas = await comex({ monthDetail: true, period: { from: `${hoje - 4}-01`, to: `${hoje}-12` }, filters: FILTRO, details: ['heading'] });
+  const ref = ultimoMes(linhas);
   const series = { grao: {}, oleo: {} };
   for (const l of linhas) {
     const s = series[produtoDe(l)];
@@ -54,8 +58,9 @@ export async function coletarMensal() {
 
 // Parte 2: destinos deste ano e do mesmo período do ano passado (só os meses já publicados), com preço médio.
 export async function coletarDestinos() {
-  const { ano, mes } = await quandoAtualizou();
-  const linhas = await comex({ monthDetail: true, period: { from: `${ano - 1}-01`, to: `${ano}-${String(mes).padStart(2, '0')}` }, filters: FILTRO, details: ['heading', 'country'] });
+  const hoje = anoBR();
+  const linhas = await comex({ monthDetail: true, period: { from: `${hoje - 2}-01`, to: `${hoje}-12` }, filters: FILTRO, details: ['heading', 'country'] }); // 3 anos: em janeiro o "ano atual" ainda é o anterior
+  const { ano, mes } = ultimoMes(linhas);
   const soma = {};
   for (const l of linhas) {
     if (Number(l.monthNumber) > mes) continue;

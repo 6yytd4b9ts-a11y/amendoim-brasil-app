@@ -17,7 +17,7 @@ export default async (req, context) => {
     if (parte) return json({ parte, ...(await atualizarParte(parte)) });
     const d = await lerExportacao();
     if (q.get('bruto')) return json(d);
-    return json({ atualizado: d.atualizado, partes: d.partes, brasil: d.brasil ? { ano: d.brasil.ano, mes: d.brasil.mes, fonte: d.brasil.atualizadoFonte, destinos: d.brasil.destinosGrao.length } : null, mundo: d.mundo ? { anos: d.mundo.anos, publicado: d.mundo.publicado, paises: Object.keys(d.mundo.paises || {}) } : null });
+    return json({ atualizado: d.atualizado, partes: d.partes, brasil: d.brasil ? { ano: d.brasil.ano, mes: d.brasil.mes, destinos: d.brasil.destinosGrao.length } : null, mundo: d.mundo ? { anos: d.mundo.anos, publicado: d.mundo.publicado, paises: Object.keys(d.mundo.paises || {}) } : null });
   }
   if (req.method !== 'POST') return json({ erro: 'metodo' }, 405);
   let b = {};
