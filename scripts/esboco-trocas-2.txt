@@ -1,0 +1,450 @@
+<<<<<<< public/painel-esboco2.js
+let redesenhar = () => {};
+=======
+const lerLista = (k) => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
+let redesenhar = () => {};
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe o que o mercado está pagando de verdade:</span>
+    <div class="pe-grade"><div class="campo"><label>Alta Paulista (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 82,00"></div><div class="campo"><label>Mogiana (R$/sc)</label><input inputmode="decimal" placeholder="ex.: 84,00"></div></div>
+    <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-feito="fisico">Publicar</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
+=======
+    <span class="mini">Referência oficial de hoje: ${dest.preco ? `${esc(dest.fonte)} ${esc(dest.regiao)} ${brl(dest.preco)}` : '…'}. Informe a faixa que o mercado está pagando de verdade (R$/saca):</span>
+    ${(conteudo().fisico?.regioes || []).map((r, i) => `<div class="pe-fis"><span>${esc(r.nome)}</span><input id="pe-fmin-${i}" inputmode="decimal" value="${esc(String(r.min).replace('.', ','))}" aria-label="mínimo"><span>a</span><input id="pe-fmax-${i}" inputmode="decimal" value="${esc(String(r.max).replace('.', ','))}" aria-label="máximo"></div>`).join('')}
+    <div class="es-botoes"><button class="btn btn-verde btn-pequeno" data-pe-fisico>Publicar no app</button><button class="btn btn-pequeno es-btn-claro" data-pe-feito="fisico">Mesmo de ontem</button></div>`)}
+  <section class="cartao" style="gap:10px">
+    <b style="font-size:15px">Termômetro do preço</b>
+    <div class="chips">${['Fraco', 'Fraco a estável', 'Estável', 'Estável a firme', 'Firme'].map((t) => `<button class="chip" data-pe-termo="${t}" aria-pressed="${conteudo().termometro === t}">${t}</button>`).join('')}</div>
+    <span class="mini">Muda na hora o ponteiro do termômetro no app.</span>
+  </section>
+  ${(() => { const l = lerLista('ab-esboco-contesta'); return `<section class="cartao" style="gap:8px">
+    <div class="cartao-cab"><b style="font-size:15px">Preços informados pelos produtores</b><span class="mini">${l.length}</span></div>
+    ${l.length ? l.slice(0, 8).map((x) => `<div class="lista-linha"><span class="cresce"><b style="font-size:14px;display:block">R$ ${esc(x.preco)} · ${esc(x.municipio)}</b><span class="mini">${esc(x.obs || 'sem detalhe')} · ${new Date(x.quando).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span></span></div>`).join('') : '<span class="mini">Quando um produtor tocar em "Esse preço está diferente na sua região?", o preço que ele viu aparece aqui.</span>'}
+  </section>`; })()}
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+  <div class="es-botoes"><button class="btn btn-escuro btn-pequeno" data-pe-csv>Baixar planilha (CSV)</button></div>
+=======
+  ${(() => { const l = lerLista('ab-esboco-chuva'); return `<section class="cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Chuva informada pelos produtores</span><span class="mini">${l.length}</span></div>
+    ${l.length ? l.slice(0, 6).map((x) => `<div class="lista-linha"><span class="cresce">${esc(x.municipio)} · ${x.dia.split('-').reverse().join('/')}</span><b class="num">${nf(x.mm)} mm</b></div>`).join('') : '<span class="mini">Quando os produtores informarem a chuva na aba Clima, aparece aqui.</span>'}
+  </section>`; })()}
+  <div class="es-botoes"><button class="btn btn-escuro btn-pequeno" data-pe-csv>Baixar planilha (CSV)</button></div>
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+// ---------- Conteúdo: agenda, patrocínio e leitura do clima ----------
+=======
+// ---------- Enquete: o Helder escreve, escolhe os dias e lança. Só aparece no app enquanto estiver no prazo. ----------
+function enqueteStatus() {
+  const e = conteudo().enquete;
+  if (!e || !e.inicio) return { e: null, ativa: false };
+  const fim = new Date(e.inicio); fim.setDate(fim.getDate() + (e.dias || 7));
+  return { e, fim, ativa: Date.now() < fim.getTime() };
+}
+function blocoEnquete() {
+  const { e, fim, ativa } = enqueteStatus();
+  let res = '';
+  if (e) {
+    let votos = {}; try { votos = JSON.parse(localStorage.getItem('ab-esboco-votos') || '{}'); } catch (er) { /* ignora */ }
+    const cont = e.opcoes.map((_, k) => (e.base?.[k] || 0) + (votos[e.id] === k ? 1 : 0)), tot = cont.reduce((a, b) => a + b, 0);
+    res = `<div class="cartao-cab"><span class="rotulo">${ativa ? 'Enquete no ar' : 'Última enquete'}</span><span class="mini">${ativa ? `até ${fim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'encerrada'} · ${nf(tot)} respostas</span></div>
+      <b style="font-size:15px;line-height:1.35">${esc(e.pergunta)}</b>
+      ${e.opcoes.map((t, k) => `<div class="lista-linha"><span class="cresce">${esc(t)}</span><b class="num">${tot ? nf((cont[k] / tot) * 100) : 0}%</b><span class="mini" style="width:44px;text-align:right">${nf(cont[k])}</span></div>`).join('')}
+      ${ativa ? '<button class="btn btn-pequeno es-btn-claro" type="button" data-pe-enq-fim>Encerrar agora</button>' : ''}`;
+  }
+  return `<section class="cartao" style="gap:10px;margin-top:4px">
+    ${res || '<div class="cartao-cab"><span class="rotulo">Enquete</span><span class="mini">nenhuma no ar</span></div><span class="mini">O app não mostra enquete enquanto você não lançar uma.</span>'}
+    ${ativa ? '' : `<details class="abre" ${e ? '' : 'open'}><summary>+ Lançar enquete</summary>
+      <div class="es-campos" style="padding-bottom:10px">
+        <div class="campo"><label for="enq-perg">Pergunta</label><textarea id="enq-perg" rows="2" placeholder="ex.: Você vai plantar mais, igual ou menos amendoim em 26/27?"></textarea></div>
+        <div class="campo"><label for="enq-ops">Opções (uma por linha)</label><textarea id="enq-ops" rows="3" placeholder="Mais\nIgual\nMenos"></textarea></div>
+        <div class="campo"><label for="enq-dias">Fica no ar por</label><select id="enq-dias">${[3, 5, 7, 10, 15].map((d) => `<option value="${d}" ${d === 7 ? 'selected' : ''}>${d} dias</option>`).join('')}</select></div>
+        <button class="btn btn-verde btn-pequeno" type="button" data-pe-enq-lancar>Lançar no app</button>
+      </div></details>`}
+  </section>`;
+}
+
+// ---------- Conteúdo: agenda, patrocínio e leitura do clima ----------
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+  return `
+  <form id="pe2-form" class="es-campos" style="margin-top:4px">
+=======
+  return `${blocoEnquete()}
+  <form id="pe2-form" class="es-campos" style="margin-top:4px">
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    </section>
+    <section class="cartao" style="gap:12px">
+=======
+    </section>
+    <section class="cartao" style="gap:10px">
+      <div class="cartao-cab"><span class="rotulo">Preço por destino (plano Empresa)</span><span class="mini">US$/t</span></div>
+      <div class="pe-dest pe-dest-cab"><span>Destino</span><span>Comex</span><span>Mín.</span><span>Máx.</span></div>
+      ${(c.destinos?.lista || []).map((x, i) => `<div class="pe-dest"><input id="pd-p-${i}" value="${esc(x.pais)}"><input id="pd-c-${i}" inputmode="numeric" value="${esc(x.comex)}"><input id="pd-a-${i}" inputmode="numeric" value="${esc(x.min)}"><input id="pd-b-${i}" inputmode="numeric" value="${esc(x.max)}"></div>`).join('')}
+      <span class="mini">Comex entra sozinho na versão final; a faixa da semana você digita aqui.</span>
+    </section>
+    <section class="cartao" style="gap:12px">
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    if ((x = q('[data-pe-desfazer]'))) { const j = lerFeito(); delete j.itens[x.dataset.peDesfazer]; gravarFeito(j); redesenhar(); return; }
+=======
+    if ((x = q('[data-pe-termo]'))) { const c = conteudo(); c.termometro = x.dataset.peTermo; salvarConteudo(c); redesenhar(); return; }
+    if (q('[data-pe-fisico]')) {
+      const c = conteudo(), num = (id) => { const v = parseFloat(t(id).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : null; };
+      const agora = new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      c.fisico = { ...c.fisico, exemplo: false, atualizado: agora.replace(',', ' ·'), regioes: (c.fisico?.regioes || []).map((r, i) => ({ ...r, min: num(`pe-fmin-${i}`) ?? r.min, max: num(`pe-fmax-${i}`) ?? r.max })) };
+      salvarConteudo(c); const j = lerFeito(); j.itens.fisico = true; gravarFeito(j); redesenhar(); return;
+    }
+    if ((x = q('[data-pe-desfazer]'))) { const j = lerFeito(); delete j.itens[x.dataset.peDesfazer]; gravarFeito(j); redesenhar(); return; }
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    }
+    if (q('[data-pe-ag-add]')) {
+=======
+    }
+    if (q('[data-pe-enq-lancar]')) {
+      const perg = t('enq-perg'), ops = (document.getElementById('enq-ops')?.value || '').split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 6);
+      if (!perg || ops.length < 2) { est.msg = 'Escreva a pergunta e pelo menos duas opções.'; redesenhar(); return; }
+      const c = conteudo(); c.enquete = { id: 'q' + Date.now(), pergunta: perg, opcoes: ops, dias: +t('enq-dias') || 7, inicio: new Date().toISOString() };
+      salvarConteudo(c); est.msg = 'Enquete no ar. Abra o app neste aparelho para ver.'; redesenhar(); return;
+    }
+    if ((x = q('[data-pe-enq-fim]'))) {
+      if (!x.dataset.certeza) { x.dataset.certeza = '1'; x.textContent = 'Confirmar encerramento'; return; }
+      const c = conteudo(); c.enquete = { ...c.enquete, dias: 0 }; salvarConteudo(c); est.msg = 'Enquete encerrada.'; redesenhar(); return;
+    }
+    if (q('[data-pe-ag-add]')) {
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
+=======
+    if (c.destinos?.lista) c.destinos = { ...c.destinos, exemplo: false, semana: new Date().toLocaleDateString('pt-BR'), lista: c.destinos.lista.map((x, i) => ({ ...x, pais: t(`pd-p-${i}`) || x.pais, comex: n(`pd-c-${i}`), min: n(`pd-a-${i}`), max: n(`pd-b-${i}`) })) };
+    salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
+>>>>>>>
+<<<<<<< public/esboco3.js
+// ESBOÇO (parte 3): novidades desde a última visita, Conab no topo, botão ★, enquete da safra, mercado físico,
+=======
+// ESBOÇO (parte 3): novidades desde a última visita, Conab no topo, botão de perfil, enquete da safra, mercado físico,
+>>>>>>>
+<<<<<<< public/esboco3.js
+import { conteudo, assinante, sessao, perfil, salvarPerfil } from '/esboco-dados.js';
+=======
+import { conteudo, assinante, sessao } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/esboco3.js
+const est = { contestar: false, msgFisico: '', bib: { tema: 'todos', busca: '' }, enqueteCel: false };
+=======
+const est = { contestar: false, msgFisico: '', bib: { tema: 'todos', busca: '' } };
+>>>>>>>
+<<<<<<< public/esboco3.js
+// ---------- Topo: botão ★ no lugar do alfinete ----------
+=======
+// ---------- Topo: botão de perfil (área do cliente) no lugar do alfinete ----------
+const PESSOA = '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>';
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `<a class="btn-icone es-btn-estrela" href="#/mercado/consultoria" aria-label="Área do Assinante" data-ev="esb-estrela">${h.ic(ESTRELA, 'style="fill:#F4AD46;stroke:#5C3A06;stroke-width:1.6"')}</a>`;
+=======
+  const s = sessao();
+  const iniciais = s?.nome ? s.nome.trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase() : '';
+  return `<a class="btn-icone es-btn-perfil" href="#/mercado/consultoria" aria-label="Minha conta e área do assinante" data-ev="esb-perfil">${iniciais ? `<b>${h.esc(iniciais)}</b>` : h.ic(PESSOA)}</a>`;
+}
+
+// Cartão limpo para conteúdo exclusivo (sem nada borrado): diz o que tem dentro e leva para assinar.
+export function cartaoExclusivo(h, titulo, texto, itens = [], href = '#/conta/planos', botao = 'Ver planos') {
+  const ok = '<path d="M5 12l5 5 9-10"/>';
+  return `<section class="cartao es-exclusivo">
+    <div class="cartao-cab"><span class="pilula pilula-verde">Para assinantes</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#5F5B52"')}</div>
+    <b class="es-h1" style="font-size:19px">${titulo}</b>
+    <span class="es-txt">${texto}</span>
+    ${itens.length ? `<div class="es-lista">${itens.map((t) => `<div class="es-item">${h.ic(ok, 'style="width:18px;height:18px;stroke:#007731;stroke-width:2.4;flex-shrink:0"')}<span>${t}</span></div>`).join('')}</div>` : ''}
+    <a class="btn btn-verde" href="${href}">${botao}</a>
+  </section>`;
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const v = varIEA(c);
+  const ieaTxt = dest.preco ? `${h.esc(dest.fonte || 'IEA')} ${h.esc(dest.regiao || 'Tupã')} hoje: <b class="num">${brl(dest.preco)}</b>${v ? (Math.abs(v.dif) < 0.005 ? ' · estável' : ` (${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)})`) : ''}` : '';
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+    ${ieaTxt ? `<span style="font-size:13px;opacity:.92">${ieaTxt}</span>` : ''}
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+    const dc = dif(atual.conab, base.conab), di = dif(atual.iea, base.iea);
+=======
+    const dc = dif(atual.conab, base.conab);
+>>>>>>>
+<<<<<<< public/esboco3.js
+    if (di) linha(bola(di > 0 ? '#007731' : '#B3261E'), `IEA Tupã ${di > 0 ? 'subiu' : 'caiu'} <b>${brl(Math.abs(di))}</b> e está em ${brl(atual.iea)}`, '#/mercado', di > 0 ? 'sobe' : 'cai');
+=======
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (itens.length < 3 && atual.fato && (!base || atual.fato === base.fato)) linha(bola('#F4AD46'), `Fato do dia: ${h.esc(atual.fato)}`, '#/mercado/hoje');
+=======
+  const dolar = D.dolar;
+  if (itens.length < 3 && atual.fato && (!base || atual.fato === base.fato)) linha(bola('#F4AD46'), `Fato do dia: ${h.esc(atual.fato)}`, '#/mercado/hoje');
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (itens.length < 3 && atual.iea != null && !(base && dif(atual.iea, base.iea))) linha(bola('#5F5B52'), `IEA Tupã hoje: ${brl(atual.iea)}`, '#/mercado');
+=======
+  if (itens.length < 3 && dolar) linha(bola('#5F5B52'), `Dólar hoje: <b>R$ ${nf(dolar.bid, 2)}</b> (${dolar.pct > 0 ? '+' : ''}${nf(dolar.pct, 1)}%)`, '#/mercado');
+>>>>>>>
+<<<<<<< public/esboco3.js
+// ---------- Enquete da safra (cadastro aos poucos) ----------
+=======
+// ---------- Enquete: só aparece quando o Helder lança pelo painel (com prazo em dias) ----------
+export function enqueteAtiva() {
+  const e = conteudo().enquete;
+  if (!e || !e.pergunta || !(e.opcoes || []).length || !e.inicio) return null;
+  const fim = new Date(e.inicio); fim.setDate(fim.getDate() + (e.dias || 7));
+  return Date.now() < fim.getTime() ? { ...e, fim } : null;
+}
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const e = conteudo().enquete, voto = ler('ab-esboco-voto');
+=======
+  const e = enqueteAtiva();
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const ops = [['mais', 'Mais'], ['igual', 'Igual'], ['menos', 'Menos']];
+  if (!voto) {
+=======
+  const votos = ler('ab-esboco-votos') || {}, voto = votos[e.id];
+  const resta = Math.max(1, Math.ceil((e.fim - Date.now()) / 86400000));
+  if (voto == null) {
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <div class="cartao-cab"><span class="rotulo">Enquete da safra 26/27</span><span class="mini">1 toque · anônimo</span></div>
+=======
+      <div class="cartao-cab"><span class="rotulo">Enquete</span><span class="mini">${resta === 1 ? 'último dia' : `mais ${resta} dias`} · anônima</span></div>
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <div class="es-enq-ops">${ops.map(([k, t]) => `<button type="button" class="es-enq-op" data-enq="${k}">${t}</button>`).join('')}</div>
+      <span class="mini">Veja o que os outros produtores responderam assim que votar.</span>
+=======
+      <div class="es-enq-ops ${e.opcoes.length > 3 ? 'col2' : ''}">${e.opcoes.map((t, k) => `<button type="button" class="es-enq-op" data-enq="${k}">${h.esc(t)}</button>`).join('')}</div>
+      <span class="mini">Veja o resultado assim que responder.</span>
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const cont = { ...e.base }; cont[voto.v] = (cont[voto.v] || 0) + 1;
+  const tot = ops.reduce((s, [k]) => s + (cont[k] || 0), 0) || 1;
+  const p = perfil();
+=======
+  const cont = e.opcoes.map((_, k) => (e.base?.[k] || 0) + (k === voto ? 1 : 0));
+  const tot = cont.reduce((a, b) => a + b, 0) || 1;
+>>>>>>>
+<<<<<<< public/esboco3.js
+    <div class="cartao-cab"><span class="rotulo">Enquete da safra 26/27</span><span class="mini">${nf(tot)} respostas${e.exemplo ? ' · exemplo' : ''}</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Enquete</span><span class="mini">${nf(tot)} ${tot === 1 ? 'resposta' : 'respostas'}</span></div>
+>>>>>>>
+<<<<<<< public/esboco3.js
+    ${ops.map(([k, t]) => { const pc = (cont[k] / tot) * 100; return `<div class="es-enq-res ${voto.v === k ? 'meu' : ''}"><span>${t}${voto.v === k ? ' · você' : ''}</span><span class="es-enq-barra"><i style="width:${pc}%"></i></span><b class="num">${nf(pc)}%</b></div>`; }).join('')}
+    ${p ? '<span class="mini">Obrigado! Você recebe o resultado da sua região quando sair.</span>' : est.enqueteCel ? `<form id="enq-form" class="es-campos">
+      <div class="campo"><label for="enq-nome">Nome</label><input id="enq-nome" autocomplete="name" required></div>
+      <div class="campo"><label for="enq-cel">WhatsApp</label><input id="enq-cel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(18) 90000-0000" required></div>
+      <div class="campo"><label for="enq-area">Quantos alqueires você vai plantar? <span style="font-weight:500">(opcional)</span></label><input id="enq-area" inputmode="decimal"></div>
+      <button class="btn btn-verde btn-pequeno" type="submit">Receber o resultado</button>
+    </form>` : `<button class="link-mini es-enq-mais" type="button" data-enq-cel>Quer o resultado da sua região no WhatsApp? Toque aqui</button>`}
+=======
+    ${e.opcoes.map((t, k) => { const pc = (cont[k] / tot) * 100; return `<div class="es-enq-res ${voto === k ? 'meu' : ''}"><span>${h.esc(t)}${voto === k ? ' · você' : ''}</span><span class="es-enq-barra"><i style="width:${pc}%"></i></span><b class="num">${nf(pc)}%</b></div>`; }).join('')}
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `${voltar}<div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
+    <section class="cartao es-cadeado">${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
+      <b class="es-h1" style="text-align:center">Plano Empresa</b>
+      <span class="es-txt" style="text-align:center">Quanto Argélia, Rússia, África do Sul e Europa estão pagando, semana a semana. Para quem exporta, beneficia ou compra para a indústria.</span>
+      <a class="btn btn-verde" href="#/conta/planos" style="width:100%">Ver o plano Empresa</a></section></div>`;
+=======
+  return voltar + cartaoExclusivo(h, 'Preço por destino', 'Quanto Argélia, Rússia, África do Sul e Europa estão pagando pelo amendoim brasileiro, semana a semana. Para quem exporta, beneficia ou compra para a indústria.',
+    ['Preço médio oficial do mês (Comex Stat)', 'Faixa negociada na semana, por destino', 'Exportação completa e paridade em R$/saca'], '#/conta/planos', 'Ver o plano Empresa');
+>>>>>>>
+<<<<<<< public/esboco3.js
+    if ((x = q('[data-enq]'))) { gravar('ab-esboco-voto', { v: x.dataset.enq, quando: Date.now() }); ctx.evento('esb-enquete'); ctx.render(false); return; }
+    if (q('[data-enq-cel]')) { est.enqueteCel = true; ctx.render(false); return; }
+=======
+    if ((x = q('[data-enq]'))) { const e = enqueteAtiva(); if (e) { const v = ler('ab-esboco-votos') || {}; v[e.id] = +x.dataset.enq; gravar('ab-esboco-votos', v); } ctx.evento('esb-enquete'); ctx.render(false); return; }
+>>>>>>>
+<<<<<<< public/esboco3.js
+    if (e.target.id === 'enq-form') {
+      e.preventDefault();
+      const voto = ler('ab-esboco-voto') || {};
+      const area = parseFloat(v('enq-area').replace(',', '.'));
+      salvarPerfil({ nome: v('enq-nome'), celular: v('enq-cel'), municipio: municipioAtual()?.nome || '', a2627: isFinite(area) ? area : null, intencao: voto.v, data: new Date().toISOString().slice(0, 10) });
+      est.enqueteCel = false; ctx.render(false);
+    }
+=======
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+// Chuva nas regiões: o que choveu nos últimos 7 dias e o previsto (ECMWF) para os próximos 7.
+=======
+// Chuva nas regiões: o que choveu nos últimos 7 dias e ontem (fonte: Open-Meteo), por município.
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    const [passado, futuro] = await Promise.all([
+      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`),
+      getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&forecast_days=7&models=ecmwf_ifs025&timezone=${tz}`).catch(() => null)
+    ]);
+    const lp = Array.isArray(passado) ? passado : [passado], lf = futuro ? (Array.isArray(futuro) ? futuro : [futuro]) : [];
+=======
+    const passado = await getJSON(`${OM}?latitude=${lat}&longitude=${lon}&daily=precipitation_sum&past_days=21&forecast_days=1&timezone=${tz}`);
+    const lp = Array.isArray(passado) ? passado : [passado];
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+      const prev7 = lf[k] ? lf[k].daily.precipitation_sum.reduce((s, v) => s + (v || 0), 0) : null;
+      return { ...m, choveu7, prev7, seco };
+=======
+      return { ...m, choveu7, ontem: mm[i - 1] ?? null, seco };
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+export function telaClimaNova(D, h) {
+=======
+const linhaPluvio = (r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${escH(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numH(r.mm)} mm</b><small>${r.meu ? '' : r.fonte ? 'estimado' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`;
+let escH = (v) => v, numH = (v) => v;
+
+export function telaClimaNova(D, h) {
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const { esc, ic, I, numBr } = h;
+=======
+  escH = h.esc; numH = h.numBr;
+  const { esc, ic, I, numBr } = h;
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const fase = D.config.faseSafra || 'Plantio';
+=======
+  const proxChuva = diasTodos.slice(hoje && (hoje.mm || 0) >= 5 ? 1 : 0).find((d) => (d.mm || 0) >= 5);
+  const fase = D.config.faseSafra || 'Plantio';
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const maxReg = Math.max(10, ...regs.map((r) => Math.max(r.prev7 || 0, r.choveu7 || 0)));
+  const linhaReg = (r) => `<div class="es-reg2">
+      <span class="es-reg-nome">${esc(r.nome)}</span>
+      <span class="es-reg-num"><small>choveu</small><b class="num">${numBr(r.choveu7)}</b></span>
+      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.prev7 || 0) / maxReg) * 100)}%"></i></span>
+      <span class="es-reg-num prev"><small>previsto</small><b class="num">${r.prev7 == null ? '—' : numBr(r.prev7)}</b></span>
+      ${r.seco >= 7 ? `<span class="es-reg-seco">${r.seco} dias sem chuva</span>` : ''}
+=======
+  const maxReg = Math.max(10, ...regs.map((r) => r.choveu7 || 0));
+  const linhaReg = (r) => `<div class="es-reg3">
+      <span class="es-reg-nome">${esc(r.nome)}${r.seco >= 7 ? `<small class="es-reg-seco">${r.seco} dias sem chuva</small>` : ''}</span>
+      <span class="es-reg-barra"><i style="width:${Math.max(2, ((r.choveu7 || 0) / maxReg) * 100)}%"></i></span>
+      <b class="num">${numBr(r.choveu7)} mm</b>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
+=======
+  // Pluviômetro: vale o que os produtores informaram; onde ninguém informou, entra o valor da fonte (estimado).
+  const relatos = [...lerChuva().filter((x) => x.dia === hojeISO()).map((x) => ({ municipio: x.municipio, mm: x.mm, n: 1, meu: true })), ...(conteudo().chuvaExemplo || [])];
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+
+  return `<header class="topo">
+=======
+  const comRelato = new Set(relatos.map((r) => r.municipio));
+  const daFonte = regs.filter((r) => r.ontem != null && !comRelato.has(r.nome)).map((r) => ({ municipio: r.nome, mm: r.ontem, fonte: true }));
+  const pluvio = [...relatos, ...daFonte];
+
+  return `<header class="topo">
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div class="es-clima-resumo">
+      <div><span>Previsto 7 dias</span><b class="num">${mm(total7)}</b></div>
+      <div><span>Dias com chuva</span><b class="num">${comChuva} de 7</b></div>
+      <div><span>Sem chuva há</span><b class="num">${numBr(a.semChuva)} dias</b></div>
+=======
+    <div class="es-clima-info">
+      <div>${icone(h, 'chuva', 20)}<span>Próxima chuva</span><b>${proxChuva ? `${esc(proxChuva.dia)}, ${dataCurta(proxChuva.data)} · ${numBr(proxChuva.mm)} mm` : 'sem chuva boa em 15 dias'}</b></div>
+      <div>${icone(h, 'garoa', 20)}<span>Próximos 7 dias</span><b>${total7 < 1 ? 'sem chuva' : `${mm(total7)} em ${comChuva} ${comChuva === 1 ? 'dia' : 'dias'}`}</b></div>
+      <div>${icone(h, 'sol', 20)}<span>Última chuva</span><b>${a.semChuva == null ? '—' : a.semChuva === 0 ? 'ontem' : `há ${numBr(a.semChuva + 1)} dias`}</b></div>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <a class="es-radar" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="cresce"><b>Radar ao vivo · IPMet/Unesp</b><small>Bauru e Presidente Prudente · onde está chovendo agora</small></span>
+      <span class="es-radar-escala" aria-hidden="true"><i style="background:#7FD8F5"></i><i style="background:#2FBF4A"></i><i style="background:#F5E33A"></i><i style="background:#F59A23"></i><i style="background:#E5322B"></i><i style="background:#D63AC8"></i></span>
+=======
+    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
+      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
+      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <span class="es-radar-leg"><span>fraca</span><span>moderada</span><span>forte</span><span>granizo</span></span>
+=======
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">mm · 7 dias</span></div>
+    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} municípios</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
+    <span class="mini">Choveu: últimos 7 dias · barra azul: previsto para os próximos 7 dias (ECMWF)</span>
+=======
+    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias</span></div>
+    ${est.regioes == null ? '<span class="mini">Carregando…</span>' : grupos.length ? grupos.map(([uf, l], k) => `<details class="abre es-reg-grupo" ${k === 0 ? 'open' : ''}><summary>${ESTADOS[uf]}<span class="mini" style="margin-left:6px;font-weight:600">${l.length} ${l.length === 1 ? 'município' : 'municípios'}</span></summary>${l.map(linhaReg).join('')}</details>`).join('') : '<span class="mini">Não foi possível carregar agora.</span>'}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div class="cartao-cab"><span class="rotulo">Pluviômetro dos produtores</span><span class="mini">hoje</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Pluviômetro</span><span class="mini">chuva de ontem</span></div>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div>${relatos.map((r) => `<div class="es-relato ${r.meu ? 'meu' : ''}"><span class="cresce">${esc(r.municipio)}${r.meu ? ' · você' : ''}</span><b class="num">${numBr(r.mm)} mm</b><small>${r.meu ? '' : `${r.n} ${r.n === 1 ? 'produtor' : 'produtores'}`}</small></div>`).join('')}</div>
+    <span class="mini">Chuva medida de verdade, no pluviômetro de quem planta${(conteudo().chuvaExemplo || []).length ? ' · relatos de exemplo' : ''}</span>
+=======
+    <div>${pluvio.slice(0, 6).map(linhaPluvio).join('')}</div>
+    ${pluvio.length > 6 ? `<details class="abre"><summary>Ver todos os municípios (${pluvio.length})</summary>${pluvio.slice(6).map(linhaPluvio).join('')}</details>` : ''}
+    <span class="mini">Produtor: medido no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (relatos de exemplo)' : ''} · Estimado: fonte Open-Meteo, quando ninguém informou</span>
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-btn-estrela { background: #FBE7C6 !important; border-color: var(--amendoim-borda) !important; }
+.es-btn-estrela svg { width: 24px; height: 24px; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-enq-res { display: grid; grid-template-columns: 92px 1fr 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+=======
+.es-enq-res { display: grid; grid-template-columns: minmax(0, 1fr) 38% 44px; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-radar { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .28); border-radius: 14px; padding: 10px 12px; color: #fff; text-decoration: none; }
+.es-radar b { display: block; font-size: 14px; }
+.es-radar small { display: block; font-size: 11px; opacity: .88; }
+.es-radar-escala { display: flex; height: 12px; border-radius: 6px; overflow: hidden; width: 90px; flex-shrink: 0; }
+.es-radar-escala i { flex: 1; }
+.es-radar-leg { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; opacity: .85; margin: -8px 2px 0 auto; width: 150px; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-reg-num { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.es-reg-num small { font-size: 9px; color: var(--texto-3); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+.es-reg-num b { font-size: 14px; }
+.es-reg-num.prev b { color: #2F5F8A; }
+=======
+>>>>>>>
+<<<<<<< public/esboco3.css
+.segmento a[href="#/mercado/consultoria"] { color: #7A4A08; font-weight: 800; }
+.segmento a[href="#/mercado/consultoria"]:not([aria-current="page"]) { background: #FBE7C6; }
+=======
+
+/* v4: perfil no topo, faixa do assinante no estilo do app, cartão de exclusivo sem borrado */
+.es-btn-perfil { color: var(--verde); text-decoration: none; }
+.es-btn-perfil b { font-size: 15px; font-weight: 800; color: var(--verde); letter-spacing: .02em; }
+.es-faixa-ass2 { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; text-decoration: none; color: inherit; }
+.es-exclusivo { gap: 12px; }
+.es-enq-ops.col2 { grid-template-columns: 1fr 1fr; }
+.es-enq-op { padding: 8px; line-height: 1.25; }
+/* v4: clima mais limpo */
+.es-clima-info { background: rgba(255, 255, 255, .14); border-radius: 16px; padding: 4px 12px; display: flex; flex-direction: column; }
+.es-clima-info div { display: grid; grid-template-columns: 26px auto 1fr; align-items: center; gap: 8px; padding: 9px 0; font-size: 14px; }
+.es-clima-info div + div { border-top: 1px solid rgba(255, 255, 255, .2); }
+.es-clima-info div > svg { stroke: #fff !important; }
+.es-clima-info span { opacity: .9; }
+.es-clima-info b { text-align: right; font-weight: 800; }
+.es-radar2 { display: flex; align-items: center; gap: 12px; background: #fff; color: #1F4E78; border-radius: 16px; padding: 12px 14px; text-decoration: none; }
+.es-radar2 b { display: block; font-size: 15px; font-weight: 800; }
+.es-radar2 small { display: block; font-size: 12px; color: #4A6683; margin-top: 1px; }
+.es-radar2-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--azul-claro); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.es-reg3 { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 62px; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--linha); font-size: 14px; }
+.es-reg3 .es-reg-nome { font-weight: 700; color: var(--texto-2); display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.es-reg3 .es-reg-seco { align-self: flex-start; font-size: 10px; }
+.es-reg3 b { text-align: right; }
+>>>>>>>
