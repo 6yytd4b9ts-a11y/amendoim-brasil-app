@@ -20,3 +20,41 @@
 .radar-linha b { display: block; font-size: 15px; }
 .leitura h2 .bandeira { margin-right: 2px; }
 .topo-inicio img { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* ===== Área da consultoria: dados de exportação ===== */
+.dx-trava { align-items: center; text-align: center; gap: 12px; padding: 22px 18px; }
+.dx-trava .campo { text-align: left; }
+.dx-trava input { font-size: 22px; letter-spacing: .25em; text-align: center; }
+.dx-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dx-tile { background: var(--cartao); border: 1px solid var(--borda); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dx-tile span { font-size: 11px; font-weight: 700; color: var(--texto-3); line-height: 1.25; }
+.dx-tile b { font-size: 15px; font-weight: 800; line-height: 1.2; }
+.dx-tile small { font-size: 11px; font-weight: 700; color: var(--texto-2); }
+.dx-cartao { gap: 10px; }
+.dx-tabela { font-size: 12px; }
+.dx-tabela th, .dx-tabela td { padding: 7px 4px; }
+.dx-tabela th:first-child { padding-left: 2px; }
+.dx-tabela td:last-child, .dx-tabela th:last-child { padding-right: 2px; }
+.dx-tabela thead th { font-size: 11px; }
+.dx-tabela td.dx-max { background: #FBE7C6; font-weight: 800; color: var(--marrom); }
+.dx-tabela tfoot th, .dx-tabela tfoot td { font-weight: 800; border-top: 2px solid var(--borda); background: var(--fundo); }
+.dx-tabela tfoot i { font-style: italic; color: var(--texto-2); }
+.dx-tabela tr.dx-sub th, .dx-tabela tr.dx-sub td { font-weight: 800; background: var(--fundo); }
+.dx-var { white-space: nowrap; }
+.dx-seta { font-size: 9px; margin-right: 2px; color: var(--texto-3); }
+.dx-seta.sobe { color: var(--verde); }
+.dx-seta.cai { color: #B3261E; }
+.dx-dest tbody th { white-space: normal; max-width: 120px; }
+.dx-leg { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: #FBE7C6; vertical-align: -1px; }
+.dx-nota { margin: 0 4px; line-height: 1.5; }
+.dx-sair { align-self: center; background: none; border: 0; color: var(--texto-3); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 6px; }
+.dx-barra-ano { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--texto-2); }
+.dx-barra { display: flex; height: 18px; border-radius: 6px; overflow: hidden; background: var(--linha); gap: 2px; }
+.dx-barra i { display: block; height: 100%; }
+.dx-legenda { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 11px; color: var(--texto-2); }
+.dx-legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+@media (max-width: 380px) { .dx-tabela th, .dx-tabela td { padding: 6px 3px; } .dx-tabela { font-size: 11px; } }
+.trava-dados { background: var(--verde-fundo); border: 1px solid #C2E2CC; margin-bottom: -4px; }
+.trava-dados .link-mini { font-weight: 800; }
+.dx-tabela .dx-var { font-size: 11px; font-weight: 700; }
+.dx-sobe { color: var(--verde); }
+.dx-cai { color: #B3261E; }
