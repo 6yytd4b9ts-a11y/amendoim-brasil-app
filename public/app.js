@@ -1,9 +1,10 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
-import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, municipioSalvo, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio, alternarPrevisao } from '/clima.js';
+import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio, alternarPrevisao } from '/clima.js';
 import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, blocoMercadoHojeDetalhe, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores, telaNumeros, desenharNumeros } from '/painel.js';
 import { telaAlertas, ligarAlertas, atualizarLocalAlertas, alertasAtivos } from '/alertas.js';
 import { telaNegociar, telaAnunciar, telaBalcaoAdmin, telaAnuncie, ligarBalcao, carregarAnuncios } from '/balcao.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
+import { bandeira } from '/bandeiras.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
 const D = {};
@@ -48,7 +49,6 @@ const H = () => {
   h.patrocinio = (local) => seloPatrocinio(D, local, h);
   return h;
 };
-const corSigla = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
 
 // Termômetro do preço da casca: para onde o preço tende a ir nas próximas semanas.
 function posTermometro(status) {
@@ -76,21 +76,6 @@ function variacaoIEA(c) {
   return { dif: 0, desde: h[i].data };
 }
 const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
-
-// Preço da praça mais perto da lavoura (IEA ou cotação Amendoim Brasil por região, como MS).
-function precoPerto() {
-  const m = municipioSalvo();
-  const c = D.cotacoes;
-  if (!m || !c) return null;
-  const cand = [
-    ...(c.referencias || []).filter((r) => r.fonte === 'IEA-SP' && r.preco != null && r.lat != null).map((r) => ({ nome: r.praca, preco: r.preco, fonte: 'IEA', data: (r.data || '').slice(0, 5), lat: r.lat, lon: r.lon })),
-    ...(c.regioes || []).filter((r) => r.preco != null && r.lat != null).map((r) => ({ nome: r.nome, preco: r.preco, fonte: 'Amendoim Brasil', data: (r.data || '').slice(0, 5), lat: r.lat, lon: r.lon }))
-  ];
-  if (!cand.length) return null;
-  const dist = (a) => (a.lat - m.lat) ** 2 + ((a.lon - m.lon) * Math.cos(m.lat * Math.PI / 180)) ** 2;
-  const p = cand.sort((a, b) => dist(a) - dist(b))[0];
-  return p.nome === (c.destaque || {}).regiao ? null : p;
-}
 
 function varChip(v) {
   if (v == null) return `<span class="var num">—</span>`;
@@ -125,7 +110,6 @@ function telaInicio() {
     <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600">
       <span>${dest.fonte ? `Fonte: ${esc(dest.fonte)} · ${esc(dest.data)}` : 'Cotação da semana em breve'}</span>
     </div>
-    ${(() => { const p = precoPerto(); return p ? `<div class="perto">${ic(I.pino, 'style="width:15px;height:15px;stroke:currentColor"')}<span>Perto de você · ${esc(p.nome)}: <b class="num">${brl(p.preco)}</b> <small>(${esc(p.fonte)}${p.data ? ' · ' + esc(p.data) : ''})</small></span></div>` : ''; })()}
     ${(() => { const r = (c.referencias || []).find((x) => x.fonte === 'Conab'); return r ? `<span style="font-size:13px;opacity:.9">Conab, média de SP: <b class="num">${brl(r.preco)}</b>${r.variacao != null ? ` (${pct(r.variacao)} na semana)` : ''}</span>` : ''; })()}
     <div class="hero-acoes">
       <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
@@ -196,13 +180,19 @@ function blocoNoticias() {
 }
 
 function cartaoAlertas() {
-  if (alertasAtivos()) return '';
+  const grupo = linkSeguro(D.config.grupoWhatsapp);
+  const link = grupo || wa('Quero receber os avisos da Amendoim Brasil no WhatsApp.');
   return `
-  <a id="alertas" class="cartao" href="#/alertas" style="background:var(--verde-fundo);border-color:#C2E2CC;flex-direction:row;align-items:center;text-decoration:none;color:inherit">
+  <section class="cartao" style="background:var(--verde-fundo);border-color:#C2E2CC;flex-direction:row;align-items:center">
+    ${ic(grupo ? I.grupo : I.zap, 'style="width:32px;height:32px;stroke:#007731;flex-shrink:0"')}
+    <div class="cresce"><b style="font-size:15px;display:block">Grupo no WhatsApp</b><span style="font-size:13px;color:#3E4A40">Radar de preços, chuva e boletins</span></div>
+    ${link ? `<a class="btn btn-verde btn-pequeno" href="${esc(link)}" target="_blank" rel="noopener" data-ev="grupo">Entrar</a>` : ''}
+  </section>
+  ${alertasAtivos() ? '' : `<a id="alertas" class="cartao" href="#/alertas" style="flex-direction:row;align-items:center;text-decoration:none;color:inherit">
     ${ic(I.sino, 'style="width:30px;height:30px;stroke:#007731;flex-shrink:0"')}
-    <div class="cresce"><b style="font-size:15px;display:block">Alertas no celular</b><span style="font-size:13px;color:#3E4A40">Preço-alvo, mudança do IEA e chuva forte na lavoura</span></div>
-    <span class="btn btn-verde btn-pequeno">Ativar</span>
-  </a>`;
+    <div class="cresce"><b style="font-size:15px;display:block">Alertas no celular</b><span style="font-size:13px;color:var(--texto-3)">Preço-alvo, mudança do IEA e chuva forte</span></div>
+    <span class="btn btn-escuro btn-pequeno">Ativar</span>
+  </a>`}`;
 }
 
 function cartaoRedes() {
@@ -341,7 +331,7 @@ function telaAnalises() {
   <div class="paises">${D.panorama.map((p) => {
     const [tt, tc] = textoTendencia[p.tendencia] || ['', ''];
     return `<article class="cartao pais">
-      <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px"><span class="sigla pilula ${corSigla[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><b style="font-size:16px">${esc(p.pais)}</b></span><span class="pilula">${esc(p.fase)}</span></div>
+      <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px">${bandeira(p.sigla, 34)}<b style="font-size:16px">${esc(p.pais)}</b></span><span class="pilula">${esc(p.fase)}</span></div>
       ${p.indicador ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b class="num" style="font-size:18px">${esc(p.indicador)}</b>${tt ? `<span class="pilula ${tc}" style="font-size:11px">${tt}</span>` : ''}</div>` : ''}
       <p style="margin:0;font-size:14px;line-height:1.45;color:var(--texto-2)">${esc(p.resumo)}</p>
     </article>`;
@@ -386,7 +376,7 @@ function telaBoletim(id) {
     ${H().patrocinio('boletim')}
     ${b.resumo ? `<div class="lead">${esc(b.resumo)}</div>` : ''}
     ${b.secoes.map((s) => `<section>
-      <h2>${siglas[s.titulo] ? `<span class="sigla pilula ${corSigla[siglas[s.titulo]] || 'pilula-verde'}">${esc(siglas[s.titulo])}</span>` : ''}${esc(s.titulo)}</h2>
+      <h2>${siglas[s.titulo] ? bandeira(siglas[s.titulo], 30) : ''}${esc(s.titulo)}</h2>
       ${paras(s.texto)}
     </section>`).join('')}
   </article>
@@ -458,7 +448,7 @@ function render(rolarTopo = true) {
 // ---------- compartilhar ----------
 // Mensagem no formato "Radar de preços", pronta para o WhatsApp (*negrito*, _itálico_) e editável.
 const URL_APP = 'https://amendoim-brasil.netlify.app';
-const URL_RADAR = URL_APP + '/radar';
+const URL_RADAR = URL_APP + '/hoje'; // link curto novo: o WhatsApp mostra a prévia com o ícone verde do app
 function dataHoje() {
   const f = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date());
   return f.charAt(0).toUpperCase() + f.slice(1);

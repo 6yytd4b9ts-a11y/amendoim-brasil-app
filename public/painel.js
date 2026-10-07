@@ -2,6 +2,7 @@
 // Cada bloco é um cartão resumido; o detalhe abre quando a pessoa toca.
 // h = utilitários do app (esc, ic, I, brl, numBr, pct, wa, linkSeguro).
 import { listaOfertas } from '/balcao.js';
+import { bandeira, NOME_CURTO } from '/bandeiras.js';
 
 function seta(h, efeito) {
   const { I } = h;
@@ -113,11 +114,10 @@ export function blocoOportunidades(D, h) {
 
 export function blocoPanoramaCompacto(D, h) {
   const { esc } = h;
-  const cor = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
   return `<a class="cartao panorama-mini" href="#/mercado/mundo">
     <div class="cartao-cab"><span class="rotulo">Panorama global</span><span class="link-mini">Ver análise</span></div>
     <div class="pm-grade">${(D.panorama || []).map((p) => `
-      <div class="pm-item"><span class="sigla pilula ${cor[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="pm-fase">${esc(p.fase)}</span><b>${esc(p.indicador || '')}</b></div>`).join('')}
+      <div class="pm-item">${bandeira(p.sigla, 38)}<b class="pm-pais">${esc(NOME_CURTO[p.sigla] || p.pais)}</b><span class="pm-ind">${esc(p.indicador || '')}</span><span class="pm-fase">${esc(p.fase)}</span></div>`).join('')}
     </div>
   </a>`;
 }
@@ -199,7 +199,14 @@ export function blocoExportacao(D, h) {
     <div class="grade-2" style="gap:10px">${e.itens.map((x) => `
       <div class="exp-tile"><span>${esc(x.nome)}</span><b class="num">${numBr(x.toneladas)} t</b><span class="var num ${x.variacao > 0 ? 'sobe' : 'cai'}">${pct(x.variacao)} vs 2025</span></div>`).join('')}
     </div>
-    ${e.precoMedio ? `<div class="exp-linha"><span>Preço médio de exportação</span><b class="num">US$ ${numBr(e.precoMedio.atual)}/t</b><span class="var num ${e.precoMedio.variacao > 0 ? 'sobe' : 'cai'}">${pct(e.precoMedio.variacao)}</span></div>` : ''}
+    ${(() => {
+      const grao = (e.itens || []).find((x) => /gr[ãa]o/i.test(x.nome));
+      if (!grao || !e.precoMedio) return '';
+      const receita = ((1 + grao.variacao / 100) * (1 + e.precoMedio.variacao / 100) - 1) * 100;
+      const cel = (rot, v, sub) => `<div class="exp-cel ${v > 0 ? 'sobe' : 'cai'}"><span>${rot}</span><b class="num">${pct(v)}</b><small>${sub}</small></div>`;
+      return `<div class="exp-faixa">${cel('Volume', grao.variacao, 'toneladas')}<span class="exp-op">×</span>${cel('Preço', e.precoMedio.variacao, `US$ ${numBr(e.precoMedio.atual)}/t`)}<span class="exp-op">=</span>${cel('Receita', receita, 'em dólar')}</div>
+      <span class="mini" style="margin-top:-4px">Embarca mais, porém mais barato: a receita cresce menos que o volume.</span>`;
+    })()}
     <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(e.leitura)}</p>
     <details class="abre">
       <summary>Ritmo dos embarques ${e.mensal?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
@@ -219,12 +226,11 @@ export function blocoExportacao(D, h) {
 
 export function blocoMundo(D, h) {
   const { esc } = h;
-  const cor = { BR: 'pilula-verde', AR: 'pilula-azul', US: 'pilula-amendoim', IN: 'pilula-amendoim', CN: 'pilula-amendoim' };
   return `<section class="cartao" id="sec-mundo" style="gap:0;padding:4px 16px">
     <div class="cartao-cab" style="padding:12px 0 6px"><span class="rotulo">Brasil e mundo</span><span class="mini">toque para abrir</span></div>
     ${(D.panorama || []).map((p) => `
       <details class="pais-linha">
-        <summary><span class="sigla pilula ${cor[p.sigla] || 'pilula-verde'}">${esc(p.sigla)}</span><span class="cresce"><b>${esc(p.pais)}</b><span class="mini">${esc(p.fase)}</span></span><b class="num">${esc(p.indicador || '')}</b></summary>
+        <summary>${bandeira(p.sigla, 34)}<span class="cresce"><b>${esc(p.pais)}</b><span class="mini">${esc(p.fase)}</span></span><b class="num">${esc(p.indicador || '')}</b></summary>
         <p>${esc(p.resumo)}</p>
       </details>`).join('')}
   </section>`;
