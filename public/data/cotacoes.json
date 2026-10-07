@@ -16,34 +16,51 @@
   "regioes": [
     {
       "nome": "Oeste Paulista",
+      "lat": -22.13,
+      "lon": -51.39,
       "preco": null,
-      "variacao": null
+      "variacao": null,
+      "data": null
     },
     {
       "nome": "Alta Paulista",
+      "lat": -21.69,
+      "lon": -51.07,
       "preco": null,
-      "variacao": null
+      "variacao": null,
+      "data": null
     },
     {
       "nome": "Alta Mogiana",
+      "lat": -21.25,
+      "lon": -48.32,
       "preco": null,
-      "variacao": null
+      "variacao": null,
+      "data": null
     },
     {
       "nome": "Mato Grosso do Sul",
+      "lat": -21.71,
+      "lon": -52.42,
       "preco": null,
-      "variacao": null
+      "variacao": null,
+      "data": null
     },
     {
       "nome": "Minas Gerais",
+      "lat": -19.75,
+      "lon": -47.94,
       "preco": null,
-      "variacao": null
+      "variacao": null,
+      "data": null
     }
   ],
   "referencias": [
     {
       "fonte": "IEA-SP",
       "praca": "Tupã",
+      "lat": -21.93,
+      "lon": -50.51,
       "preco": 77.0,
       "variacao": null,
       "data": "05/10/2026",
@@ -62,6 +79,8 @@
     {
       "fonte": "IEA-SP",
       "praca": "Presidente Prudente",
+      "lat": -22.13,
+      "lon": -51.39,
       "preco": 80.0,
       "variacao": null,
       "data": "05/10/2026",
