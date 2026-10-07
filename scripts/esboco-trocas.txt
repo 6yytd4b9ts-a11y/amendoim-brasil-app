@@ -1,24 +1,127 @@
 <<<<<<< public/app.js
-
-const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
+  localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
 =======
-import { telaAssinatura, telaConta, telaEstimativas, telaTermos, telaPrivacidade, boasVindasFeitas, mostrarBoasVindas, ligarEsboco } from '/esboco.js';
-import { faixaAssinante, cartaoAgendaInicio, cartaoPerfilInicio, telaAgenda, telaPerfil, telaPatrocinio, ligarEsboco2 } from '/esboco2.js';
-import { telaClimaNova, ligarClimaNovo } from '/esboco-clima.js';
-import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, ligarEsboco3 } from '/esboco3.js';
-
-const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
+  if (boasVindasFeitas()) localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
+  else if (rota().aba === 'inicio') setTimeout(() => mostrarBoasVindas(H()), 600);
 >>>>>>>
 <<<<<<< public/app.js
-  const i = posTermometro(status);
+  ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
 =======
-  return medidor5(status, esc);
-  const i = posTermometro(status);
+  ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
+  ajustarDados(D);
 >>>>>>>
 <<<<<<< public/app.js
-    <button class="btn-icone" aria-label="Município da lavoura" onclick="location.hash='#/clima'">${ic(I.pino)}</button>
+ligarDados(render, evento);
 =======
-    ${botaoAssinanteTopo(H())}
+ligarDados(render, evento);
+ligarEsboco({
+  render, evento,
+  // Boas-vindas: a localização só é pedida quando a pessoa toca no botão.
+  localizar: async () => {
+    const m = await localDoAparelho(15000);
+    if (m) { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); registrarRegiao(); }
+    return m;
+  }
+});
+ligarEsboco2({ render, evento, escolherLocal: (m) => { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); } });
+ligarClimaNovo({ render });
+ligarEsboco3({ render, evento });
+>>>>>>>
+<<<<<<< public/app.js
+  const assinatura = '_Amendoim Brasil · Helder Lamberti_';
+=======
+  const assinatura = '_Amendoim Brasil · Helder Lamberti_';
+  if (tipo === 'noticias') return textoNoticias() || 'Amendoim Brasil: ' + URL_RADAR;
+>>>>>>>
+<<<<<<< public/app.js
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar' };
+=======
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado' };
+>>>>>>>
+<<<<<<< public/app.js
+  boletim: (id) => telaBoletim(id)
+=======
+  boletim: (id) => telaBoletim(id),
+  conta: (sub) => telaConta(sub, H()),
+  estimativas: () => telaEstimativas(H()),
+  termos: () => telaTermos(H()),
+  privacidade: () => telaPrivacidade(H()),
+  agenda: () => telaAgenda(H()),
+  perfil: () => telaPerfil(H()),
+  destinos: () => telaDestinos(H()),
+  biblioteca: () => telaBiblioteca(H())
+>>>>>>>
+<<<<<<< public/app.js
+  clima: () => telaClimaAuto(D, H()),
+=======
+  clima: () => telaClimaNova(D, H()),
+>>>>>>>
+<<<<<<< public/app.js
+  anuncie: () => telaAnuncie(D, H()),
+=======
+  anuncie: () => telaPatrocinio(D, H()),
+>>>>>>>
+<<<<<<< public/app.js
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : sub === 'dados' ? telaDados(D, H()) : telaCotacoes(),
+=======
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDadosAssinante(D, H(), telaDados) : telaCotacoes(),
+>>>>>>>
+<<<<<<< public/app.js
+  </a>` : ''}
+=======
+  </a>` : ''}
+
+  ${cartaoNoticiasDia(H(), false)}
+>>>>>>>
+<<<<<<< public/app.js
+  <a class="chamada" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
+=======
+  <a class="chamada es-consult" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
+>>>>>>>
+<<<<<<< public/app.js
+    <div class="grafico" id="grafico">${graficoPreco()}</div>
+=======
+    ${graficoNovo(D, estado.periodo)}
+>>>>>>>
+<<<<<<< public/app.js
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="${wa(`Olá Helder, quero assinar a consultoria para ver o histórico de preço de ${p}.`) || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+=======
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+>>>>>>>
+<<<<<<< public/app.js
+  ${blocoMercadoHojeDetalhe(D, H())}
+=======
+  ${cartaoFisico(D, H())}
+
+  ${cartaoFato(D, H())}
+>>>>>>>
+<<<<<<< public/app.js
+    ${c.referencias.map((r) => {
+=======
+    ${ordenarRefs(c.referencias).map((r) => {
+>>>>>>>
+<<<<<<< public/app.js
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Consultoria']];
+=======
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
+>>>>>>>
+<<<<<<< public/app.js
+  ${blocoNoticias()}
+=======
+  ${blocoNoticias()}
+
+  ${cartaoEnquete(H())}
+>>>>>>>
+<<<<<<< public/app.js
+  </div>
+
+=======
+  </div>
+
+  ${cartaoNoticiasDia(H())}
+
+  ${cartaoAgendaInicio(H())}
+
 >>>>>>>
 <<<<<<< public/app.js
   <section class="destaque">
@@ -43,157 +146,60 @@ const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patr
   ${heroConab(D, H())}
 
   ${blocoNovidades(D, H())}
-
-  ${faixaAssinante(H())}
 >>>>>>>
 <<<<<<< public/app.js
-  ${b ? `
+    <button class="btn-icone" aria-label="Município da lavoura" onclick="location.hash='#/clima'">${ic(I.pino)}</button>
 =======
-  ${cartaoAgendaInicio(H())}
-
-  ${b ? `
+    ${botaoAssinanteTopo(H())}
 >>>>>>>
 <<<<<<< public/app.js
-
-  ${blocoOportunidades(D, H())}
+  const chuva7 = auto?.total7;
 =======
-
-  ${cartaoEnquete(H())}
-
-  ${blocoOportunidades(D, H())}
+  const chuva7 = chuva7Unificada(auto);
 >>>>>>>
 <<<<<<< public/app.js
-  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Consultoria']];
+function medidor(status) {
 =======
-  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
+function medidor(status) {
+  return medidor5(status, esc);
 >>>>>>>
 <<<<<<< public/app.js
-    ${c.referencias.map((r) => {
+import { telaDados, ligarDados } from '/exportacao.js';
 =======
-    ${ordenarRefs(c.referencias).map((r) => {
->>>>>>>
-<<<<<<< public/app.js
-
-  ${blocoMercadoHojeDetalhe(D, H())}
-=======
-
-  ${cartaoFisico(D, H())}
-
-  ${blocoMercadoHojeDetalhe(D, H())}
->>>>>>>
-<<<<<<< public/app.js
-      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="${wa(`Olá Helder, quero assinar a consultoria para ver o histórico de preço de ${p}.`) || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
-=======
-      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
->>>>>>>
-<<<<<<< public/app.js
-    <div class="grafico" id="grafico">${graficoPreco()}</div>
-=======
-    ${graficoNovo(D, estado.periodo)}
->>>>>>>
-<<<<<<< public/app.js
-  <a class="chamada" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
-=======
-  <a class="chamada es-consult" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
->>>>>>>
-<<<<<<< public/app.js
-  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : sub === 'dados' ? telaDados(D, H()) : telaCotacoes(),
-=======
-  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDados(D, H()) : telaCotacoes(),
->>>>>>>
-<<<<<<< public/app.js
-  anuncie: () => telaAnuncie(D, H()),
-=======
-  anuncie: () => telaPatrocinio(D, H()),
->>>>>>>
-<<<<<<< public/app.js
-  clima: () => telaClimaAuto(D, H()),
-=======
-  clima: () => telaClimaNova(D, H()),
->>>>>>>
-<<<<<<< public/app.js
-  boletim: (id) => telaBoletim(id)
-=======
-  boletim: (id) => telaBoletim(id),
-  conta: (sub) => telaConta(sub, H()),
-  estimativas: () => telaEstimativas(H()),
-  termos: () => telaTermos(H()),
-  privacidade: () => telaPrivacidade(H()),
-  agenda: () => telaAgenda(H()),
-  perfil: () => telaPerfil(H()),
-  destinos: () => telaDestinos(H()),
-  biblioteca: () => telaBiblioteca(H())
->>>>>>>
-<<<<<<< public/app.js
-const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar' };
-=======
-const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'ferramentas' };
->>>>>>>
-<<<<<<< public/app.js
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-periodo],[data-boletim],[data-prev]');
-=======
-ligarEsboco({
-  render, evento,
-  // Boas-vindas: a localização só é pedida quando a pessoa toca no botão.
-  localizar: async () => {
-    const m = await localDoAparelho(15000);
-    if (m) { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); registrarRegiao(); }
-    return m;
-  }
-});
-ligarEsboco2({ render, evento, escolherLocal: (m) => { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); } });
-ligarClimaNovo({ render });
-ligarEsboco3({ render, evento });
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-periodo],[data-boletim],[data-prev]');
->>>>>>>
-<<<<<<< public/app.js
-  ligarBalcao(D, H(), render, evento);
-=======
-  ajustarDados(D);
-  ligarBalcao(D, H(), render, evento);
->>>>>>>
-<<<<<<< public/app.js
-  localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
-=======
-  if (boasVindasFeitas()) localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
-  else if (rota().aba === 'inicio') setTimeout(() => mostrarBoasVindas(H()), 600);
+import { telaDados, ligarDados } from '/exportacao.js';
+import { telaAssinatura, telaConta, telaEstimativas, telaTermos, telaPrivacidade, boasVindasFeitas, mostrarBoasVindas, ligarEsboco } from '/esboco.js';
+import { faixaAssinante, cartaoAgendaInicio, cartaoPerfilInicio, telaAgenda, telaPerfil, telaPatrocinio, ligarEsboco2 } from '/esboco2.js';
+import { telaClimaNova, ligarClimaNovo } from '/esboco-clima.js';
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3 } from '/esboco3.js';
+import { chuva7Unificada } from '/esboco-clima.js';
 >>>>>>>
 <<<<<<< public/index.html
-</head>
+<body>
 =======
+<body>
+  <div class="es-faixa" aria-hidden="true">ESBOÇO · TESTE</div>
+>>>>>>>
+<<<<<<< public/index.html
+  <link rel="stylesheet" href="/visual.css">
+=======
+  <link rel="stylesheet" href="/visual.css">
   <link rel="stylesheet" href="/esboco.css">
   <link rel="stylesheet" href="/esboco2.css">
   <link rel="stylesheet" href="/esboco3.css">
-</head>
->>>>>>>
-<<<<<<< public/index.html
-  <div class="app">
-=======
-  <div class="es-faixa" aria-hidden="true">ESBOÇO · TESTE</div>
-  <div class="app">
 >>>>>>>
 <<<<<<< public/sw.js
 const VERSAO = 'ab-v9';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 =======
-const VERSAO = 'ab-v14';
-const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
+const VERSAO = 'ab-v16';
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 >>>>>>>
 <<<<<<< public/painel-admin.js
-
-const CHAVE_LS = 'ab-chave-numeros';
+if (location.hash === '#balcao') est.aba = 'balcao';
 =======
-import { telaAssinantesAdm, telaConteudo, ligarPainelEsboco } from '/painel-esboco.js';
-import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from '/painel-esboco2.js';
-
-const CHAVE_LS = 'ab-chave-numeros';
->>>>>>>
-<<<<<<< public/painel-admin.js
-  const abas = [['geral', 'Visão geral'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`]];
-=======
-  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo']];
+if (location.hash === '#balcao') est.aba = 'balcao';
+ligarPainelEsboco(desenhar);
+ligarPainelEsboco2(desenhar);
 >>>>>>>
 <<<<<<< public/painel-admin.js
     ${est.aba !== 'balcao' ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
@@ -203,27 +209,29 @@ const CHAVE_LS = 'ab-chave-numeros';
     ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
 >>>>>>>
 <<<<<<< public/painel-admin.js
-try { est.k = localStorage.getItem(CHAVE_LS) || ''; } catch (e) { /* sem armazenamento */ }
+  const abas = [['geral', 'Visão geral'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`]];
 =======
-ligarPainelEsboco(desenhar);
-ligarPainelEsboco2(desenhar);
-try { est.k = localStorage.getItem(CHAVE_LS) || ''; } catch (e) { /* sem armazenamento */ }
+  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo']];
+>>>>>>>
+<<<<<<< public/painel-admin.js
+import { MUNICIPIOS } from '/clima.js';
+=======
+import { MUNICIPIOS } from '/clima.js';
+import { telaAssinantesAdm, telaConteudo, ligarPainelEsboco } from '/painel-esboco.js';
+import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from '/painel-esboco2.js';
 >>>>>>>
 <<<<<<< public/painel.html
-  <style>
+  <link rel="stylesheet" href="/visual.css">
 =======
+  <link rel="stylesheet" href="/visual.css">
   <link rel="stylesheet" href="/esboco.css">
   <link rel="stylesheet" href="/esboco2.css">
   <link rel="stylesheet" href="/esboco3.css">
-  <style>
 >>>>>>>
 <<<<<<< public/painel.js
-  const itens = itensHoje(D, h);
-  return `${blocoMercadoFisico(D, h)}
-  <section class="cartao" id="sec-hoje">
+    <a href="${h.wa('Olá Helder, quero assinar a consultoria para ver a paridade de exportação em R$/saca.') || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
 =======
-  const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico');
-  return `<section class="cartao" id="sec-hoje">
+    <a href="#/destinos" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Preço por destino e paridade</b><span class="mini">★ Plano Empresa</span></span><span class="link-mini">Ver</span></a>
 >>>>>>>
 <<<<<<< public/painel.js
     <div class="grade-2" style="gap:10px">${e.itens.map((x) => `
@@ -240,49 +248,30 @@ try { est.k = localStorage.getItem(CHAVE_LS) || ''; } catch (e) { /* sem armazen
 =======
 >>>>>>>
 <<<<<<< public/painel.js
-    <a href="${h.wa('Olá Helder, quero assinar a consultoria para ver a paridade de exportação em R$/saca.') || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
+  const itens = itensHoje(D, h);
+  return `${blocoMercadoFisico(D, h)}
+  <section class="cartao" id="sec-hoje">
 =======
-    <a href="#/destinos" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Preço por destino e paridade</b><span class="mini">★ Plano Empresa</span></span><span class="link-mini">Ver</span></a>
->>>>>>>
-<<<<<<< public/ferramentas.js
-
-const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
-=======
-import { cartaoBiblioteca } from '/esboco3.js';
-
-const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
->>>>>>>
-<<<<<<< public/ferramentas.js
-  <section class="cartao" style="gap:14px" id="ferr" data-ferr-k="${k}">
-=======
-  ${cartaoBiblioteca(h)}
-  <section class="cartao" style="gap:14px" id="ferr" data-ferr-k="${k}">
+  const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico');
+  return `<section class="cartao" id="sec-hoje">
 >>>>>>>
 <<<<<<< public/esboco2.js
-
-let h = null;
+  <p class="mini es-legal">Datas do USDA e da Conab conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>`;
 =======
-import { cartaoExclusivo } from '/esboco3.js';
-
-let h = null;
+  <p class="mini es-legal">Datas do USDA, da Conab e da SIAL conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>
+  </div>`;
 >>>>>>>
 <<<<<<< public/esboco2.js
-const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], safra: ['Safra', 'es-t-safra'], evento: ['Evento', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
+  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['safra', 'Safra'], ['evento', 'Eventos'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
 =======
-const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira internacional', 'es-t-feira'], safra: ['Safra', 'es-t-safra'], evento: ['Evento no Brasil', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
+  ${!assinante() ? cartaoExclusivo(h, 'Nunca perca uma data importante', 'As datas que mexem no preço do amendoim, com lembrete no celular um dia antes.', ['Relatórios do USDA e levantamentos da Conab', 'Feiras internacionais: SIAL, Gulfood, Congresso INC', 'Eventos do amendoim no Brasil e da Câmara Setorial']) : ''}
+  <div ${!assinante() ? 'hidden' : ''}>
+  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['feira', 'Feiras'], ['evento', 'Eventos'], ['safra', 'Safra'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
 >>>>>>>
 <<<<<<< public/esboco2.js
-  return `<a class="es-faixa-ass" href="#/mercado/consultoria" data-ev="esb-faixa">
-    <span class="es-faixa-ic">${h.ic(estrela, 'style="width:20px;height:20px;stroke:#5C3A06;fill:#F4AD46"')}</span>
-    <span class="cresce"><b>${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])} · sua área` : 'Área do Assinante'}</b>
-      <small>${ok ? `Novo: estimativa ${h.esc(ult.safra)} e balanço do mês` : `Quanto o Brasil vai colher em ${h.esc(ult.safra)}? Estimativas e relatórios`}</small></span>
-    <span class="es-faixa-btn">${ok ? 'Abrir' : 'Conhecer'}</span>
+    <div><h1>Agenda do amendoim</h1><div class="sub">Relatórios que mexem no preço, safra e eventos do setor</div></div>
 =======
-  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="esb-faixa">
-    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--verde-claro)">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#007731"')}</span>
-    <span class="cresce"><b style="font-size:15px;display:block">${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}` : 'Área do assinante'}</b>
-      <span class="mini">${ok ? `Novo na sua área: estimativa ${h.esc(ult.safra)}` : 'Estimativas de safra, relatórios e agenda do mercado'}</span></span>
-    ${h.ic(h.I.seta, 'style="width:18px;height:18px;stroke:#5F5B52"')}
+    <div><h1>Agenda do mercado</h1><div class="sub">Relatórios que mexem no preço, feiras e eventos do amendoim</div></div>
 >>>>>>>
 <<<<<<< public/esboco2.js
   if (!prox.length && !agora) return '';
@@ -301,22 +290,28 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
     ${travado ? '<span class="mini">USDA, Conab, feiras internacionais e eventos do amendoim, com lembrete no celular</span>' : ''}
 >>>>>>>
 <<<<<<< public/esboco2.js
-    <div><h1>Agenda do amendoim</h1><div class="sub">Relatórios que mexem no preço, safra e eventos do setor</div></div>
+  return `<a class="es-faixa-ass" href="#/mercado/consultoria" data-ev="esb-faixa">
+    <span class="es-faixa-ic">${h.ic(estrela, 'style="width:20px;height:20px;stroke:#5C3A06;fill:#F4AD46"')}</span>
+    <span class="cresce"><b>${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])} · sua área` : 'Área do Assinante'}</b>
+      <small>${ok ? `Novo: estimativa ${h.esc(ult.safra)} e balanço do mês` : `Quanto o Brasil vai colher em ${h.esc(ult.safra)}? Estimativas e relatórios`}</small></span>
+    <span class="es-faixa-btn">${ok ? 'Abrir' : 'Conhecer'}</span>
 =======
-    <div><h1>Agenda do mercado</h1><div class="sub">Relatórios que mexem no preço, feiras e eventos do amendoim</div></div>
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="esb-faixa">
+    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--verde-claro)">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#007731"')}</span>
+    <span class="cresce"><b style="font-size:15px;display:block">${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}` : 'Área do assinante'}</b>
+      <span class="mini">${ok ? `Novo na sua área: estimativa ${h.esc(ult.safra)}` : 'Estimativas de safra, relatórios e agenda do mercado'}</span></span>
+    ${h.ic(h.I.seta, 'style="width:18px;height:18px;stroke:#5F5B52"')}
 >>>>>>>
 <<<<<<< public/esboco2.js
-  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['safra', 'Safra'], ['evento', 'Eventos'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
+const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], safra: ['Safra', 'es-t-safra'], evento: ['Evento', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
 =======
-  ${!assinante() ? cartaoExclusivo(h, 'Nunca perca uma data importante', 'As datas que mexem no preço do amendoim, com lembrete no celular um dia antes.', ['Relatórios do USDA e levantamentos da Conab', 'Feiras internacionais: SIAL, Gulfood, Congresso INC', 'Eventos do amendoim no Brasil e da Câmara Setorial']) : ''}
-  <div ${!assinante() ? 'hidden' : ''}>
-  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['feira', 'Feiras'], ['evento', 'Eventos'], ['safra', 'Safra'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
+const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira internacional', 'es-t-feira'], safra: ['Safra', 'es-t-safra'], evento: ['Evento no Brasil', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
 >>>>>>>
 <<<<<<< public/esboco2.js
-  <p class="mini es-legal">Datas do USDA e da Conab conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>`;
+import { MUNICIPIOS } from '/clima.js';
 =======
-  <p class="mini es-legal">Datas do USDA, da Conab e da SIAL conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>
-  </div>`;
+import { MUNICIPIOS } from '/clima.js';
+import { cartaoExclusivo } from '/esboco3.js';
 >>>>>>>
 <<<<<<< public/esboco2.css
 .pe-prod thead th:first-child, .pe-prod tbody th { text-align: left; }
@@ -328,13 +323,20 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
 .es-cadeado-linha { flex-direction: row; align-items: center; gap: 12px; padding: 14px; background: var(--amendoim-fundo); border-color: var(--amendoim-borda); }
 >>>>>>>
 <<<<<<< public/esboco-dados.js
-    produtor: { nome: 'Produtor', mensal: 29.9, anual: 299 },
+    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' }
 =======
-    produtor: { nome: 'Produtor', mensal: 29.9, anual: 298.8 },
+    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' },
+    { id: 'e11', data: '2026-10-17', fim: '2026-10-21', tipo: 'feira', titulo: 'SIAL Paris 2026', local: 'Paris, França', detalhe: 'Uma das maiores feiras de alimentos do mundo (a cada 2 anos). Compradores europeus e do Oriente Médio fecham negócios de amendoim e derivados.' },
+    { id: 'e12', data: null, tipo: 'feira', titulo: 'Congresso INC 2027 (castanhas e frutas secas)', local: 'Maio · local e data a confirmar', detalhe: 'Encontro mundial do setor de castanhas e amendoim: estimativas de safra e negócios entre exportadores e importadores. Em 2026 foi em Macau, de 12 a 14 de maio.' },
+    { id: 'e13', data: null, tipo: 'feira', titulo: 'Gulfood 2027', local: 'Dubai · jan/fev, data a confirmar', detalhe: 'Maior feira de alimentos do Oriente Médio, porta de entrada para compradores árabes e africanos.' },
+    { id: 'e14', data: null, tipo: 'evento', titulo: 'Feira Nacional do Amendoim 2027', local: 'Jaboticabal/SP · agosto, data a confirmar', detalhe: 'Maior evento técnico do amendoim no Brasil (Unesp Jaboticabal): palestras, dia de campo e feira de negócios. Em 2026 foi de 12 a 14 de agosto.' },
+    { id: 'e15', data: null, tipo: 'evento', titulo: 'Festa do Amendoim 2027', local: 'Quintana/SP · setembro, data a confirmar', detalhe: 'Festa tradicional do amendoim na Alta Paulista. Em 2026 foi em 5 e 6 de setembro.' },
+    { id: 'e16', data: null, tipo: 'evento', titulo: 'Evento da Turma do Amendoim', local: 'Data a confirmar', detalhe: 'Aguardando a data com a organização.' }
 >>>>>>>
 <<<<<<< public/esboco-dados.js
-  leituraClima: 'Texto de exemplo: semana de chuva irregular no Oeste Paulista. Quem tem umidade boa no talhão pode avançar no plantio; quem está no seco, espere uma chuva de 15 a 20 mm. Você escreve esta leitura no painel (ou o Claude deixa um rascunho pronto toda segunda).',
+  patrocinio: { semestral: 6000, cotas: 5 },
 =======
+  patrocinio: { semestral: 6000, cotas: 5 },
   // Termômetro com 5 posições: Fraco · Fraco a estável · Estável · Estável a firme · Firme
   termometro: 'Estável a firme',
   // Mercado físico: faixa de negócio do dia (o Helder atualiza no painel). Valores de exemplo até ele preencher.
@@ -354,20 +356,26 @@ const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira intern
     { pais: 'Polônia', comex: 1300, min: 1270, max: 1320, tend: 'estavel' }
   ] },
   enquete: null, // o Helder lança pelo painel: { id, pergunta, opcoes: [...], dias, inicio }
-  chuvaExemplo: [
-    { municipio: 'Tupã', mm: 22, n: 3 }, { municipio: 'Presidente Prudente', mm: 8, n: 2 }, { municipio: 'Jaboticabal', mm: 35, n: 4 },
-    { municipio: 'Rancharia', mm: 15, n: 1 }, { municipio: 'Glória de Dourados', mm: 0, n: 2 }
+  chuvaExemplo: [], // só o que os produtores informarem de verdade
+  // Notícias do dia: o Helder (ou o rascunho do Claude) lança no painel; somem sozinhas depois de 2 dias.
+  noticias: [
+    { id: 'n1', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Argentina confirma área 8% menor para a safra 26/27', fonte: 'Bolsa de Cereales de Córdoba', resumo: 'Menos amendoim argentino na Europa em 2027', link: '', exemplo: true },
+    { id: 'n2', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Conab publica o 1º levantamento da safra 26/27 no dia 15', fonte: 'Conab', resumo: 'Primeira estimativa oficial de área e produção', link: '', exemplo: true }
   ],
-  leituraClima: 'Texto de exemplo: semana de chuva irregular no Oeste Paulista. Quem tem umidade boa no talhão pode avançar no plantio; quem está no seco, espere uma chuva de 15 a 20 mm. Você escreve esta leitura no painel (ou o Claude deixa um rascunho pronto toda segunda).',
+  // El Niño agora: o texto principal vem do clima.json (INPE); os impactos por região o Helder ajusta no painel.
+  enso: {
+    titulo: 'El Niño muito forte em andamento',
+    selo: 'alerta',
+    regioes: [
+      { nome: 'Oeste e Alta Paulista (Tupã, Prudente, Marília)', texto: 'Primavera com chuva acima da média: plantio tende a andar bem, mas atenção a excesso de água e a doenças de folha. Risco de chuva na colheita de fevereiro a abril.' },
+      { nome: 'Alta Mogiana e Norte de SP (Jaboticabal, Ribeirão)', texto: 'Calor acima do normal e chuva mais irregular: risco de veranico em dezembro e janeiro, na florada e no enchimento das vagens.' },
+      { nome: 'Norte de MS e MT (Chapadão, Campo Verde, Sorriso)', texto: 'Tendência de mais quente e mais seco que o normal: plantio pode atrasar esperando umidade; irrigação e cobertura do solo fazem diferença.' },
+      { nome: 'Sul de MS (Dourados, Glória, Itaporã)', texto: 'Mais perto do padrão do Sul: chuva acima da média e temporais no fim do ano. Cuidado com encharcamento e perdas na colheita.' }
+    ]
+  },
 >>>>>>>
 <<<<<<< public/esboco-dados.js
-    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' }
+    produtor: { nome: 'Produtor', mensal: 29.9, anual: 299 },
 =======
-    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' },
-    { id: 'e11', data: '2026-10-17', fim: '2026-10-21', tipo: 'feira', titulo: 'SIAL Paris 2026', local: 'Paris, França', detalhe: 'Uma das maiores feiras de alimentos do mundo (a cada 2 anos). Compradores europeus e do Oriente Médio fecham negócios de amendoim e derivados.' },
-    { id: 'e12', data: null, tipo: 'feira', titulo: 'Congresso INC 2027 (castanhas e frutas secas)', local: 'Maio · local e data a confirmar', detalhe: 'Encontro mundial do setor de castanhas e amendoim: estimativas de safra e negócios entre exportadores e importadores. Em 2026 foi em Macau, de 12 a 14 de maio.' },
-    { id: 'e13', data: null, tipo: 'feira', titulo: 'Gulfood 2027', local: 'Dubai · jan/fev, data a confirmar', detalhe: 'Maior feira de alimentos do Oriente Médio, porta de entrada para compradores árabes e africanos.' },
-    { id: 'e14', data: null, tipo: 'evento', titulo: 'Feira Nacional do Amendoim 2027', local: 'Jaboticabal/SP · agosto, data a confirmar', detalhe: 'Maior evento técnico do amendoim no Brasil (Unesp Jaboticabal): palestras, dia de campo e feira de negócios. Em 2026 foi de 12 a 14 de agosto.' },
-    { id: 'e15', data: null, tipo: 'evento', titulo: 'Festa do Amendoim 2027', local: 'Quintana/SP · setembro, data a confirmar', detalhe: 'Festa tradicional do amendoim na Alta Paulista. Em 2026 foi em 5 e 6 de setembro.' },
-    { id: 'e16', data: null, tipo: 'evento', titulo: 'Evento da Turma do Amendoim', local: 'Data a confirmar', detalhe: 'Aguardando a data com a organização.' }
+    produtor: { nome: 'Produtor', mensal: 29.9, anual: 298.8 },
 >>>>>>>
