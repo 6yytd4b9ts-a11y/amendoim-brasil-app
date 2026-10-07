@@ -13,3 +13,4 @@ done
 base64 -d assets/painel-180.png.b64 > public/icons/painel-180.png
 cp public/icons/icon-maskable-512.png public/img/og-app.png   # prévia do link (WhatsApp): o mesmo ícone verde do app
 echo "Imagens prontas."
+node scripts/esboco-ligar.mjs   # ramo do esboço: liga as telas de teste
