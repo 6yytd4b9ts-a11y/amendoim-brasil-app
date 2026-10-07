@@ -178,7 +178,7 @@ document.addEventListener('click', (e) => {
 const VERSAO = 'ab-v9';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 =======
-const VERSAO = 'ab-v13';
+const VERSAO = 'ab-v14';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 >>>>>>>
 <<<<<<< public/painel-admin.js
@@ -218,9 +218,11 @@ try { est.k = localStorage.getItem(CHAVE_LS) || ''; } catch (e) { /* sem armazen
   <style>
 >>>>>>>
 <<<<<<< public/painel.js
+  const itens = itensHoje(D, h);
   return `${blocoMercadoFisico(D, h)}
   <section class="cartao" id="sec-hoje">
 =======
+  const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico');
   return `<section class="cartao" id="sec-hoje">
 >>>>>>>
 <<<<<<< public/painel.js
@@ -255,70 +257,6 @@ const ALQ = 2.42; // 1 alqueire paulista = 2,42 ha
 =======
   ${cartaoBiblioteca(h)}
   <section class="cartao" style="gap:14px" id="ferr" data-ferr-k="${k}">
->>>>>>>
-<<<<<<< public/esboco.js
-
-let h = null;
-=======
-import { cartaoExclusivo } from '/esboco3.js';
-
-let h = null;
->>>>>>>
-<<<<<<< public/esboco.js
-      ${item('Estimativas Amendoim Brasil: área, produção e balanço')}
-      ${item('Exportação mês a mês, destinos e preço por país')}
-      ${item('Histórico de preço de 1 e 5 anos e sazonalidade')}
-      ${item('Empresa: paridade de exportação e alertas avançados')}
-=======
-      ${item('<b>Estimativas Amendoim Brasil</b>: área, produção e balanço, todo mês')}
-      ${item('<b>Leitura semanal do mercado</b>: o momento é de segurar ou vender?')}
-      ${item('<b>Agenda do mercado</b> com lembretes: USDA, Conab, feiras e eventos')}
-      ${item('<b>Histórico de 5 anos</b>, sazonalidade e alerta de preço-alvo')}
-      ${item('<b>Empresa</b>: preço por destino, exportação completa e paridade')}
->>>>>>>
-<<<<<<< public/esboco.js
-
-  <a class="cartao es-previa" href="#/estimativas">
-    <div class="cartao-cab"><span class="rotulo">Estimativa de safra ${h.esc(c.estimativas[c.estimativas.length - 1].safra)}</span>${h.ic(h.I.cadeado, 'style="width:18px;height:18px;stroke:#7A4A08"')}</div>
-    <div class="es-borrado" aria-hidden="true"><div class="dx-tiles">
-      <div class="dx-tile"><span>Área</span><b>${nf(c.estimativas[c.estimativas.length - 1].areaMin)} mil ha</b></div>
-      <div class="dx-tile"><span>Produção</span><b>${nf(p.scMeio / 1e6, 1)} mi sc</b></div>
-      <div class="dx-tile"><span>Variação</span><b>−00%</b></div>
-    </div></div>
-    <span class="mini">Toque para ver o que tem dentro</span>
-  </a>
-=======
->>>>>>>
-<<<<<<< public/esboco.js
-  ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
-=======
-  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do mercado', 'USDA, Conab, feiras e eventos, com lembrete')}
-  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
-  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
-  ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
->>>>>>>
-<<<<<<< public/esboco.js
-  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · 2 meses grátis']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
-  ${cartao('produtor', ['Estimativas Amendoim Brasil', 'Dados de exportação completos', 'Histórico de preço e sazonalidade'])}
-  ${cartao('empresa', ['Tudo do Produtor', 'Paridade de exportação', 'Alertas avançados e relatório mensal', 'Até 3 pessoas da empresa'])}`;
-=======
-  <div class="segmento es-periodo">${[['mensal', 'Mensal'], ['anual', 'Anual · mais barato']].map(([k, t]) => `<button type="button" data-esb-periodo="${k}" aria-pressed="${per === k}">${t}</button>`).join('')}</div>
-  ${cartao('produtor', ['Estimativas Amendoim Brasil todo mês', 'Leitura semanal do mercado', 'Agenda do mercado com lembretes', 'Histórico de 5 anos e alerta de preço-alvo'])}
-  ${cartao('empresa', ['Tudo do Produtor', 'Preço por destino: Argélia, Rússia, África do Sul…', 'Exportação completa e paridade', 'Relatório mensal e até 3 pessoas'])}`;
->>>>>>>
-<<<<<<< public/esboco.js
-    <div class="es-travado"><div class="es-borrado" aria-hidden="true">${corpo}</div>
-      <section class="cartao es-cadeado">
-        ${h.ic(h.I.cadeado, 'style="width:34px;height:34px;stroke:#7A4A08"')}
-        <b class="es-h1" style="text-align:center">Estimativas Amendoim Brasil</b>
-        <span class="es-txt" style="text-align:center">Área, produção e balanço de cada safra, com a leitura do Helder. Exclusivo para assinantes.</span>
-        <a class="btn btn-verde" href="#/conta/criar" style="width:100%">Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}</a>
-        <a class="btn btn-escuro" href="#/conta/entrar" style="width:100%">Já sou assinante</a>
-      </section>
-    </div>`;
-=======
-    ${cartaoExclusivo(h, 'Estimativas Amendoim Brasil', 'Quanto o Brasil vai plantar e colher, safra por safra, com a leitura do Helder.', ['Área, produtividade e produção de cada safra', 'Balanço de oferta e demanda do Brasil', 'Atualizado todo mês'], '#/conta/criar', `Assinar${conteudo().diasTeste ? ` · ${conteudo().diasTeste} dias grátis` : ''}`)}
-    <a class="btn btn-escuro" href="#/conta/entrar">Já sou assinante</a>`;
 >>>>>>>
 <<<<<<< public/esboco2.js
 
