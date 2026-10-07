@@ -174,12 +174,6 @@ import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRe
 import { chuva7Unificada } from '/esboco-clima.js';
 >>>>>>>
 <<<<<<< public/index.html
-<body>
-=======
-<body>
-  <div class="es-faixa" aria-hidden="true">ESBOÇO · TESTE</div>
->>>>>>>
-<<<<<<< public/index.html
   <link rel="stylesheet" href="/visual.css">
 =======
   <link rel="stylesheet" href="/visual.css">
@@ -191,7 +185,7 @@ import { chuva7Unificada } from '/esboco-clima.js';
 const VERSAO = 'ab-v9';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 =======
-const VERSAO = 'ab-v16';
+const VERSAO = 'ab-v17';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 >>>>>>>
 <<<<<<< public/painel-admin.js
@@ -255,64 +249,6 @@ import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from 
   const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico');
   return `<section class="cartao" id="sec-hoje">
 >>>>>>>
-<<<<<<< public/esboco2.js
-  <p class="mini es-legal">Datas do USDA e da Conab conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>`;
-=======
-  <p class="mini es-legal">Datas do USDA, da Conab e da SIAL conferidas nas fontes oficiais. As outras ficam como "a confirmar" até sair a data.</p>
-  </div>`;
->>>>>>>
-<<<<<<< public/esboco2.js
-  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['safra', 'Safra'], ['evento', 'Eventos'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
-=======
-  ${!assinante() ? cartaoExclusivo(h, 'Nunca perca uma data importante', 'As datas que mexem no preço do amendoim, com lembrete no celular um dia antes.', ['Relatórios do USDA e levantamentos da Conab', 'Feiras internacionais: SIAL, Gulfood, Congresso INC', 'Eventos do amendoim no Brasil e da Câmara Setorial']) : ''}
-  <div ${!assinante() ? 'hidden' : ''}>
-  <div class="chips">${[['todos', 'Tudo'], ['dados', 'Dados de mercado'], ['feira', 'Feiras'], ['evento', 'Eventos'], ['safra', 'Safra'], ['camara', 'Câmara Setorial']].map(([k, t]) => `<button class="chip" data-ag-filtro="${k}" aria-pressed="${est.filtro === k}">${t}</button>`).join('')}</div>
->>>>>>>
-<<<<<<< public/esboco2.js
-    <div><h1>Agenda do amendoim</h1><div class="sub">Relatórios que mexem no preço, safra e eventos do setor</div></div>
-=======
-    <div><h1>Agenda do mercado</h1><div class="sub">Relatórios que mexem no preço, feiras e eventos do amendoim</div></div>
->>>>>>>
-<<<<<<< public/esboco2.js
-  if (!prox.length && !agora) return '';
-  return `<a class="cartao es-agenda-inicio" href="#/agenda" data-ev="esb-agenda-inicio">
-    <div class="cartao-cab"><span class="rotulo">Agenda do amendoim</span><span class="link-mini">ver tudo ›</span></div>
-    ${prox.map((e) => `<div class="es-ag-linha">${dataBloco(e)}<span class="cresce"><b>${h.esc(e.titulo)}</b><small>${h.esc(quando(e, hoje))}${e.aConfirmar ? ' · data aproximada' : ''}</small></span></div>`).join('')}
-    ${agora ? `<span class="mini" style="display:flex;align-items:center;gap:6px"><i class="es-ponto-vivo"></i>Agora: ${h.esc(agora.titulo.split(' · ')[0])}</span>` : ''}
-=======
-  if ((!prox.length && !agora) || !assinante()) return '';
-  const travado = false;
-  return `<a class="cartao es-agenda-inicio ${travado ? 'es-ag-travada' : ''}" href="#/agenda" data-ev="esb-agenda-inicio">
-    <div class="cartao-cab"><span class="rotulo">Agenda do mercado</span>${travado ? `<span class="pilula pilula-amendoim" style="font-size:11px">★ ASSINANTE</span>` : '<span class="link-mini">ver tudo ›</span>'}</div>
-    ${travado ? `<span class="mini" style="font-weight:700;color:var(--texto-2)">${prox.length} datas que mexem no preço nas próximas semanas</span>` : ''}
-    ${prox.map((e) => `<div class="es-ag-linha ${travado ? 'es-borrado' : ''}">${dataBloco(e)}<span class="cresce"><b>${h.esc(e.titulo)}</b><small>${h.esc(quando(e, hoje))}${e.aConfirmar ? ' · data aproximada' : ''}</small></span></div>`).join('')}
-    ${agora && !travado ? `<span class="mini" style="display:flex;align-items:center;gap:6px"><i class="es-ponto-vivo"></i>Agora: ${h.esc(agora.titulo.split(' · ')[0])}</span>` : ''}
-    ${travado ? '<span class="mini">USDA, Conab, feiras internacionais e eventos do amendoim, com lembrete no celular</span>' : ''}
->>>>>>>
-<<<<<<< public/esboco2.js
-  return `<a class="es-faixa-ass" href="#/mercado/consultoria" data-ev="esb-faixa">
-    <span class="es-faixa-ic">${h.ic(estrela, 'style="width:20px;height:20px;stroke:#5C3A06;fill:#F4AD46"')}</span>
-    <span class="cresce"><b>${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])} · sua área` : 'Área do Assinante'}</b>
-      <small>${ok ? `Novo: estimativa ${h.esc(ult.safra)} e balanço do mês` : `Quanto o Brasil vai colher em ${h.esc(ult.safra)}? Estimativas e relatórios`}</small></span>
-    <span class="es-faixa-btn">${ok ? 'Abrir' : 'Conhecer'}</span>
-=======
-  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="esb-faixa">
-    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--verde-claro)">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#007731"')}</span>
-    <span class="cresce"><b style="font-size:15px;display:block">${ok ? `Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}` : 'Área do assinante'}</b>
-      <span class="mini">${ok ? `Novo na sua área: estimativa ${h.esc(ult.safra)}` : 'Estimativas de safra, relatórios e agenda do mercado'}</span></span>
-    ${h.ic(h.I.seta, 'style="width:18px;height:18px;stroke:#5F5B52"')}
->>>>>>>
-<<<<<<< public/esboco2.js
-const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], safra: ['Safra', 'es-t-safra'], evento: ['Evento', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
-=======
-const TIPOS = { dados: ['Dados de mercado', 'es-t-dados'], feira: ['Feira internacional', 'es-t-feira'], safra: ['Safra', 'es-t-safra'], evento: ['Evento no Brasil', 'es-t-evento'], camara: ['Câmara Setorial', 'es-t-camara'] };
->>>>>>>
-<<<<<<< public/esboco2.js
-import { MUNICIPIOS } from '/clima.js';
-=======
-import { MUNICIPIOS } from '/clima.js';
-import { cartaoExclusivo } from '/esboco3.js';
->>>>>>>
 <<<<<<< public/esboco2.css
 .pe-prod thead th:first-child, .pe-prod tbody th { text-align: left; }
 =======
@@ -321,61 +257,4 @@ import { cartaoExclusivo } from '/esboco3.js';
 .es-t-feira { background: #FCE4E0; color: #9A2F1E; }
 .es-ag-travada .es-ag-linha { pointer-events: none; }
 .es-cadeado-linha { flex-direction: row; align-items: center; gap: 12px; padding: 14px; background: var(--amendoim-fundo); border-color: var(--amendoim-borda); }
->>>>>>>
-<<<<<<< public/esboco-dados.js
-    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' }
-=======
-    { id: 'e10', data: null, tipo: 'evento', titulo: 'Agrishow 2027', local: 'Ribeirão Preto/SP · abr/mai, data a confirmar', detalhe: 'Maior feira do agro do país: máquinas de amendoim, sementes e encontros do setor.' },
-    { id: 'e11', data: '2026-10-17', fim: '2026-10-21', tipo: 'feira', titulo: 'SIAL Paris 2026', local: 'Paris, França', detalhe: 'Uma das maiores feiras de alimentos do mundo (a cada 2 anos). Compradores europeus e do Oriente Médio fecham negócios de amendoim e derivados.' },
-    { id: 'e12', data: null, tipo: 'feira', titulo: 'Congresso INC 2027 (castanhas e frutas secas)', local: 'Maio · local e data a confirmar', detalhe: 'Encontro mundial do setor de castanhas e amendoim: estimativas de safra e negócios entre exportadores e importadores. Em 2026 foi em Macau, de 12 a 14 de maio.' },
-    { id: 'e13', data: null, tipo: 'feira', titulo: 'Gulfood 2027', local: 'Dubai · jan/fev, data a confirmar', detalhe: 'Maior feira de alimentos do Oriente Médio, porta de entrada para compradores árabes e africanos.' },
-    { id: 'e14', data: null, tipo: 'evento', titulo: 'Feira Nacional do Amendoim 2027', local: 'Jaboticabal/SP · agosto, data a confirmar', detalhe: 'Maior evento técnico do amendoim no Brasil (Unesp Jaboticabal): palestras, dia de campo e feira de negócios. Em 2026 foi de 12 a 14 de agosto.' },
-    { id: 'e15', data: null, tipo: 'evento', titulo: 'Festa do Amendoim 2027', local: 'Quintana/SP · setembro, data a confirmar', detalhe: 'Festa tradicional do amendoim na Alta Paulista. Em 2026 foi em 5 e 6 de setembro.' },
-    { id: 'e16', data: null, tipo: 'evento', titulo: 'Evento da Turma do Amendoim', local: 'Data a confirmar', detalhe: 'Aguardando a data com a organização.' }
->>>>>>>
-<<<<<<< public/esboco-dados.js
-  patrocinio: { semestral: 6000, cotas: 5 },
-=======
-  patrocinio: { semestral: 6000, cotas: 5 },
-  // Termômetro com 5 posições: Fraco · Fraco a estável · Estável · Estável a firme · Firme
-  termometro: 'Estável a firme',
-  // Mercado físico: faixa de negócio do dia (o Helder atualiza no painel). Valores de exemplo até ele preencher.
-  fisico: { atualizado: 'exemplo', exemplo: true, regioes: [
-    { nome: 'Alta Paulista (Tupã, Marília)', min: 78, max: 82 },
-    { nome: 'Oeste Paulista (Pres. Prudente)', min: 79, max: 83 },
-    { nome: 'Alta Mogiana (Jaboticabal, Ribeirão)', min: 80, max: 84 },
-    { nome: 'Mato Grosso do Sul', min: 75, max: 79 }
-  ] },
-  // Plano Empresa: preço por destino. Comex = média oficial do mês (automática); faixa = negociação da semana (o Helder digita).
-  destinos: { exemplo: true, mes: 'set/2026', semana: 'exemplo', lista: [
-    { pais: 'Argélia', comex: 1180, min: 1150, max: 1210, tend: 'sobe' },
-    { pais: 'Rússia', comex: 1240, min: 1200, max: 1260, tend: 'estavel' },
-    { pais: 'África do Sul', comex: 1210, min: 1180, max: 1230, tend: 'sobe' },
-    { pais: 'Países Baixos', comex: 1350, min: 1320, max: 1380, tend: 'estavel' },
-    { pais: 'Reino Unido', comex: 1390, min: 1350, max: 1400, tend: 'cai' },
-    { pais: 'Polônia', comex: 1300, min: 1270, max: 1320, tend: 'estavel' }
-  ] },
-  enquete: null, // o Helder lança pelo painel: { id, pergunta, opcoes: [...], dias, inicio }
-  chuvaExemplo: [], // só o que os produtores informarem de verdade
-  // Notícias do dia: o Helder (ou o rascunho do Claude) lança no painel; somem sozinhas depois de 2 dias.
-  noticias: [
-    { id: 'n1', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Argentina confirma área 8% menor para a safra 26/27', fonte: 'Bolsa de Cereales de Córdoba', resumo: 'Menos amendoim argentino na Europa em 2027', link: '', exemplo: true },
-    { id: 'n2', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Conab publica o 1º levantamento da safra 26/27 no dia 15', fonte: 'Conab', resumo: 'Primeira estimativa oficial de área e produção', link: '', exemplo: true }
-  ],
-  // El Niño agora: o texto principal vem do clima.json (INPE); os impactos por região o Helder ajusta no painel.
-  enso: {
-    titulo: 'El Niño muito forte em andamento',
-    selo: 'alerta',
-    regioes: [
-      { nome: 'Oeste e Alta Paulista (Tupã, Prudente, Marília)', texto: 'Primavera com chuva acima da média: plantio tende a andar bem, mas atenção a excesso de água e a doenças de folha. Risco de chuva na colheita de fevereiro a abril.' },
-      { nome: 'Alta Mogiana e Norte de SP (Jaboticabal, Ribeirão)', texto: 'Calor acima do normal e chuva mais irregular: risco de veranico em dezembro e janeiro, na florada e no enchimento das vagens.' },
-      { nome: 'Norte de MS e MT (Chapadão, Campo Verde, Sorriso)', texto: 'Tendência de mais quente e mais seco que o normal: plantio pode atrasar esperando umidade; irrigação e cobertura do solo fazem diferença.' },
-      { nome: 'Sul de MS (Dourados, Glória, Itaporã)', texto: 'Mais perto do padrão do Sul: chuva acima da média e temporais no fim do ano. Cuidado com encharcamento e perdas na colheita.' }
-    ]
-  },
->>>>>>>
-<<<<<<< public/esboco-dados.js
-    produtor: { nome: 'Produtor', mensal: 29.9, anual: 299 },
-=======
-    produtor: { nome: 'Produtor', mensal: 29.9, anual: 298.8 },
 >>>>>>>

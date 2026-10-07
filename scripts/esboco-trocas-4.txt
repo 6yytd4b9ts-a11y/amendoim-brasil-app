@@ -57,3 +57,21 @@ const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'rendimento', 'dolar', '
       <div class="campo"><label for="alvo-ref">Preço de referência</label><select id="alvo-ref" name="ref">${(() => { const refs = (D.cotacoes?.referencias || []).filter((r) => r.preco != null); const atual = p.ref || `${dest.fonte || 'IEA-SP'} ${dest.regiao || 'Tupã'}`; return refs.map((r) => { const k = `${r.fonte} ${r.praca}`; return `<option value="${esc(k)}" ${k === atual ? 'selected' : ''}>${esc(r.fonte === 'Conab' ? 'Conab · ' + r.praca : 'IEA · ' + r.praca)} · ${brl(r.preco)}</option>`; }).join(''); })()}</select></div>
       <span class="mini">O aviso chega quando o preço publicado da referência escolhida passar do seu alvo.</span>
 >>>>>>>
+<<<<<<< public/painel-esboco.js
+      <p class="mini">Nesta fase de teste, o conteúdo fica salvo só neste aparelho. Quando o app oficial estiver no ar, o que você salvar aqui vale para todo mundo.</p>
+=======
+      <p class="mini">Nesta fase, o conteúdo fica salvo só neste aparelho. Quando o painel estiver ligado ao servidor, o que você salvar aqui vale para todo mundo.</p>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+      ${campo('rendimento', 'Rendimento casca → grão (%)', c.balanco.rendimento)}
+=======
+      ${campo('rendimento', 'Rendimento casca → grão (%)', c.balanco.rendimento)}
+      ${campo('exportGrao', 'Exportação de grão · 12 meses (mil t de grão)', c.balanco.exportGrao)}
+      ${campo('exportOleo', 'Exportação de óleo · 12 meses (mil t em casca equiv.)', c.balanco.exportOleo)}
+      <label class="pe-campo"><span>Fonte da exportação</span><input name="exportFonte" value="${esc(c.balanco.exportFonte || '')}" placeholder="Comex Stat · período"></label>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+      c.balanco = { consumoKgHab: num(fd.get('consumoKgHab')), populacaoMi: num(fd.get('populacaoMi')), sementeKgHa: num(fd.get('sementeKgHa')), rendimento: num(fd.get('rendimento')) };
+=======
+      c.balanco = { consumoKgHab: num(fd.get('consumoKgHab')), populacaoMi: num(fd.get('populacaoMi')), sementeKgHa: num(fd.get('sementeKgHa')), rendimento: num(fd.get('rendimento')), exportGrao: num(fd.get('exportGrao')), exportOleo: num(fd.get('exportOleo')), exportFonte: String(fd.get('exportFonte') || ''), exportExemplo: false };
+>>>>>>>
