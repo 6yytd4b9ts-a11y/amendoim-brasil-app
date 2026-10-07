@@ -41,3 +41,8 @@ import { cartaoBiblioteca } from '/esboco3.js';
   ${cartaoBiblioteca(h)}
 =======
 >>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v14';
+=======
+const VERSAO = 'ab-v15';
+>>>>>>>
