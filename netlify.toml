@@ -2,6 +2,12 @@
   command = "bash scripts/montar.sh"
   publish = "public"
 
+# Link curto para compartilhar (abre o app normalmente)
+[[redirects]]
+  from = "/radar"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/data/*"
   [headers.values]
