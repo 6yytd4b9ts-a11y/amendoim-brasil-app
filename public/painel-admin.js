@@ -274,7 +274,7 @@ document.addEventListener('click', async (e) => {
   if (t.closest('#pn-avisos')) {
     const m = $('#pn-avisos-msg');
     const sp = suporte();
-    if (sp.ios && !sp.instalado) { m.textContent = 'No iPhone: abra o app Amendoim Brasil instalado, entre em amendoim-brasil.netlify.app/#/numeros e toque em "Abrir o painel". Ative lá.'; return; }
+    if (sp.ios && !sp.instalado) { m.textContent = 'No iPhone, ative por dentro do app instalado: na tela inicial, toque 5 vezes seguidas no logo para abrir este painel e toque em Ativar.'; return; }
     try { await ativar(prefsSalvas() || { mudanca: true, chuva: false, boletim: false, balcao: false }, { k: est.k }); m.textContent = 'Pronto: este celular avisa a cada anúncio novo.'; }
     catch (er) { m.textContent = er.message === 'permissao' ? 'Permita as notificações quando o celular perguntar.' : 'Não deu para ativar agora. Tente de novo em instantes.'; }
   }
