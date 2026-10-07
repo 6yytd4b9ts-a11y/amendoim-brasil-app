@@ -106,19 +106,58 @@ function telaDestinos(b) {
 
 // ---------- Mundo: balanço dos grandes players (USDA) ----------
 const LINHAS = [['producao', 'Produção'], ['exportacao', 'Exportação'], ['importacao', 'Importação'], ['esmagamento', 'Esmagamento'], ['alimentacao', 'Consumo alimentar'], ['estoqueFinal', 'Estoque final']];
+// Produção do Brasil: Conab (mil t em casca). O 26/27 entra quando a Conab publicar (1º levantamento em 15/10/2026).
+const CONAB = { 2024: 1159.7, 2025: 1281.5 };
+const CONAB_FONTE = '10º levantamento, jul/2026';
+const RENDIMENTO = 0.7; // 1 t de grão sem casca = 1/0,7 t em casca
+// Exportação por safra comercial (mar a fev), do Comex Stat, convertida para casca. Devolve também quantos meses já saíram.
+function expSafra(b, ano) {
+  const sr = b.series?.grao || {};
+  let t = 0, meses = 0;
+  for (let i = 0; i < 12; i++) {
+    const y = i < 10 ? ano : ano + 1, mi = i < 10 ? i + 2 : i - 10;
+    if (y > b.ano || (y === b.ano && mi >= b.mes)) continue;
+    const v = sr[y]?.t?.[mi];
+    if (v == null) continue;
+    t += v; meses++;
+  }
+  return meses ? { mil: t / RENDIMENTO / 1000, meses } : null;
+}
+const FONTE_PEQ = (t) => `<span class="dx-fonte">${t}</span>`;
+function cartaoBrasil(b, anos) {
+  const ex = Object.fromEntries(anos.map((a) => [a, b ? expSafra(b, a + 1) : null])); // a safra 24/25 é exportada de março/2025 a fevereiro/2026
+  const parcial = anos.filter((a) => ex[a] && ex[a].meses < 12);
+  const cel = (v, par) => (v == null ? '–' : `${nf(v)}${par ? '*' : ''}`);
+  const pen = anos[anos.length - 2], ult = anos[anos.length - 1];
+  const vprod = CONAB[ult] && CONAB[pen] ? varia(CONAB[ult], CONAB[pen]) : null;
+  const ate = b ? MESES[b.mes - 1].toLowerCase() : '';
+  return `<section class="cartao dx-cartao">
+    <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px">${bandeira('BR', 30)}<b style="font-size:16px">Brasil</b></span><span class="mini">mil t em casca</span></div>
+    <table class="tabela dx-tabela"><thead><tr><th></th>${anos.map((a) => `<th>${safra(a)}</th>`).join('')}<th>Var.</th></tr></thead>
+    <tbody>
+      <tr><th>Produção</th>${anos.map((a) => `<td>${a in CONAB ? nf(CONAB[a]) : '–'}</td>`).join('')}<td class="dx-var">${vc(vprod)}</td></tr>
+      <tr><th>Exportação</th>${anos.map((a) => `<td>${ex[a] ? cel(ex[a].mil, ex[a].meses < 12) : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+      <tr><th>Exportado da safra</th>${anos.map((a) => `<td>${ex[a] && a in CONAB && ex[a].meses === 12 ? nf((ex[a].mil / CONAB[a]) * 100) + '%' : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+    </tbody></table>
+    ${parcial.length ? `<span class="mini">* Parcial: ${parcial.map((a) => `${safra(a)} de março até ${ate}/${b.ano} (${ex[a].meses} meses)`).join('; ')}. A safra comercial vai de março a fevereiro.</span>` : ''}
+    ${!(ult in CONAB) ? `<span class="mini">Safra ${safra(ult)}: a Conab publica a 1ª estimativa em 15/10/2026.</span>` : ''}
+    ${FONTE_PEQ('Fonte: Conab (produção, ' + CONAB_FONTE + ') e Comex Stat/MDIC (exportação, grão ÷ 0,70)')}
+  </section>`;
+}
 function cartaoPais(cod, p, anos) {
   const linhas = LINHAS.filter(([k]) => anos.some((a) => p.anos[a]?.[k]));
   return `<section class="cartao dx-cartao">
     <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px">${cod === 'MUNDO' ? '' : bandeira(SIGLA[cod] || cod, 30)}<b style="font-size:16px">${p.nome}</b></span><span class="mini">mil t em casca</span></div>
     <table class="tabela dx-tabela"><thead><tr><th></th>${anos.map((a) => `<th>${safra(a)}</th>`).join('')}<th>Var.</th></tr></thead>
     <tbody>${linhas.map(([k, rot]) => { const ult = p.anos[anos[anos.length - 1]]?.[k], pen = p.anos[anos[anos.length - 2]]?.[k]; const v = varia(ult, pen); return `<tr><th>${rot}</th>${anos.map((a) => `<td>${nf(p.anos[a]?.[k])}</td>`).join('')}<td class="dx-var">${vc(v)}</td></tr>`; }).join('')}</tbody></table>
+    ${FONTE_PEQ('Fonte: USDA')}
   </section>`;
 }
-function telaMundo(m) {
+function telaMundo(m, b) {
   const anos = m.anos.slice(-3);
   const ordem = ['BR', 'AR', 'US', 'IN', 'CH'].filter((c) => m.paises[c]);
-  return `<p class="mini dx-nota">Balanço anual por ano-safra (USDA). A última coluna é projeção e muda a cada relatório mensal.</p>
-    ${ordem.map((c) => cartaoPais(c, m.paises[c], anos)).join('')}
+  return `<p class="mini dx-nota">Balanço anual por ano-safra. Brasil: Conab e Comex Stat; os demais países: USDA. A última coluna é projeção e muda a cada relatório.</p>
+    ${ordem.map((c) => (c === 'BR' ? cartaoBrasil(b, anos) : cartaoPais(c, m.paises[c], anos))).join('')}
     ${cartaoPais('MUNDO', { nome: 'Mundo', anos: m.mundo }, anos)}`;
 }
 
@@ -173,17 +212,17 @@ export function telaDados(D, h) {
     </section>`;
   }
   const d = est.dados, b = d.brasil, m = d.mundo;
-  const abas = [['brasil', 'Brasil'], ['destinos', 'Destinos'], ['mundo', 'Mundo'], ['balanco', 'Balanço']];
+  const abas = [['brasil', 'Brasil'], ['destinos', 'Destinos'], ['mundo', 'Mundo']]; // 'Balanço' (USDA do Brasil) fora por enquanto: o Brasil agora usa Conab e Comex
   const quando = d.atualizado ? new Date(d.atualizado).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '';
   let corpo = '<div class="vazio">Dados indisponíveis agora. Tente mais tarde.</div>';
   if (est.aba === 'brasil' && b) corpo = telaBrasil(b);
   if (est.aba === 'destinos' && b) corpo = telaDestinos(b);
-  if (est.aba === 'mundo' && m) corpo = telaMundo(m);
+  if (est.aba === 'mundo' && m) corpo = telaMundo(m, b);
   if (est.aba === 'balanco' && m) corpo = telaBalanco(m, b);
   return `${topo}
   <div class="segmento">${abas.map(([k, t]) => `<button data-dx-aba="${k}" aria-pressed="${est.aba === k}">${t}</button>`).join('')}</div>
   ${corpo}
-  <p class="mini dx-nota">Fontes: Comex Stat/MDIC${b ? ` (dados até ${MESES[b.mes - 1].toLowerCase()}/${b.ano})` : ''} e USDA PSD${m?.publicado ? ` (relatório ${m.publicado.slice(5)}/${m.publicado.slice(0, 4)})` : ''}. Conferido em ${quando}. Atualiza sozinho quando os órgãos publicam.</p>
+  <p class="mini dx-nota">Fontes: Comex Stat/MDIC${b ? ` (dados até ${MESES[b.mes - 1].toLowerCase()}/${b.ano})` : ''} e USDA PSD (outros países)${m?.publicado ? ` (relatório ${m.publicado.slice(5)}/${m.publicado.slice(0, 4)})` : ''}. Conferido em ${quando}. Atualiza sozinho quando os órgãos publicam.</p>
   <button class="link-mini dx-sair" data-dx-sair>Sair da área da consultoria</button>`;
 }
 

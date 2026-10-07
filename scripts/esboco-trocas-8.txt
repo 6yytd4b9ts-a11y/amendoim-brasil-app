@@ -1,0 +1,7 @@
+<<<<<<< public/ferramentas.js
+aparelho.</p>
+}
+=======
+aparelho.</p>`;
+}
+>>>>>>>
