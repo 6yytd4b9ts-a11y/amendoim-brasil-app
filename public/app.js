@@ -1,6 +1,6 @@
 // App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
 import { MUNICIPIOS, carregarClima, telaClima as telaClimaAuto, municipioAtual, definirMunicipio, localInicial, localDoAparelho, nomeLocal, recomendacaoPlantio, alternarPrevisao } from '/clima.js';
-import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoMercadoHojeDetalhe, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores } from '/painel.js';
+import { blocoMercadoHoje, blocoOportunidades, blocoPanoramaCompacto, telaAlertas, blocoMercadoHojeDetalhe, blocoOfertaDemanda, blocoExportacao, blocoMundo, cartaoTermometroDetalhe, seloPatrocinio, blocoPatrocinadores, telaNumeros, desenharNumeros } from '/painel.js';
 import { telaFerramentas, ligarFerramentas } from '/ferramentas.js';
 
 const ARQUIVOS = ['config', 'cotacoes', 'boletins', 'noticias', 'ofertas', 'patrocinadores', 'panorama', 'clima', 'mercado'];
@@ -37,6 +37,8 @@ const I = {
   globo: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
   insta: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/>',
   fora: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  enviar: '<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v12M7 8l5-5 5 5"/>',
+  pdf: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14l3 3 3-3"/>',
   grupo: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/>'
 };
 const H = () => {
@@ -72,8 +74,22 @@ function cartaoTermometro() {
       <span class="cresce">${esc(f.nome)}</span><b>${esc(f.valor)}</b></div>`).join('')}</div>
       <span class="mini">${ic(I.sobe, 'style="width:12px;height:12px;stroke:#007731;stroke-width:2.6;vertical-align:-1px"')} segura o preço · ${ic(I.cai, 'style="width:12px;height:12px;stroke:#B3261E;stroke-width:2.6;vertical-align:-1px"')} pressiona o preço</span>` : ''}
     <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+    <span class="mini aviso-rec">Leitura de mercado, não é recomendação de compra ou venda.</span>
   </section>`;
 }
+
+// Variação do preço do IEA (Tupã) dia a dia, a partir de cotacoes.json → historicoIEA.
+function variacaoIEA(c) {
+  const h = (c.historicoIEA || []).filter((x) => x && x.data && isFinite(x.preco)).sort((a, b) => (a.data < b.data ? -1 : 1));
+  if (h.length < 2) return null;
+  const ult = h[h.length - 1], ant = h[h.length - 2];
+  const dif = ult.preco - ant.preco;
+  if (Math.abs(dif) >= 0.005) return { dif, desde: ant.data };
+  let i = h.length - 1;
+  while (i > 0 && Math.abs(h[i - 1].preco - ult.preco) < 0.005) i--;
+  return { dif: 0, desde: h[i].data };
+}
+const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 
 function varChip(v) {
   if (v == null) return `<span class="var num">—</span>`;
@@ -97,14 +113,22 @@ function telaInicio() {
   </header>
 
   <section class="destaque">
-    <div class="cartao-cab"><span class="rotulo">${esc(c.produto)} · esta semana</span><span class="pilula pilula-verde-escuro">${esc(dest.regiao || cfg.regiaoPadrao)}</span></div>
+    <div class="cartao-cab"><span class="rotulo">${esc(c.produto)} · último preço</span><span class="pilula pilula-verde-escuro">${esc(dest.regiao || cfg.regiaoPadrao)}</span></div>
     <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brl(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
+    ${(() => {
+      const v = variacaoIEA(c);
+      if (!v) return '';
+      const txt = v.dif === 0 ? `Estável desde ${ddmm(v.desde)}` : `${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)}`;
+      return `<div class="hero-var ${v.dif > 0 ? 'sobe' : v.dif < 0 ? 'cai' : ''}">${v.dif === 0 ? '<span aria-hidden="true">=</span>' : ic(v.dif > 0 ? I.sobe : I.cai, 'style="width:16px;height:16px;stroke-width:2.6"')}<span>${txt}</span></div>`;
+    })()}
     <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600">
-      ${dest.variacao != null ? ic(dest.variacao >= 0 ? I.sobe : I.cai, 'style="width:16px;height:16px;stroke:#F4AD46;stroke-width:2.4"') : ''}
-      <span>${dest.variacao != null ? pct(dest.variacao) + ' vs semana anterior' : dest.fonte ? `Fonte: ${esc(dest.fonte)} · ${esc(dest.data)}` : 'Cotação da semana em breve'}</span>
+      <span>${dest.fonte ? `Fonte: ${esc(dest.fonte)} · ${esc(dest.data)}` : 'Cotação da semana em breve'}</span>
     </div>
     ${(() => { const r = (c.referencias || []).find((x) => x.fonte === 'Conab'); return r ? `<span style="font-size:13px;opacity:.9">Conab, média de SP: <b class="num">${brl(r.preco)}</b>${r.variacao != null ? ` (${pct(r.variacao)} na semana)` : ''}</span>` : ''; })()}
-    <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
+    <div class="hero-acoes">
+      <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
+      <button class="btn-enviar" data-compartilhar="preco" aria-label="Enviar o preço no WhatsApp">${ic(I.enviar)}<span>Enviar</span></button>
+    </div>
   </section>
 
   ${blocoMercadoHoje(D, H())}
@@ -176,7 +200,7 @@ function cartaoAlertas() {
   <section id="alertas" class="cartao" style="background:var(--verde-fundo);border-color:#C2E2CC;flex-direction:row;align-items:center">
     ${ic(grupo ? I.grupo : I.zap, 'style="width:32px;height:32px;stroke:#007731;flex-shrink:0"')}
     <div class="cresce"><b style="font-size:15px;display:block">${grupo ? 'Grupo no WhatsApp' : 'Alertas no WhatsApp'}</b><span style="font-size:13px;color:#3E4A40">Chuva, veranico, cotação e boletins</span></div>
-    ${link ? `<a class="btn btn-verde btn-pequeno" href="${esc(link)}" target="_blank" rel="noopener">${grupo ? 'Entrar' : 'Ativar'}</a>` : `<span class="btn btn-verde btn-pequeno" style="opacity:.6" title="Configure o WhatsApp em config.json">Ativar</span>`}
+    ${link ? `<a class="btn btn-verde btn-pequeno" href="${esc(link)}" target="_blank" rel="noopener" data-ev="grupo">${grupo ? 'Entrar' : 'Ativar'}</a>` : `<span class="btn btn-verde btn-pequeno" style="opacity:.6" title="Configure o WhatsApp em config.json">Ativar</span>`}
   </section>`;
 }
 
@@ -185,8 +209,8 @@ function cartaoRedes() {
   const zap = wa('Olá Helder, vim pelo app Amendoim Brasil.');
   if (!insta && !zap) return '';
   return `<section class="redes">
-    ${insta ? `<a href="${esc(insta)}" target="_blank" rel="noopener">${ic(I.insta)}<span><b>Instagram</b><small>@amendoim.brasil</small></span></a>` : ''}
-    ${zap ? `<a href="${zap}" target="_blank" rel="noopener">${ic(I.zap)}<span><b>Fale com o Helder</b><small>WhatsApp</small></span></a>` : ''}
+    ${insta ? `<a href="${esc(insta)}" target="_blank" rel="noopener" data-ev="instagram">${ic(I.insta)}<span><b>Instagram</b><small>@amendoim.brasil</small></span></a>` : ''}
+    ${zap ? `<a href="${zap}" target="_blank" rel="noopener" data-ev="falar">${ic(I.zap)}<span><b>Fale com o Helder</b><small>WhatsApp</small></span></a>` : ''}
   </section>`;
 }
 
@@ -234,7 +258,7 @@ function telaCotacoes() {
     <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
     <div class="chips" role="group" aria-label="Período">
       ${['3M', '6M'].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${p}</button>`).join('')}
-      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="${wa(`Olá Helder, quero assinar a consultoria para ver o histórico de preço de ${p}.`) || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
     </div>
     <div class="grafico" id="grafico">${graficoPreco()}</div>
     ${h.fonte ? `<span class="mini">Fonte: ${linkSeguro(h.link) ? `<a class="link-mini" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
@@ -257,7 +281,7 @@ function telaCotacoes() {
   <section class="destaque" style="gap:12px">
     <b style="font-size:19px;line-height:1.25">Quer decidir a venda com quem está no mercado todo dia?</b>
     <span style="font-size:14px;line-height:1.5;opacity:.9">Consultoria Amendoim Brasil: recomendação de comercialização, histórico completo e paridade de exportação.</span>
-    <a class="btn btn-amendoim" href="#/mercado/consultoria">Conhecer a consultoria</a>
+    <a class="btn btn-amendoim" href="#/mercado/consultoria" data-ev="consultoria">Conhecer a consultoria</a>
   </section>`;
 }
 
@@ -333,7 +357,7 @@ function telaAnalises() {
   <section class="destaque" style="gap:12px">
     <b style="font-size:20px;line-height:1.25;letter-spacing:-0.01em">Decida a venda com informação de quem está no mercado</b>
     ${['Relatórios e boletins completos', 'Histórico de preços completo', 'Paridade de exportação em R$/saca', 'Alertas personalizados no WhatsApp'].map((t) => `<div style="display:flex;align-items:center;gap:10px;font-size:14px">${ic('<path d="M5 12l5 5 9-10"/>', 'style="width:18px;height:18px;stroke:#F4AD46;stroke-width:2.6"')}${t}</div>`).join('')}
-    <a class="btn btn-amendoim" href="#/mercado/consultoria">Quero assinar</a>
+    <a class="btn btn-amendoim" href="#/mercado/consultoria" data-ev="consultoria">Quero assinar</a>
   </section>
 
   <div class="secao-titulo"><h2>Boletins e relatórios</h2></div>
@@ -362,6 +386,10 @@ function telaBoletim(id) {
     <span class="tag-boletim">${ic(I.doc, 'style="width:16px;height:16px"')}${esc(b.tipo)} · ${esc(b.data)}</span>
     <h1>${esc(b.titulo)}</h1>
     <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+    <div class="pdf-acoes">
+      <button class="btn btn-verde btn-pequeno" data-pdf="${esc(b.id)}" data-modo="enviar">${ic(I.enviar)}Enviar PDF</button>
+      <button class="btn btn-escuro btn-pequeno" data-pdf="${esc(b.id)}" data-modo="baixar">${ic(I.pdf)}Baixar PDF</button>
+    </div>
     ${H().patrocinio('boletim')}
     ${b.resumo ? `<div class="lead">${esc(b.resumo)}</div>` : ''}
     ${b.secoes.map((s) => `<section>
@@ -372,7 +400,7 @@ function telaBoletim(id) {
   <section class="destaque" style="gap:12px">
     <b style="font-size:18px;line-height:1.3">Quer saber o melhor momento de vender a sua produção?</b>
     <span style="font-size:14px;line-height:1.5;opacity:.9">A consultoria Amendoim Brasil acompanha o mercado com você, semana a semana.</span>
-    ${zap ? `<a class="btn btn-amendoim" href="${zap}" target="_blank" rel="noopener">Falar com o Helder</a>` : `<a class="btn btn-amendoim" href="#/mercado/consultoria">Conhecer a consultoria</a>`}
+    ${zap ? `<a class="btn btn-amendoim" href="${zap}" target="_blank" rel="noopener">Falar com o Helder</a>` : `<a class="btn btn-amendoim" href="#/mercado/consultoria" data-ev="consultoria">Conhecer a consultoria</a>`}
   </section>
   <a class="chamada" href="#/ferramentas/custo"><span class="cresce"><b style="font-size:15px;display:block">Faça a conta do seu custo por saca</b><span style="font-size:13px;color:#5C3A06">Calculadora com tabela de lucro</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
 }
@@ -388,7 +416,7 @@ function telaConsultoria() {
     <form id="form-login" class="campo" style="gap:10px">
       <label for="tel">Seu celular (WhatsApp)</label>
       <input id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(18) 90000-0000" required>
-      <button class="btn btn-verde" type="submit">Receber código no WhatsApp</button>
+      <button class="btn btn-verde" type="submit">Pedir acesso no WhatsApp</button>
     </form>
     <div id="msg-login" role="status" class="mini"></div>
     ${zap ? `<a class="link-mini" style="text-align:center" href="${zap}" target="_blank" rel="noopener">Ainda não é cliente? Fale com o Helder</a>` : ''}
@@ -408,7 +436,7 @@ function telaNegociar() {
   const anunciar = wa('Olá Helder, quero anunciar uma oferta no balcão Amendoim Brasil.');
   return `<header class="topo">
     <div class="topo-linha"><div><h1>Negociar</h1><div class="sub">Balcão de ofertas de amendoim</div></div>
-      ${anunciar ? `<a class="btn btn-amendoim btn-pequeno" href="${anunciar}" target="_blank" rel="noopener">${ic(I.mais, 'style="width:18px;height:18px;stroke-width:2.6"')}Anunciar</a>` : `<span class="btn btn-amendoim btn-pequeno">${ic(I.mais, 'style="width:18px;height:18px;stroke-width:2.6"')}Anunciar</span>`}</div>
+      ${anunciar ? `<a class="btn btn-amendoim btn-pequeno" href="${anunciar}" target="_blank" rel="noopener" data-ev="anunciar-oferta">${ic(I.mais, 'style="width:18px;height:18px;stroke-width:2.6"')}Anunciar</a>` : `<span class="btn btn-amendoim btn-pequeno">${ic(I.mais, 'style="width:18px;height:18px;stroke-width:2.6"')}Anunciar</span>`}</div>
     <div class="segmento">${lados.map(([k, t]) => `<button data-lado="${k}" aria-pressed="${estado.lado === k}">${t}</button>`).join('')}</div>
     <div class="chips">${prods.map((p) => `<button class="chip" data-produto="${p}" aria-pressed="${estado.produto === p}">${p}</button>`).join('')}</div>
   </header>
@@ -421,7 +449,7 @@ function telaNegociar() {
       <div><b style="font-size:17px;display:block">${esc(o.produto)}</b><span style="font-size:13px;color:var(--texto-3)">${esc(o.detalhe)}</span></div>
       <div class="oferta-grade"><div><span>Volume</span><b class="num">${esc(o.volume)}</b></div><div><span>Preço</span><b class="num">${esc(o.preco)}</b></div><div><span>Entrega</span><b>${esc(o.entrega)}</b></div></div>
       <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--texto-2)">${ic(I.pino, 'style="width:16px;height:16px;stroke:#5F5B52"')}${esc(o.regiao)}</div>
-      ${link ? `<a class="btn btn-verde" href="${link}" target="_blank" rel="noopener">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Tenho interesse</a>` : `<span class="btn btn-verde" style="opacity:.6">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Tenho interesse</span>`}
+      ${link ? `<a class="btn btn-verde" href="${link}" target="_blank" rel="noopener" data-ev="interesse">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Tenho interesse</a>` : `<span class="btn btn-verde" style="opacity:.6">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Tenho interesse</span>`}
     </article>`;
   }).join('') : '<div class="vazio">Nenhuma oferta com esse filtro agora.</div>'}`;
 }
@@ -431,12 +459,13 @@ const ROTAS = {
   inicio: () => telaInicio(),
   mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : telaCotacoes(),
   alertas: () => telaAlertas(D, H()),
+  numeros: () => telaNumeros(H()),
   clima: () => telaClimaAuto(D, H()),
   ferramentas: (sub) => telaFerramentas(sub, H()),
   negociar: () => telaNegociar(),
   boletim: (id) => telaBoletim(id)
 };
-const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio' };
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio' };
 
 function rota() {
   const [aba = 'inicio', sub] = location.hash.replace(/^#\/?/, '').split('/');
@@ -449,11 +478,116 @@ function render(rolarTopo = true) {
   tela.innerHTML = ROTAS[aba](sub);
   const marcada = ABA_DA_ROTA[aba] || aba;
   document.querySelectorAll('.abas a').forEach((a) => { if (a.dataset.aba === marcada) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-  if (rolarTopo) window.scrollTo(0, 0);
+  if (rolarTopo) { window.scrollTo(0, 0); if (aba !== 'inicio' || location.hash) evento('aba-' + aba); }
   // Atalhos para uma seção da aba Mercado (#/mercado/mundo, #/mercado/termometro…)
   const alvo = sub && document.getElementById('sec-' + sub);
   if (alvo && rolarTopo) { alvo.scrollIntoView({ block: 'start' }); if (alvo.tagName === 'DETAILS') alvo.open = true; }
+  const bPdf = document.querySelector('[data-pdf]');
+  if (bPdf) prepararPdf(bPdf.dataset.pdf).catch(() => {});
 }
+
+// ---------- compartilhar ----------
+const URL_APP = 'https://amendoim-brasil.netlify.app';
+function textoCompartilhar(tipo) {
+  const c = D.cotacoes, dest = c.destaque || {}, m = D.mercado || {};
+  if (tipo === 'fato' && m.fato) {
+    return `*Fato do dia · Amendoim Brasil*\n${m.fato.titulo}\n${m.fato.texto || ''}\n\nAcompanhe o mercado do amendoim todo dia no app: ${URL_APP}`;
+  }
+  const v = variacaoIEA(c);
+  const varTxt = !v ? '' : v.dif === 0 ? ` (estável desde ${ddmm(v.desde)})` : ` (${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)})`;
+  const conab = (c.referencias || []).find((x) => x.fonte === 'Conab');
+  return `*Amendoim em casca · ${dest.regiao || 'Tupã'}*\n${brl(dest.preco)} por saca de 25 kg${varTxt}\nFonte: ${dest.fonte || 'IEA-SP'} · ${dest.data || ''}` +
+    (conab ? `\nConab, média de SP: ${brl(conab.preco)}` : '') +
+    (m.fato ? `\n\nFato do dia: ${m.fato.titulo}` : '') +
+    `\n\nVeja o mercado do dia no app Amendoim Brasil: ${URL_APP}`;
+}
+async function compartilhar(tipo) {
+  const texto = textoCompartilhar(tipo);
+  evento('compartilhar-' + tipo);
+  if (navigator.share && /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) {
+    try { await navigator.share({ text: texto }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+}
+
+// ---------- PDF do boletim ----------
+// O PDF é preparado assim que o boletim abre, para o "Enviar" funcionar na hora no celular.
+const pdfsProntos = new Map();
+function prepararPdf(id) {
+  if (pdfsProntos.has(id)) return pdfsProntos.get(id);
+  const b = D.boletins.find((x) => x.id === id);
+  if (!b || !b.secoes?.length) return Promise.reject(new Error('boletim'));
+  const pr = (async () => {
+    const { gerarPdfBoletim, carregarPdfLib } = await import('/pdf.js');
+    const [PDFLib, logo] = await Promise.all([carregarPdfLib(), fetch('/img/logo.png').then((r) => r.arrayBuffer())]);
+    const siglas = Object.fromEntries((D.panorama || []).map((p) => [p.pais, p.sigla]));
+    const bytes = await gerarPdfBoletim(PDFLib, b, { logo, url: URL_APP, whatsapp: D.config.whatsappHelder, siglas });
+    const arquivo = new File([bytes], `Boletim-Amendoim-Brasil-${b.id}.pdf`, { type: 'application/pdf' });
+    pr.pronto = arquivo;
+    return arquivo;
+  })();
+  pr.catch(() => pdfsProntos.delete(id));
+  pdfsProntos.set(id, pr);
+  return pr;
+}
+function salvarArquivo(arquivo) {
+  const u = URL.createObjectURL(arquivo);
+  const a = document.createElement('a');
+  a.href = u; a.download = arquivo.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 15000);
+}
+async function baixarPdf(id, modo) {
+  const b = D.boletins.find((x) => x.id === id);
+  if (!b) return;
+  evento(modo === 'enviar' ? 'pdf-enviar' : 'pdf-baixar');
+  const botoes = document.querySelectorAll(`[data-pdf="${CSS.escape(id)}"]`);
+  let arquivo = pdfsProntos.get(id)?.pronto;
+  if (!arquivo) {
+    botoes.forEach((x) => { x.disabled = true; x.dataset.txt = x.innerHTML; x.textContent = 'Gerando PDF…'; });
+    try { arquivo = await prepararPdf(id); }
+    catch (e) { alert('Não foi possível gerar o PDF agora. Verifique a internet e tente de novo.'); return; }
+    finally { botoes.forEach((x) => { x.disabled = false; if (x.dataset.txt) x.innerHTML = x.dataset.txt; }); }
+  }
+  if (modo === 'enviar' && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+    try {
+      await navigator.share({ files: [arquivo], title: b.titulo, text: `${b.titulo} · Boletim Amendoim Brasil. Acompanhe o mercado todo dia no app: ${URL_APP}` });
+      return;
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  salvarArquivo(arquivo);
+}
+
+// ---------- medição (anônima: só conta aberturas e cliques, sem dados pessoais) ----------
+const MEDIR = location.hostname === 'amendoim-brasil.netlify.app';
+function evento(nome) {
+  if (!MEDIR || !/^[a-z0-9-]{1,30}$/.test(nome)) return;
+  try {
+    const corpo = JSON.stringify({ e: nome });
+    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/evento', corpo))) fetch('/api/evento', { method: 'POST', body: corpo, keepalive: true }).catch(() => {});
+  } catch (e) { /* medição nunca atrapalha o app */ }
+}
+function eventoAbertura() {
+  evento('abriu');
+  try {
+    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+    const ultimo = localStorage.getItem('ab-dia');
+    if (ultimo !== hoje) {
+      evento('aparelho-dia'); // conta cada aparelho uma vez por dia
+      if (ultimo) evento('voltou'); // já tinha aberto em outro dia
+      else evento('aparelho-novo');
+      localStorage.setItem('ab-dia', hoje);
+    }
+  } catch (e) { /* sem armazenamento */ }
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('[data-ev]');
+  if (a) evento(a.dataset.ev);
+  const s = e.target.closest('[data-compartilhar]');
+  if (s) { e.preventDefault(); compartilhar(s.dataset.compartilhar); }
+  const p = e.target.closest('[data-pdf]');
+  if (p) { e.preventDefault(); baixarPdf(p.dataset.pdf, p.dataset.modo); }
+});
 
 // Eventos delegados (filtros, gráfico, login)
 ligarFerramentas({ esc, ic, I, brl, numBr, render });
@@ -485,10 +619,29 @@ function mostraDica(e) {
   g.appendChild(d);
 }
 
-document.addEventListener('submit', (e) => {
+document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'form-numeros') {
+    e.preventDefault();
+    const k = document.getElementById('chave-numeros').value.trim();
+    const saida = document.getElementById('numeros-saida');
+    saida.innerHTML = '<div class="vazio">Carregando…</div>';
+    try {
+      const r = await fetch('/api/numeros?k=' + encodeURIComponent(k), { cache: 'no-store' });
+      if (r.status === 401) { saida.innerHTML = '<div class="vazio">Chave incorreta.</div>'; return; }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      try { localStorage.setItem('ab-chave-numeros', k); } catch (er) { /* ignora */ }
+      saida.innerHTML = desenharNumeros(await r.json(), H());
+    } catch (er) { saida.innerHTML = '<div class="vazio">Não foi possível carregar os números agora.</div>'; }
+    return;
+  }
   if (e.target.id !== 'form-login') return;
   e.preventDefault();
-  document.getElementById('msg-login').textContent = 'O login por código no WhatsApp será ativado quando o banco de dados (Supabase) estiver conectado.';
+  // Enquanto o login não existe, o pedido de acesso vai direto para o WhatsApp do Helder.
+  const tel = (document.getElementById('tel')?.value || '').trim();
+  const link = wa(`Olá Helder, sou cliente da consultoria e quero acessar a área do cliente no app. Meu celular: ${tel}`);
+  evento('consultoria-login');
+  if (link) window.open(link, '_blank', 'noopener');
+  document.getElementById('msg-login').textContent = 'Abrimos o WhatsApp do Helder para liberar o seu acesso.';
 });
 
 window.addEventListener('hashchange', () => render());
@@ -497,6 +650,7 @@ async function iniciar() {
   const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
   ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
   render();
+  eventoAbertura();
   carregarDolar();
   // Mostra o clima na hora (local salvo ou Presidente Prudente) e troca para a localização da pessoa quando ela permitir.
   atualizarClima(municipioAtual());
