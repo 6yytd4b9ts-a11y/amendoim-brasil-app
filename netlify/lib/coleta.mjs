@@ -47,7 +47,7 @@ export function lerLinhasConab(linhas, acc) {
     if (prod === 'PRODUTO') continue; // cabeçalho
     if (prod.startsWith('AMENDOIM')) {
       acc.viu = true;
-      if (c[3].trim() === 'SP' && /PRODUTOR/i.test(c[9])) {
+      if (c[3].trim() === 'SP' && /RECEBIDO|PRODUTOR/i.test(c[9])) { // "PREÇO RECEBIDO P/ PR"
         const [ini, fim] = c[7].split(' - ').map((d) => d.trim());
         const kg = num(c[10]);
         if (kg && fim) acc.semanas.push({ classificacao: c[1].trim(), inicio: ini, fim, kg });
@@ -59,7 +59,7 @@ export function lerLinhasConab(linhas, acc) {
 export async function coletarConab() {
   const r = await fetch(CONAB, { signal: AbortSignal.timeout(22000) });
   if (!r.ok || !r.body) throw new Error('Conab ' + r.status);
-  const leitor = r.body.getReader(), dec = new TextDecoder('utf-8');
+  const leitor = r.body.getReader(), dec = new TextDecoder('windows-1252'); // arquivo em Latin-1
   const acc = { viu: false, fim: false, semanas: [] };
   let resto = '', lidos = 0;
   while (!acc.fim) {
