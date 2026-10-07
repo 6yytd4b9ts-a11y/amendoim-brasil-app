@@ -1,48 +1,59 @@
-<<<<<<< public/app.js
-import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, ligarEsboco3 } from '/esboco3.js';
+<<<<<<< public/ferramentas.js
+      <span class="mini">${dif >= 0 ? 'O prêmio do prazo paga mais que o seu custo do dinheiro.' : 'O prêmio do prazo não cobre o seu custo do dinheiro: melhor receber à vista.'} Lembre também do risco de receber.</span>`;
 =======
-import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoBiblioteca, ligarEsboco3 } from '/esboco3.js';
->>>>>>>
-<<<<<<< public/app.js
-
-  ${faixaAssinante(H())}
-=======
->>>>>>>
-<<<<<<< public/app.js
-  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
-=======
-  ${cartaoBiblioteca(H())}
-
-  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
->>>>>>>
-<<<<<<< public/app.js
-const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'ferramentas' };
-=======
-const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado' };
->>>>>>>
-<<<<<<< public/esboco3.js
-  const dolar = D.dolar;
-=======
->>>>>>>
-<<<<<<< public/esboco3.js
-  if (itens.length < 3 && dolar) linha(bola('#5F5B52'), `Dólar hoje: <b>R$ ${nf(dolar.bid, 2)}</b> (${dolar.pct > 0 ? '+' : ''}${nf(dolar.pct, 1)}%)`, '#/mercado');
-=======
->>>>>>>
-<<<<<<< public/esboco3.js
-    <a class="link-mini" href="#/ferramentas" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Ferramentas</a>
-=======
-    <a class="link-mini" href="#/mercado/analises" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Análises</a>
+      <span class="mini">${dif >= 0 ? 'O prêmio do prazo paga mais que o seu custo do dinheiro.' : 'O prêmio do prazo não cobre o seu custo do dinheiro: melhor receber à vista.'} Lembre também do risco de receber. Selic de referência: 13,75% ao ano, cerca de 1,1% ao mês (confira a taxa do dia).</span>`;
 >>>>>>>
 <<<<<<< public/ferramentas.js
-import { cartaoBiblioteca } from '/esboco3.js';
+const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'arrendamento', 'barter']; // casca → grão e dólar → saca fora por enquanto
 =======
+const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'rendimento', 'dolar', 'arrendamento', 'barter'];
 >>>>>>>
 <<<<<<< public/ferramentas.js
-  ${cartaoBiblioteca(h)}
+    padrao: { avista: '76,00', aprazo: '80,00', dias: '60', juros: '1,2' }
 =======
+    padrao: { avista: '76,80', aprazo: '80,00', dias: '60', juros: '1,1' }
 >>>>>>>
-<<<<<<< public/sw.js
-const VERSAO = 'ab-v14';
+<<<<<<< public/ferramentas.js
+      ['dias', 'Prazo de pagamento', 'int', 'dias', ''],
+      ['juros', 'Custo do dinheiro', 'dec', '% ao mês', ''],
 =======
-const VERSAO = 'ab-v15';
+      ['dias', 'Prazo médio · 30/60 = 45, 30/60/90 = 60', 'int', 'dias', ''],
+      ['juros', 'Custo do dinheiro · Selic', 'dec', '% ao mês', ''],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    padrao: { preco: '75,00', meses: '4', armaz: '3,00', secagem: '3,50', juros: '1,2', quebra: '2,5' }
+=======
+    padrao: { preco: '78,00', meses: '4', armaz: '2,25', secagem: '3,50', juros: '1,1', quebra: '2,5' }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['armaz', 'Armazenagem na safra', 'brl', 'R$/sc', ''],
+      ['secagem', 'Secagem', 'brl', 'R$/sc', ''],
+      ['juros', 'Custo do dinheiro', 'dec', '% ao mês', ''],
+=======
+      ['armaz', 'Armazenagem na safra · média', 'brl', 'R$/sc', ''],
+      ['secagem', 'Secagem · média', 'brl', 'R$/sc', ''],
+      ['juros', 'Custo do dinheiro · Selic', 'dec', '% ao mês', ''],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    padrao: { prod: '380', custo: '30.000,00', preco: '72,00', area: '' }
+=======
+    padrao: { prod: '450', custo: '30.000,00', preco: '78,00', area: '' }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    nome: 'Lucratividade', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
+=======
+    nome: 'Rentabilidade', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
+>>>>>>>
+<<<<<<< public/alertas.js
+      acima: numero(f.acima.value), abaixo: numero(f.abaixo.value),
+=======
+      acima: numero(f.acima.value), abaixo: numero(f.abaixo.value), ref: f.ref ? f.ref.value : undefined,
+>>>>>>>
+<<<<<<< public/alertas.js
+      <span class="rotulo">Preço-alvo · IEA ${esc(dest.regiao || 'Tupã')}</span>
+      <span class="mini">Hoje: <b class="num">${brl(dest.preco)}</b> por saca (${esc((dest.data || '').slice(0, 5))}). O aviso chega quando o preço publicado passar do seu alvo.</span>
+=======
+      <span class="rotulo">Preço-alvo</span>
+      <div class="campo"><label for="alvo-ref">Preço de referência</label><select id="alvo-ref" name="ref">${(() => { const refs = (D.cotacoes?.referencias || []).filter((r) => r.preco != null); const atual = p.ref || `${dest.fonte || 'IEA-SP'} ${dest.regiao || 'Tupã'}`; return refs.map((r) => { const k = `${r.fonte} ${r.praca}`; return `<option value="${esc(k)}" ${k === atual ? 'selected' : ''}>${esc(r.fonte === 'Conab' ? 'Conab · ' + r.praca : 'IEA · ' + r.praca)} · ${brl(r.preco)}</option>`; }).join(''); })()}</select></div>
+      <span class="mini">O aviso chega quando o preço publicado da referência escolhida passar do seu alvo.</span>
 >>>>>>>
