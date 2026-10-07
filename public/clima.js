@@ -167,7 +167,7 @@ export async function carregarClima(local = municipioAtual()) {
   return out;
 }
 
-// Orientação da semana conforme a fase da safra e a previsão (regras simples; o texto do Helder em clima.json tem prioridade).
+// Orientação técnica da semana conforme a fase da safra e a previsão (regras simples; o texto do Helder em clima.json tem prioridade).
 export function recomendacaoPlantio(a, fase = 'Plantio') {
   if (!a || !a.dias?.length) return null;
   const prox3 = a.dias.slice(0, 3).reduce((s, d) => s + (d.mm || 0), 0);
@@ -177,30 +177,31 @@ export function recomendacaoPlantio(a, fase = 'Plantio') {
   const seco = (a.semChuva || 0) >= 7 && (a.total7 || 0) < 15;
   const r = (titulo, itens, dica) => ({ titulo, itens, dica });
   const f = (fase || '').toLowerCase();
+  const p3 = Math.round(prox3), t7 = Math.round(a.total7 || 0), c7 = Math.round(a.chuva7passados || 0), sc = a.semChuva || 0;
 
   if (f.startsWith('emerg')) {
-    if (forte) return r('Chuva forte na emergência: atenção à crosta', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Chuva pesada logo após o plantio pode formar crosta e segurar a emergência, principalmente em solo arenoso.`], 'Depois da chuva, ande nas linhas mais baixas e veja se a planta está rompendo o solo.');
-    if (seco) return r('Solo secando na emergência', [`São ${a.semChuva} dias sem chuva. Emergência irregular deixa estande falhado e lavoura desuniforme.`], 'Conte plantas por metro em vários pontos e compare com a população planejada antes de pensar em replantio.');
-    return r('Boa condição para emergência', [`Choveu ${Math.round(a.chuva7passados || 0)} mm nos últimos 7 dias e a previsão é de ${Math.round(a.total7)} mm na semana.`], 'Avalie o estande entre 10 e 15 dias após o plantio: é o momento de decidir se precisa de algum ajuste.');
+    if (forte) return r('Chuva intensa na fase de emergência', [`Previsão de ${p3} mm nos próximos 3 dias. Chuvas intensas logo após a semeadura favorecem o encrostamento superficial e podem comprometer a emergência, principalmente em solos arenosos.`], 'Após a chuva, avalie a emergência e a formação de crosta, com atenção às áreas de baixada e às linhas expostas ao escorrimento.');
+    if (seco) return r('Déficit hídrico na emergência', [`${sc} dias sem chuva e ${t7} mm previstos para a semana. A falta de umidade pode provocar emergência irregular e falhas no estande.`], 'Faça a contagem de plantas por metro em diferentes pontos do talhão e compare com a população planejada antes de decidir sobre replantio.');
+    return r('Condições adequadas para a emergência', [`Acumulado de ${c7} mm nos últimos 7 dias e previsão de ${t7} mm para a semana.`], 'Avalie o estande entre 10 e 15 dias após a semeadura para confirmar a população de plantas.');
   }
   if (f.startsWith('flor')) {
-    if (seco) return r('Florada com pouca chuva', [`São ${a.semChuva} dias sem chuva e só ${Math.round(a.total7)} mm previstos. Falta de água na florada reduz o pegamento e a formação de vagens.`], 'É a fase em que a falta de chuva mais pesa na produtividade. Acompanhe o radar e a previsão de 15 dias.');
-    if (umido) return r('Umidade alta na florada: olho nas doenças', [`Choveu ${Math.round(a.chuva7passados)} mm nos últimos 7 dias. Tempo úmido favorece mancha e ferrugem.`], 'Mantenha o calendário de fungicida em dia e não deixe o intervalo esticar com a chuva.');
-    return r('Florada em andamento', [`Previsão de ${Math.round(a.total7)} mm na semana.`], 'Chuva regular nesta fase é o que garante vagem. Acompanhe a previsão de 15 dias.');
+    if (seco) return r('Déficit hídrico na florada', [`${sc} dias sem chuva e ${t7} mm previstos para a semana. A falta de água nesta fase reduz o pegamento dos ginóforos e a formação de vagens.`], 'Fase crítica para a produtividade. Acompanhe a previsão de 15 dias e priorize o monitoramento das áreas de solo mais arenoso.');
+    if (umido) return r('Alta umidade na florada: atenção às doenças foliares', [`Acumulado de ${c7} mm nos últimos 7 dias. O molhamento foliar prolongado favorece mancha-castanha, mancha-preta e ferrugem.`], 'Mantenha o programa de fungicidas dentro do intervalo recomendado e evite atrasar as aplicações por causa da chuva.');
+    return r('Florada com umidade adequada', [`Previsão de ${t7} mm para os próximos 7 dias.`], 'Chuvas regulares nesta fase garantem o pegamento e a formação de vagens. Acompanhe a previsão de 15 dias.');
   }
   if (f.startsWith('ench')) {
-    if (seco) return r('Seca no enchimento: risco para o grão', [`São ${a.semChuva} dias sem chuva. Falta de água no enchimento deixa grão miúdo e aumenta o risco de aflatoxina.`], 'Se a seca continuar, antecipe a conversa sobre a comercialização: a qualidade pode cair.');
-    return r('Enchimento com boa umidade', [`Previsão de ${Math.round(a.total7)} mm na semana.`], 'Monitore a maturação (raspagem de vagens) para planejar o arranquio com antecedência.');
+    if (seco) return r('Déficit hídrico no enchimento de grãos', [`${sc} dias sem chuva. A falta de água no enchimento aumenta a proporção de grãos miúdos e o risco de aflatoxina.`], 'Monitore a evolução da maturação e considere o risco de qualidade no planejamento da comercialização.');
+    return r('Enchimento de grãos com umidade adequada', [`Previsão de ${t7} mm para os próximos 7 dias.`], 'Monitore a maturação pelo método de raspagem das vagens para planejar a época de arranquio.');
   }
   if (f.startsWith('arranq') || f.startsWith('colh')) {
-    if (forte || prox3 >= 15) return r('Chuva prevista: cuidado ao arrancar', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Amendoim arrancado que toma chuva na leira perde qualidade.`], 'Procure uma janela de 3 a 4 dias secos para arrancar e recolher.');
-    return r('Janela seca para o arranquio', [`Pouca chuva prevista nos próximos dias (${Math.round(prox3)} mm em 3 dias).`], 'Aproveite para arrancar e recolher com o produto secando bem na leira.');
+    if (forte || prox3 >= 15) return r('Chuva prevista: planeje o arranquio', [`Previsão de ${p3} mm nos próximos 3 dias. Amendoim arrancado que recebe chuva na leira perde qualidade e tem maior risco de aflatoxina.`], 'Programe o arranquio para uma janela de 3 a 4 dias sem chuva, garantindo a secagem adequada na leira.');
+    return r('Janela favorável ao arranquio', [`Previsão de ${p3} mm nos próximos 3 dias.`], 'Condições adequadas para o arranquio e a secagem na leira. Programe o recolhimento conforme a umidade das vagens.');
   }
   // Plantio (padrão)
-  if (forte) return r('Chuva forte nos próximos dias: segure o plantio', [`Previsão de ${Math.round(prox3)} mm em 3 dias. Evite plantar logo antes do temporal, principalmente em solo arenoso: a chuva forte pode arrastar semente e formar crosta, atrapalhando a emergência.`], 'Se já plantou, acompanhe a emergência nos pontos mais baixos e nas linhas expostas.');
-  if (umido) return r('Solo com umidade: boa janela para plantar', [`Choveu ${Math.round(a.chuva7passados)} mm nos últimos 7 dias. Aproveite a umidade e plante sem atraso.`], 'Profundidade entre 4 e 6 cm, com a semente em contato com o solo úmido. Em solo arenoso, pode ir um pouco mais fundo.');
-  if (seco) return r('Solo secando e pouca chuva prevista', [`São ${a.semChuva} dias sem chuva e só ${Math.round(a.total7)} mm previstos na semana. O ideal é esperar uma chuva de pelo menos 15 a 20 mm antes de plantar.`], 'Não aprofunde demais a semente para buscar umidade: plantar fundo atrasa e enfraquece a emergência.');
-  return r('Plante com o solo úmido', [`Previsão de ${Math.round(a.total7)} mm na semana. Plante quando houver umidade no solo e evite os dias de chuva forte.`], 'Profundidade entre 4 e 6 cm, com boa regulagem da plantadeira para não danificar a semente.');
+  if (forte) return r('Chuva intensa prevista: programe o plantio para depois do evento', [`Previsão de ${p3} mm nos próximos 3 dias, com risco de escorrimento superficial e encrostamento do solo.`], 'Aguarde a passagem da chuva e retome a semeadura com o solo em condição adequada de umidade. Nas áreas já semeadas, acompanhe a emergência nas baixadas.');
+  if (umido) return r('Condições de umidade favoráveis ao plantio', [`Acumulado de ${c7} mm nos últimos 7 dias. As condições de umidade do solo são favoráveis à semeadura.`], 'Verifique a previsão dos próximos dias e planeje o plantio, priorizando os talhões com melhor umidade e evitando semear às vésperas de chuva intensa.');
+  if (seco) return r('Umidade insuficiente para o plantio', [`${sc} dias sem chuva e ${t7} mm previstos para a semana. A umidade do solo está abaixo do ideal para uma emergência uniforme.`], 'Recomenda-se aguardar uma chuva de 15 a 20 mm antes de retomar a semeadura. Acompanhe a previsão de 15 dias.');
+  return r('Condições intermediárias para o plantio', [`Previsão de ${t7} mm para os próximos 7 dias e ${c7} mm acumulados nos últimos 7 dias.`], 'Avalie a umidade do solo em cada talhão antes da semeadura e programe o plantio para as janelas com umidade adequada e sem chuva intensa prevista.');
 }
 
 let periodoPrev = 7;
@@ -251,27 +252,11 @@ export function telaClima(D, h) {
 
   ${a?.erro ? `<div class="vazio">${esc(a.erro)}</div>` : ''}
 
-  <section class="clima-resumo">
-    ${tile('Últimos 5 dias', carregando ? '…' : mm(a.chuva5passados), 'choveu')}
-    ${tile('Últimos 7 dias', carregando ? '…' : mm(a.chuva7passados), 'choveu')}
-    ${tile('Próximos 7 dias', carregando ? '…' : mm(a.total7), 'previsto', 'prev')}
-    ${tile('Sem chuva', carregando ? '…' : numBr(a.semChuva) + (a.semChuva === 1 ? ' dia' : ' dias'), 'seguidos até ontem', a && a.semChuva >= 10 ? 'alerta' : '')}
-  </section>
-
-  ${rec ? `<section class="cartao fase-cartao">
-    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Lavoura · fase de ${esc(fase.toLowerCase())}</span><span class="pilula pilula-verde">${esc(D.config.safraAtual || '')}</span></div>
-    <div class="fases-linha">${(D.config.fases || []).map((x) => `<span class="${x === fase ? 'atual' : ''}">${esc(x)}</span>`).join('')}</div>
-    <b style="font-size:17px;line-height:1.3">${esc(rec.titulo)}</b>
-    ${rec.itens.map((t) => `<p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(t)}</p>`).join('')}
-    ${rec.dica ? `<div class="dica"><span class="fato-tag">Dica da semana</span><span>${esc(rec.dica)}</span></div>` : ''}
-    <span class="mini">Orientação automática pela previsão e pela fase da safra. Na dúvida, fale com seu agrônomo.</span>
-  </section>` : ''}
-
   <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Previsão de chuva</span>
+    <div class="cartao-cab"><span class="rotulo">Previsão de chuva${a ? ' · ' + esc(nomeLocal(a.municipio)) : ''}</span>
       <div class="alterna" role="group" aria-label="Período da previsão"><button data-prev="7" aria-pressed="${periodoPrev === 7}">7 dias</button><button data-prev="15" aria-pressed="${periodoPrev === 15}">15 dias</button></div>
     </div>
-    <div class="mini" style="margin-top:-4px">${a ? `<b class="num">${mm(periodoPrev === 7 ? a.total7 : a.total15)}</b> previstos em ${periodoPrev} dias` : 'carregando…'}</div>
+    <div class="prev-totais">${a ? `<span>Próximos 7 dias <b class="num">${mm(a.total7)}</b></span><span>Próximos 15 dias <b class="num">${mm(a.total15)}</b></span>` : '<span>carregando…</span>'}</div>
     <div class="prev-lista ${periodoPrev === 15 ? 'longa' : ''}">${(dias.length ? dias : Array.from({ length: 7 }, () => null)).map((d) => d
       ? `<div class="prev-dia ${d.mm >= 30 ? 'forte' : ''}">
           <span class="prev-nome">${esc(d.dia)}</span><span class="prev-data">${dataCurta(d.data)}</span>
@@ -284,8 +269,33 @@ export function telaClima(D, h) {
     ${h.patrocinio ? h.patrocinio('clima') : ''}
   </section>
 
+  <section class="clima-resumo">
+    ${tile('Últimos 5 dias', carregando ? '…' : mm(a.chuva5passados), 'choveu')}
+    ${tile('Últimos 7 dias', carregando ? '…' : mm(a.chuva7passados), 'choveu')}
+    ${tile('Próximos 7 dias', carregando ? '…' : mm(a.total7), 'previsto', 'prev')}
+    ${tile('Sem chuva', carregando ? '…' : numBr(a.semChuva) + (a.semChuva === 1 ? ' dia' : ' dias'), 'seguidos até ontem', a && a.semChuva >= 10 ? 'alerta' : '')}
+  </section>
+
+  <p class="mini fonte-clima">Fonte dos dados: Open-Meteo (CC BY 4.0), modelos meteorológicos globais e histórico ERA5 · atualizado a cada abertura do app${a?.atualizado ? ' · ' + new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(a.atualizado) : ''}</p>
+
+  <section class="cartao">
+    <div class="cartao-cab"><span class="rotulo">Radar de chuva ao vivo</span><span class="pilula pilula-verde">IPMet</span></div>
+    <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Radar GIS local do IPMet, com os radares de Bauru e Presidente Prudente. Dentro do radar dá para escolher PPI, chuva da última hora e acumulado de 24 horas.</span>
+    <a class="btn btn-verde" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener">Abrir radar</a>
+    ${c.radarAlternativo ? `<span class="mini">O site do IPMet às vezes fica fora do ar. Se não abrir, <a class="link-mini" href="${esc(c.radarAlternativo)}" target="_blank" rel="noopener">veja as nuvens pelo satélite</a>.</span>` : ''}
+  </section>
+
+  ${rec ? `<section class="cartao fase-cartao">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Orientação técnica · fase de ${esc(fase.toLowerCase())}</span><span class="pilula pilula-verde">${esc(D.config.safraAtual || '')}</span></div>
+    <div class="fases-linha">${(D.config.fases || []).map((x) => `<span class="${x === fase ? 'atual' : ''}">${esc(x)}</span>`).join('')}</div>
+    <b style="font-size:17px;line-height:1.3">${esc(rec.titulo)}</b>
+    ${rec.itens.map((t) => `<p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(t)}</p>`).join('')}
+    ${rec.dica ? `<div class="dica"><span class="fato-tag">Recomendação</span><span>${esc(rec.dica)}</span></div>` : ''}
+    <span class="mini">Orientação automática com base na previsão do tempo e na fase da safra. Não substitui a recomendação do seu agrônomo.</span>
+  </section>` : ''}
+
   <section class="cartao" style="gap:12px">
-    <div><span class="rotulo" style="display:block">Chuva acumulada desde 01/09</span>${a ? `<span class="mini">Lavoura ${esc(nomeLocal(a.municipio))}</span>` : ''}</div>
+    <div><span class="rotulo" style="display:block">Histórico de chuva · desde 01/09</span>${a ? `<span class="mini">Lavoura ${esc(nomeLocal(a.municipio))}</span>` : ''}</div>
     ${a && a.chuvaSafra != null ? '' : `<span class="mini">${carregando ? 'carregando…' : 'Sem dados do histórico agora.'}</span>`}
     ${a && a.chuvaSafra != null ? `
     <div class="comp-linha"><div class="cartao-cab"><b>Esta safra · 01/09 a ${dataCurta(a.ate)}/${anoA}</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
@@ -300,13 +310,6 @@ export function telaClima(D, h) {
   </section>
 
   <section class="cartao">
-    <div class="cartao-cab"><span class="rotulo">Radar de chuva ao vivo</span><span class="pilula pilula-verde">IPMet</span></div>
-    <span style="font-size:14px;line-height:1.5;color:var(--texto-2)">Radar GIS local do IPMet, com os radares de Bauru e Presidente Prudente. Dentro do radar dá para escolher PPI, chuva da última hora e acumulado de 24 horas.</span>
-    <a class="btn btn-verde" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener">Abrir radar</a>
-    ${c.radarAlternativo ? `<span class="mini">O site do IPMet às vezes fica fora do ar. Se não abrir, <a class="link-mini" href="${esc(c.radarAlternativo)}" target="_blank" rel="noopener">veja as nuvens pelo satélite</a>.</span>` : ''}
-  </section>
-
-  <section class="cartao">
     <div style="display:flex;align-items:center;gap:12px">
       <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--azul-claro)">${ic(I.globo, 'style="stroke:#2F5F8A"')}</span>
       <b class="cresce" style="font-size:16px">El Niño · La Niña</b>
@@ -318,6 +321,5 @@ export function telaClima(D, h) {
       ${c.ensoLinkPermanente ? `<a class="link-mini" href="${esc(c.ensoLinkPermanente)}" target="_blank" rel="noopener">Acompanhar no CPTEC/INPE</a>` : ''}
     </div>
   </section>
-
-  <p class="mini" style="text-align:center;margin:0">Dados de clima: Open-Meteo (CC BY 4.0) · fonte provisória em teste</p>`;
+`;
 }

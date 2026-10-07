@@ -487,19 +487,45 @@ function render(rolarTopo = true) {
 }
 
 // ---------- compartilhar ----------
+// Mensagem no formato "Radar de preços", pronta para o WhatsApp (*negrito*, _itálico_) e editável.
 const URL_APP = 'https://amendoim-brasil.netlify.app';
+const URL_RADAR = URL_APP + '/radar';
+function dataHoje() {
+  const f = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date());
+  return f.charAt(0).toUpperCase() + f.slice(1);
+}
 function textoCompartilhar(tipo) {
   const c = D.cotacoes, dest = c.destaque || {}, m = D.mercado || {};
+  const assinatura = '_Amendoim Brasil · Helder Lamberti_';
   if (tipo === 'fato' && m.fato) {
-    return `*Fato do dia · Amendoim Brasil*\n${m.fato.titulo}\n${m.fato.texto || ''}\n\nAcompanhe o mercado do amendoim todo dia no app: ${URL_APP}`;
+    return [
+      '*FATO DO DIA · AMENDOIM BRASIL*',
+      `_${dataHoje()}_`,
+      '',
+      `*${m.fato.titulo}*`,
+      m.fato.texto || '',
+      '',
+      `Radar de preços completo: ${URL_RADAR}`,
+      assinatura
+    ].join('\n');
   }
   const v = variacaoIEA(c);
-  const varTxt = !v ? '' : v.dif === 0 ? ` (estável desde ${ddmm(v.desde)})` : ` (${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)})`;
+  const varTxt = !v ? '' : v.dif === 0 ? ' · estável' : ` · ${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)}`;
   const conab = (c.referencias || []).find((x) => x.fonte === 'Conab');
-  return `*Amendoim em casca · ${dest.regiao || 'Tupã'}*\n${brl(dest.preco)} por saca de 25 kg${varTxt}\nFonte: ${dest.fonte || 'IEA-SP'} · ${dest.data || ''}` +
-    (conab ? `\nConab, média de SP: ${brl(conab.preco)}` : '') +
-    (m.fato ? `\n\nFato do dia: ${m.fato.titulo}` : '') +
-    `\n\nVeja o mercado do dia no app Amendoim Brasil: ${URL_APP}`;
+  const linhas = [
+    '*RADAR DE PREÇOS · AMENDOIM BRASIL*',
+    `_${dataHoje()}_`,
+    '',
+    '*Amendoim em casca · saca de 25 kg*',
+    `• ${dest.fonte || 'IEA-SP'} ${dest.regiao || 'Tupã'} (${(dest.data || '').slice(0, 5)}): *${brl(dest.preco)}*${varTxt}`
+  ];
+  if (conab) linhas.push(`• Conab, média de SP: ${brl(conab.preco)}${conab.variacao != null ? ` · ${pct(conab.variacao)} na semana` : ''}`);
+  if (D.dolar) linhas.push(`• Dólar: ${brl(D.dolar.bid)} · ${pct(D.dolar.pct)} hoje`);
+  const hoje = (m.hoje || []).filter((x) => ['exportacao', 'demanda', 'oferta'].includes(x.id));
+  if (hoje.length) linhas.push('', '*Mercado*', ...hoje.map((x) => `• ${x.rotulo}: ${x.valor}`));
+  if (m.fato) linhas.push('', '*Fato do dia*', m.fato.titulo);
+  linhas.push('', `Mercado físico, clima e ferramentas: ${URL_RADAR}`, assinatura);
+  return linhas.join('\n');
 }
 async function compartilhar(tipo) {
   const texto = textoCompartilhar(tipo);
