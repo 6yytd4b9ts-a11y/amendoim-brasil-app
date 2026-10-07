@@ -1,0 +1,95 @@
+<<<<<<< public/ferramentas.js
+      <span class="mini">${dif >= 0 ? 'O prêmio do prazo paga mais que o seu custo do dinheiro.' : 'O prêmio do prazo não cobre o seu custo do dinheiro: melhor receber à vista.'} Lembre também do risco de receber.</span>`;
+=======
+      <span class="mini">${dif >= 0 ? 'O prêmio do prazo paga mais que o seu custo do dinheiro.' : 'O prêmio do prazo não cobre o seu custo do dinheiro: melhor receber à vista.'} Lembre também do risco de receber. Selic de referência: 13,75% ao ano, cerca de 1,1% ao mês (confira a taxa do dia).</span>`;
+>>>>>>>
+<<<<<<< public/ferramentas.js
+const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'arrendamento', 'barter']; // casca → grão e dólar → saca fora por enquanto
+=======
+const ORDEM = ['custo', 'avista', 'armazenar', 'frete', 'rendimento', 'dolar', 'arrendamento', 'barter'];
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    padrao: { avista: '76,00', aprazo: '80,00', dias: '60', juros: '1,2' }
+=======
+    padrao: { avista: '76,80', aprazo: '80,00', dias: '60', juros: '1,1' }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['dias', 'Prazo de pagamento', 'int', 'dias', ''],
+      ['juros', 'Custo do dinheiro', 'dec', '% ao mês', ''],
+=======
+      ['dias', 'Prazo médio · 30/60 = 45, 30/60/90 = 60', 'int', 'dias', ''],
+      ['juros', 'Custo do dinheiro · Selic', 'dec', '% ao mês', ''],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    padrao: { preco: '75,00', meses: '4', armaz: '3,00', secagem: '3,50', juros: '1,2', quebra: '2,5' }
+=======
+    padrao: { preco: '78,00', meses: '4', armaz: '2,25', secagem: '3,50', juros: '1,1', quebra: '2,5' }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+      ['armaz', 'Armazenagem na safra', 'brl', 'R$/sc', ''],
+      ['secagem', 'Secagem', 'brl', 'R$/sc', ''],
+      ['juros', 'Custo do dinheiro', 'dec', '% ao mês', ''],
+=======
+      ['armaz', 'Armazenagem na safra · média', 'brl', 'R$/sc', ''],
+      ['secagem', 'Secagem · média', 'brl', 'R$/sc', ''],
+      ['juros', 'Custo do dinheiro · Selic', 'dec', '% ao mês', ''],
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    padrao: { prod: '380', custo: '30.000,00', preco: '72,00', area: '' }
+=======
+    padrao: { prod: '450', custo: '30.000,00', preco: '78,00', area: '' }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    nome: 'Lucratividade', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
+=======
+    nome: 'Rentabilidade', desc: 'Custo por saca, ponto de equilíbrio e tabela de lucro',
+>>>>>>>
+<<<<<<< public/alertas.js
+      acima: numero(f.acima.value), abaixo: numero(f.abaixo.value),
+=======
+      acima: numero(f.acima.value), abaixo: numero(f.abaixo.value), ref: f.ref ? f.ref.value : undefined,
+>>>>>>>
+<<<<<<< public/alertas.js
+      <span class="rotulo">Preço-alvo · IEA ${esc(dest.regiao || 'Tupã')}</span>
+      <span class="mini">Hoje: <b class="num">${brl(dest.preco)}</b> por saca (${esc((dest.data || '').slice(0, 5))}). O aviso chega quando o preço publicado passar do seu alvo.</span>
+=======
+      <span class="rotulo">Preço-alvo</span>
+      <div class="campo"><label for="alvo-ref">Preço de referência</label><select id="alvo-ref" name="ref">${(() => { const refs = (D.cotacoes?.referencias || []).filter((r) => r.preco != null); const atual = p.ref || `${dest.fonte || 'IEA-SP'} ${dest.regiao || 'Tupã'}`; return refs.map((r) => { const k = `${r.fonte} ${r.praca}`; return `<option value="${esc(k)}" ${k === atual ? 'selected' : ''}>${esc(r.fonte === 'Conab' ? 'Conab · ' + r.praca : 'IEA · ' + r.praca)} · ${brl(r.preco)}</option>`; }).join(''); })()}</select></div>
+      <span class="mini">O aviso chega quando o preço publicado da referência escolhida passar do seu alvo.</span>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+      salvarConteudo(c); est.msg = 'Salvo. Abra o app neste aparelho para ver.'; redesenhar();
+=======
+      salvarConteudo(c); est.msg = 'Salvo. Vale para o app aberto neste aparelho.'; redesenhar();
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70 };
+=======
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70, exportGrao: n('pe-expg'), exportOleo: n('pe-expo'), exportFonte: t('pe-expf'), exportExemplo: false };
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+      </div>
+=======
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+      </div>
+      <span class="mini">Ao salvar, a exportação deixa de ser "exemplo" no app.</span>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+=======
+        <div class="campo"><label>Rendimento casca → grão %</label>${inp('pe-rend', c.balanco.rendimento, 'number')}</div>
+        <div class="campo"><label>Exportação de grão (mil t de grão)</label>${inp('pe-expg', c.balanco.exportGrao ?? '', 'number')}</div>
+        <div class="campo"><label>Exportação de óleo (mil t, em casca)</label>${inp('pe-expo', c.balanco.exportOleo ?? '', 'number')}</div>
+        <div class="campo"><label>Fonte/período da exportação</label>${inp('pe-expf', c.balanco.exportFonte || '')}</div>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+  ${aviso('<b>Esboço:</b> o que você salvar aqui aparece no app <b>deste aparelho</b> (abra Mercado › Assinantes). Na versão final vale para todos os assinantes na hora.')}
+=======
+  ${aviso('<b>Nesta fase:</b> o que você salvar aqui aparece no app <b>deste aparelho</b> (abra Mercado › Assinantes). Na versão final vale para todos os assinantes na hora.')}
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+  ${aviso('<b>Esboço:</b> nomes fictícios para você ver como fica. Na versão final a lista vem do cadastro e os pagamentos do Asaas, atualizados sozinhos.')}
+=======
+  ${aviso('<b>Nesta fase:</b> nomes fictícios para você ver como fica. Na versão final a lista vem do cadastro e os pagamentos do Asaas, atualizados sozinhos.')}
+>>>>>>>

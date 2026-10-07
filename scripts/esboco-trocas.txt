@@ -1,0 +1,260 @@
+<<<<<<< public/app.js
+  localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
+=======
+  if (boasVindasFeitas()) localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
+  else if (rota().aba === 'inicio') setTimeout(() => mostrarBoasVindas(H()), 600);
+>>>>>>>
+<<<<<<< public/app.js
+  ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
+=======
+  ARQUIVOS.forEach((a, i) => { D[a] = res[i]; });
+  ajustarDados(D);
+>>>>>>>
+<<<<<<< public/app.js
+ligarDados(render, evento);
+=======
+ligarDados(render, evento);
+ligarEsboco({
+  render, evento,
+  // Boas-vindas: a localização só é pedida quando a pessoa toca no botão.
+  localizar: async () => {
+    const m = await localDoAparelho(15000);
+    if (m) { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); registrarRegiao(); }
+    return m;
+  }
+});
+ligarEsboco2({ render, evento, escolherLocal: (m) => { definirMunicipio(m); D.climaAuto = null; atualizarClima(m); atualizarLocalAlertas(); } });
+ligarClimaNovo({ render });
+ligarEsboco3({ render, evento });
+>>>>>>>
+<<<<<<< public/app.js
+  const assinatura = '_Amendoim Brasil · Helder Lamberti_';
+=======
+  const assinatura = '_Amendoim Brasil · Helder Lamberti_';
+  if (tipo === 'noticias') return textoNoticias() || 'Amendoim Brasil: ' + URL_RADAR;
+>>>>>>>
+<<<<<<< public/app.js
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar' };
+=======
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado' };
+>>>>>>>
+<<<<<<< public/app.js
+  boletim: (id) => telaBoletim(id)
+=======
+  boletim: (id) => telaBoletim(id),
+  conta: (sub) => telaConta(sub, H()),
+  estimativas: () => telaEstimativas(H()),
+  termos: () => telaTermos(H()),
+  privacidade: () => telaPrivacidade(H()),
+  agenda: () => telaAgenda(H()),
+  perfil: () => telaPerfil(H()),
+  destinos: () => telaDestinos(H()),
+  biblioteca: () => telaBiblioteca(H())
+>>>>>>>
+<<<<<<< public/app.js
+  clima: () => telaClimaAuto(D, H()),
+=======
+  clima: () => telaClimaNova(D, H()),
+>>>>>>>
+<<<<<<< public/app.js
+  anuncie: () => telaAnuncie(D, H()),
+=======
+  anuncie: () => telaPatrocinio(D, H()),
+>>>>>>>
+<<<<<<< public/app.js
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? telaConsultoria() : sub === 'dados' ? telaDados(D, H()) : telaCotacoes(),
+=======
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDadosAssinante(D, H(), telaDados) : telaCotacoes(),
+>>>>>>>
+<<<<<<< public/app.js
+  </a>` : ''}
+=======
+  </a>` : ''}
+
+  ${cartaoNoticiasDia(H(), false)}
+>>>>>>>
+<<<<<<< public/app.js
+  <a class="chamada" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
+=======
+  <a class="chamada es-consult" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
+>>>>>>>
+<<<<<<< public/app.js
+    <div class="grafico" id="grafico">${graficoPreco()}</div>
+=======
+    ${graficoNovo(D, estado.periodo)}
+>>>>>>>
+<<<<<<< public/app.js
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="${wa(`Olá Helder, quero assinar a consultoria para ver o histórico de preço de ${p}.`) || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+=======
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+>>>>>>>
+<<<<<<< public/app.js
+  ${blocoMercadoHojeDetalhe(D, H())}
+=======
+  ${cartaoFisico(D, H())}
+
+  ${cartaoFato(D, H())}
+>>>>>>>
+<<<<<<< public/app.js
+    ${c.referencias.map((r) => {
+=======
+    ${ordenarRefs(c.referencias).map((r) => {
+>>>>>>>
+<<<<<<< public/app.js
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Consultoria']];
+=======
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
+>>>>>>>
+<<<<<<< public/app.js
+  ${blocoNoticias()}
+=======
+  ${blocoNoticias()}
+
+  ${cartaoEnquete(H())}
+>>>>>>>
+<<<<<<< public/app.js
+  </div>
+
+=======
+  </div>
+
+  ${cartaoNoticiasDia(H())}
+
+  ${cartaoAgendaInicio(H())}
+
+>>>>>>>
+<<<<<<< public/app.js
+  <section class="destaque">
+    <div class="cartao-cab"><span class="rotulo">${esc(c.produto)} · último preço</span><span class="pilula pilula-verde-escuro">${esc(dest.regiao || cfg.regiaoPadrao)}</span></div>
+    <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brl(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
+    ${(() => {
+      const v = variacaoIEA(c);
+      if (!v) return '';
+      const txt = v.dif === 0 ? `Estável desde ${ddmm(v.desde)}` : `${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif))} vs ${ddmm(v.desde)}`;
+      return `<div class="hero-var ${v.dif > 0 ? 'sobe' : v.dif < 0 ? 'cai' : ''}">${v.dif === 0 ? '<span aria-hidden="true">=</span>' : ic(v.dif > 0 ? I.sobe : I.cai, 'style="width:16px;height:16px;stroke-width:2.6"')}<span>${txt}</span></div>`;
+    })()}
+    <div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600">
+      <span>${dest.fonte ? `Fonte: ${esc(dest.fonte)} · ${esc(dest.data)}` : 'Cotação da semana em breve'}</span>
+    </div>
+    ${(() => { const r = (c.referencias || []).find((x) => x.fonte === 'Conab'); return r ? `<span style="font-size:13px;opacity:.9">Conab, média de SP: <b class="num">${brl(r.preco)}</b>${r.variacao != null ? ` (${pct(r.variacao)} na semana)` : ''}</span>` : ''; })()}
+    <div class="hero-acoes">
+      <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
+      <button class="btn-enviar" data-compartilhar="preco" aria-label="Enviar o preço no WhatsApp">${ic(I.enviar)}<span>Enviar</span></button>
+    </div>
+  </section>
+=======
+  ${heroConab(D, H())}
+
+  ${blocoNovidades(D, H())}
+>>>>>>>
+<<<<<<< public/app.js
+    <button class="btn-icone" aria-label="Município da lavoura" onclick="location.hash='#/clima'">${ic(I.pino)}</button>
+=======
+    ${botaoAssinanteTopo(H())}
+>>>>>>>
+<<<<<<< public/app.js
+  const chuva7 = auto?.total7;
+=======
+  const chuva7 = chuva7Unificada(auto);
+>>>>>>>
+<<<<<<< public/app.js
+function medidor(status) {
+=======
+function medidor(status) {
+  return medidor5(status, esc);
+>>>>>>>
+<<<<<<< public/app.js
+import { telaDados, ligarDados } from '/exportacao.js';
+=======
+import { telaDados, ligarDados } from '/exportacao.js';
+import { telaAssinatura, telaConta, telaEstimativas, telaTermos, telaPrivacidade, boasVindasFeitas, mostrarBoasVindas, ligarEsboco } from '/esboco.js';
+import { faixaAssinante, cartaoAgendaInicio, cartaoPerfilInicio, telaAgenda, telaPerfil, telaPatrocinio, ligarEsboco2 } from '/esboco2.js';
+import { telaClimaNova, ligarClimaNovo } from '/esboco-clima.js';
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3 } from '/esboco3.js';
+import { chuva7Unificada } from '/esboco-clima.js';
+>>>>>>>
+<<<<<<< public/index.html
+  <link rel="stylesheet" href="/visual.css">
+=======
+  <link rel="stylesheet" href="/visual.css">
+  <link rel="stylesheet" href="/esboco.css">
+  <link rel="stylesheet" href="/esboco2.css">
+  <link rel="stylesheet" href="/esboco3.css">
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v9';
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
+=======
+const VERSAO = 'ab-v17';
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
+>>>>>>>
+<<<<<<< public/painel-admin.js
+if (location.hash === '#balcao') est.aba = 'balcao';
+=======
+if (location.hash === '#balcao') est.aba = 'balcao';
+ligarPainelEsboco(desenhar);
+ligarPainelEsboco2(desenhar);
+>>>>>>>
+<<<<<<< public/painel-admin.js
+    ${est.aba !== 'balcao' ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+    ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : telaBalcao()}`;
+=======
+    ${!['balcao', 'hoje', 'assin', 'prod', 'conteudo'].includes(est.aba) ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+    ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
+>>>>>>>
+<<<<<<< public/painel-admin.js
+  const abas = [['geral', 'Visão geral'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`]];
+=======
+  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo']];
+>>>>>>>
+<<<<<<< public/painel-admin.js
+import { MUNICIPIOS } from '/clima.js';
+=======
+import { MUNICIPIOS } from '/clima.js';
+import { telaAssinantesAdm, telaConteudo, ligarPainelEsboco } from '/painel-esboco.js';
+import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from '/painel-esboco2.js';
+>>>>>>>
+<<<<<<< public/painel.html
+  <link rel="stylesheet" href="/visual.css">
+=======
+  <link rel="stylesheet" href="/visual.css">
+  <link rel="stylesheet" href="/esboco.css">
+  <link rel="stylesheet" href="/esboco2.css">
+  <link rel="stylesheet" href="/esboco3.css">
+>>>>>>>
+<<<<<<< public/painel.js
+    <a href="${h.wa('Olá Helder, quero assinar a consultoria para ver a paridade de exportação em R$/saca.') || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
+=======
+    <a href="#/destinos" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Preço por destino e paridade</b><span class="mini">★ Plano Empresa</span></span><span class="link-mini">Ver</span></a>
+>>>>>>>
+<<<<<<< public/painel.js
+    <div class="grade-2" style="gap:10px">${e.itens.map((x) => `
+      <div class="exp-tile"><span>${esc(x.nome)}</span><b class="num">${numBr(x.toneladas)} t</b><span class="var num ${x.variacao > 0 ? 'sobe' : 'cai'}">${pct(x.variacao)} vs 2025</span></div>`).join('')}
+    </div>
+    ${(() => {
+      const grao = (e.itens || []).find((x) => /gr[ãa]o/i.test(x.nome));
+      if (!grao || !e.precoMedio) return '';
+      const receita = ((1 + grao.variacao / 100) * (1 + e.precoMedio.variacao / 100) - 1) * 100;
+      const cel = (rot, v, sub) => `<div class="exp-cel ${v > 0 ? 'sobe' : 'cai'}"><span>${rot}</span><b class="num">${pct(v)}</b><small>${sub}</small></div>`;
+      return `<div class="exp-faixa">${cel('Volume', grao.variacao, 'toneladas')}<span class="exp-op">×</span>${cel('Preço', e.precoMedio.variacao, `US$ ${numBr(e.precoMedio.atual)}/t`)}<span class="exp-op">=</span>${cel('Receita', receita, 'em dólar')}</div>
+      <span class="mini" style="margin-top:-4px">Embarca mais, porém mais barato: a receita cresce menos que o volume.</span>`;
+    })()}
+=======
+>>>>>>>
+<<<<<<< public/painel.js
+  const itens = itensHoje(D, h);
+  return `${blocoMercadoFisico(D, h)}
+  <section class="cartao" id="sec-hoje">
+=======
+  const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico');
+  return `<section class="cartao" id="sec-hoje">
+>>>>>>>
+<<<<<<< public/esboco2.css
+.pe-prod thead th:first-child, .pe-prod tbody th { text-align: left; }
+=======
+.pe-prod thead th:first-child, .pe-prod tbody th { text-align: left; }
+
+.es-t-feira { background: #FCE4E0; color: #9A2F1E; }
+.es-ag-travada .es-ag-linha { pointer-events: none; }
+.es-cadeado-linha { flex-direction: row; align-items: center; gap: 12px; padding: 14px; background: var(--amendoim-fundo); border-color: var(--amendoim-borda); }
+>>>>>>>
