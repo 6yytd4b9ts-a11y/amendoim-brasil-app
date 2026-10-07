@@ -1,7 +1,7 @@
 // Service worker: app abre rápido, funciona com sinal fraco no campo e recebe os alertas no celular.
 // Sempre tenta a versão mais nova na rede; se estiver sem sinal, usa a cópia guardada.
 const VERSAO = 'ab-v8';
-const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/extra.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSAO).then((c) => c.addAll(APP)).then(() => self.skipWaiting()));

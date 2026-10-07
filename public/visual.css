@@ -1,0 +1,21 @@
+/* ===== Bandeiras, panorama limpo, exportação volume × preço, radar compacto ===== */
+.bandeira { display: inline-flex; flex-shrink: 0; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px rgba(27,27,23,.12); }
+.bandeira svg { display: block; }
+.bandeira-sigla { align-items: center; justify-content: center; background: var(--fundo); font-size: 11px; font-weight: 800; color: var(--texto-2); }
+.pm-grade { gap: 4px; }
+.pm-item { gap: 3px; }
+.pm-pais { font-size: 12px !important; font-weight: 800; }
+.pm-ind { font-size: 11px; font-weight: 700; line-height: 1.2; color: var(--texto); }
+.pm-fase { font-size: 10px; }
+.exp-faixa { display: flex; align-items: stretch; gap: 4px; }
+.exp-cel { flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 9px 8px; border-radius: 10px; background: var(--fundo); border-top: 3px solid var(--verde); }
+.exp-cel.cai { border-top-color: #B3261E; }
+.exp-cel span { font-size: 11px; font-weight: 700; color: var(--texto-3); }
+.exp-cel b { font-size: 17px; font-weight: 800; }
+.exp-cel.sobe b { color: var(--verde-escuro); }
+.exp-cel.cai b { color: #B3261E; }
+.exp-cel small { font-size: 10px; color: var(--texto-3); }
+.exp-op { align-self: center; font-size: 15px; font-weight: 800; color: var(--texto-3); }
+.radar-linha { flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px; text-decoration: none; color: var(--texto); }
+.radar-linha b { display: block; font-size: 15px; }
+.leitura h2 .bandeira { margin-right: 2px; }
