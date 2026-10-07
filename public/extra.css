@@ -243,3 +243,8 @@ details.abre summary::after { margin-left: auto; }
 .aviso-rec { font-style: italic; }
 .pdf-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pdf-acoes .btn .ic { width: 18px; height: 18px; stroke: currentColor; }
+
+/* ===== Clima reorganizado ===== */
+.prev-totais { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: -4px; font-size: 13px; color: var(--texto-3); }
+.prev-totais b { color: var(--azul); font-size: 14px; margin-left: 4px; }
+.fonte-clima { margin: -4px 4px 0; text-align: center; line-height: 1.45; }
