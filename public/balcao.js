@@ -4,6 +4,7 @@ import { ativar, prefsSalvas } from '/alertas.js';
 
 const estado = { lado: 'Todas', produto: 'Todos', enviado: false, ultimo: null };
 const NOME_PRODUTO = { Casca: 'amendoim em casca', Debulhado: 'amendoim debulhado', Blancheado: 'amendoim blancheado', Semente: 'semente de amendoim' };
+const milhar = (s) => String(s ?? '').replace(/(^|[^\d.,])(\d{4,})/g, (_, a, n) => a + n.replace(/\B(?=(\d{3})+$)/g, '.')); // 50000 → 50.000 (quantidade e preço)
 const PRODUTOS = ['Casca', 'Debulhado', 'Blancheado', 'Semente'];
 const chaveSalva = () => { try { return localStorage.getItem('ab-chave-numeros') || ''; } catch (e) { return ''; } };
 const dataCurta = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }); };
@@ -26,12 +27,12 @@ export function listaOfertas(D) {
 function cartaoOferta(o, h) {
   const { esc, ic, I, wa } = h;
   const ref = o.id ? ` (anúncio ${o.id.slice(-5).toUpperCase()})` : '';
-  const link = wa(`Olá Helder, tenho interesse na oferta do balcão${ref}: ${o.lado} de ${o.produto}, ${o.volume}, ${o.regiao}.`);
+  const link = wa(`Olá Helder, tenho interesse na oferta do balcão${ref}: ${o.lado} de ${o.produto}, ${milhar(o.volume)}, ${o.regiao}.`);
   return `<article class="cartao">
     <div class="cartao-cab"><span class="lado ${o.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${o.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span>
       <span class="oferta-origem">${o.origem === 'amendoim' ? `${ic(I.escudo, 'style="width:14px;height:14px;stroke:#007731;stroke-width:2.4"')}Amendoim Brasil` : `Anúncio verificado · ${esc(dataCurta(o.data))}`}</span></div>
     <div><b style="font-size:17px;display:block">${esc(o.produto)}</b>${o.detalhe ? `<span style="font-size:13px;color:var(--texto-3)">${esc(o.detalhe)}</span>` : ''}</div>
-    <div class="oferta-grade"><div><span>Volume</span><b class="num">${esc(o.volume)}</b></div><div><span>Preço</span><b class="num">${esc(o.preco)}</b></div><div><span>Entrega</span><b>${esc(o.entrega)}</b></div></div>
+    <div class="oferta-grade"><div><span>Volume</span><b class="num">${esc(milhar(o.volume))}</b></div><div><span>Preço</span><b class="num">${esc(milhar(o.preco))}</b></div><div><span>Entrega</span><b>${esc(o.entrega)}</b></div></div>
     <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--texto-2)">${ic(I.pino, 'style="width:16px;height:16px;stroke:#5F5B52"')}${esc(o.regiao)}</div>
     ${link ? `<a class="btn btn-verde" href="${link}" target="_blank" rel="noopener" data-ev="interesse">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Tenho interesse</a>` : ''}
   </article>`;
@@ -64,8 +65,8 @@ export function telaAnunciar(D, h) {
     const txt = [
       `Olá Helder, acabei de anunciar no balcão do app Amendoim Brasil${cod ? ` (anúncio ${cod})` : ''}:`,
       `${u.lado === 'Compra' ? 'COMPRA' : 'VENDA'} de ${NOME_PRODUTO[u.categoria] || u.categoria || 'amendoim'}`,
-      `Quantidade: ${u.volume || '-'}`,
-      `Preço: ${u.preco || 'a combinar'}`,
+      `Quantidade: ${milhar(u.volume) || '-'}`,
+      `Preço: ${milhar(u.preco) || 'a combinar'}`,
       `Cidade: ${u.regiao || '-'}`,
       `Entrega: ${u.entrega || 'a combinar'}`,
       u.detalhe ? `Detalhes: ${u.detalhe}` : null,
@@ -131,8 +132,8 @@ function desenharAdmin(lista, h) {
     const dig = String(c.whatsapp || ''), zap = `https://wa.me/${dig.length >= 12 && dig.startsWith('55') ? dig : '55' + dig}?text=${encodeURIComponent(`Olá ${c.nome || ''}, aqui é o Helder da Amendoim Brasil. Recebi o seu anúncio no balcão (${x.lado} de ${x.produto}, ${x.volume}). Podemos confirmar os detalhes?`)}`;
     return `<article class="cartao" style="gap:8px">
       <div class="cartao-cab"><span class="lado ${x.lado === 'Compra' ? 'lado-compra' : 'lado-venda'}">${x.lado === 'Compra' ? 'COMPRA' : 'VENDA'}</span><span class="mini">${esc(dataCurta(a.criado))} · ${esc(a.id.slice(-5).toUpperCase())}</span></div>
-      <b style="font-size:16px">${esc(x.produto)} · ${esc(x.volume)}</b>
-      <span class="mini">${esc(x.regiao)} · ${esc(x.preco)} · entrega ${esc(x.entrega)}${x.detalhe ? '<br>' + esc(x.detalhe) : ''}</span>
+      <b style="font-size:16px">${esc(x.produto)} · ${esc(milhar(x.volume))}</b>
+      <span class="mini">${esc(x.regiao)} · ${esc(milhar(x.preco))} · entrega ${esc(x.entrega)}${x.detalhe ? '<br>' + esc(x.detalhe) : ''}</span>
       <a class="link-mini" href="${zap}" target="_blank" rel="noopener">${esc(c.nome)} · WhatsApp ${esc(c.whatsapp)}</a>
       <div class="duas-acoes">
         ${a.status === 'pendente' ? `<button class="btn btn-verde btn-pequeno" data-adm="aprovar" data-id="${esc(a.id)}">Aprovar</button><button class="btn btn-pequeno btn-contorno" data-adm="recusar" data-id="${esc(a.id)}">Recusar</button>` : `<button class="btn btn-pequeno btn-contorno" data-adm="remover" data-id="${esc(a.id)}">Tirar do ar</button>`}
@@ -222,6 +223,10 @@ export function ligarBalcao(D, h, render, evento) {
         if (m) m.textContent = 'Pronto: este celular avisa a cada anúncio novo.';
       } catch (er) { if (m) m.textContent = 'Não deu para ativar aqui. Use o Chrome no Android ou o app instalado no iPhone.'; }
     }
+  });
+  // Quantidade e preço ganham o ponto de milhar quando a pessoa sai do campo (50000 → 50.000).
+  document.addEventListener('focusout', (e) => {
+    if (e.target.matches?.('#an-volume, #an-preco')) e.target.value = milhar(e.target.value);
   });
   document.addEventListener('submit', async (e) => {
     if (e.target.id === 'form-balcao-admin') { e.preventDefault(); abrirAdmin(); return; }
