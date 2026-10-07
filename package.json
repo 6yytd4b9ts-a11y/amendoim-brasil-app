@@ -1,0 +1,8 @@
+{
+  "name": "amendoim-brasil-app",
+  "private": true,
+  "description": "App Amendoim Brasil. O site é estático (pasta public); este arquivo só existe para as funções da Netlify (medição de acessos).",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

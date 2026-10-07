@@ -1,6 +1,6 @@
 // Service worker: app abre rápido e funciona com sinal fraco no campo.
 // Sempre tenta a versão mais nova na rede; se estiver sem sinal, usa a cópia guardada.
-const VERSAO = 'ab-v5';
+const VERSAO = 'ab-v6';
 const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/extra.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

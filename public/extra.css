@@ -219,9 +219,27 @@ details.abre summary::after { margin-left: auto; }
 .hoje-valor b { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
 .hoje-valor .seta-ef { width: 15px; height: 15px; }
 .hoje-quadro .hoje-nota { font-size: 11px; line-height: 1.3; }
-.fato-linha { display: flex; align-items: baseline; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--amendoim-fundo); text-decoration: none; color: var(--texto); font-size: 13px; font-weight: 600; line-height: 1.35; }
+.fato-linha { display: flex; align-items: center; gap: 6px; padding: 4px 4px 4px 12px; border-radius: 12px; background: var(--amendoim-fundo); font-size: 13px; font-weight: 600; line-height: 1.35; }
+.fato-linha a { flex: 1; display: flex; align-items: baseline; gap: 8px; padding: 6px 0; text-decoration: none; color: var(--texto); }
 .fato-linha .fato-tag { flex-shrink: 0; }
+.fato-enviar { flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.fato-enviar .ic { width: 18px; height: 18px; stroke: var(--verde); }
 .hoje .patrocinio { justify-content: flex-end; border: 0; padding: 0 2px; background: transparent; }
 .hoje .patrocinio img { max-height: 18px; }
 .hoje .patrocinio.vago { border: 0; }
 .prev-dia b small { font-size: 10px; font-weight: 600; }
+
+/* ===== Ajustes da análise: variação, compartilhar, PDF ===== */
+.hero-var { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 14px; font-weight: 700; }
+.hero-var .ic { stroke: currentColor; }
+.hero-var.sobe { color: #C9F7D6; }
+.hero-var.cai { color: #FFD3CC; }
+.hero-acoes { display: flex; gap: 8px; margin-top: 8px; }
+.hero-acoes .btn-branco { flex: 1; margin-top: 0; }
+.btn-enviar { flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,.55); background: transparent; color: #fff; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-enviar .ic { width: 18px; height: 18px; stroke: #fff; }
+.link-enviar { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--verde); cursor: pointer; }
+.link-enviar .ic { width: 16px; height: 16px; stroke: var(--verde); }
+.aviso-rec { font-style: italic; }
+.pdf-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pdf-acoes .btn .ic { width: 18px; height: 18px; stroke: currentColor; }

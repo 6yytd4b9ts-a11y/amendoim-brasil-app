@@ -22,6 +22,17 @@ function itensHoje(D, h) {
   return lista;
 }
 
+// "Atualizado hoje / ontem / há N dias" a partir de dd/mm/aaaa (horário de Brasília).
+export function quando(br) {
+  const m = String(br || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!m) return br || '';
+  const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+  const dias = Math.round((new Date(hoje + 'T12:00:00Z') - new Date(`${m[3]}-${m[2]}-${m[1]}T12:00:00Z`)) / 86400000);
+  if (dias <= 0) return 'hoje';
+  if (dias === 1) return 'ontem';
+  return `há ${dias} dias`;
+}
+
 // ---------- HOME ----------
 // Resumo do dia em 4 quadros (o preço já está no destaque verde). Toque leva à aba Mercado.
 const DESTINO = { dolar: '#/mercado/hoje', exportacao: '#/mercado/exportacao', demanda: '#/mercado/oferta', oferta: '#/mercado/oferta' };
@@ -31,7 +42,7 @@ export function blocoMercadoHoje(D, h) {
   if (!m) return '';
   const itens = itensHoje(D, h).filter((x) => x.id !== 'fisico').slice(0, 4);
   return `<section class="cartao hoje">
-    <div class="cartao-cab"><span class="rotulo">Mercado hoje</span><span class="mini">Atualizado ${esc(m.atualizado)}</span></div>
+    <div class="cartao-cab"><span class="rotulo">Mercado hoje</span><span class="mini" title="${esc(m.atualizado)}">Atualizado ${esc(quando(m.atualizado))}</span></div>
     <div class="hoje-grade">${itens.map((x) => `
       <a class="hoje-quadro ${x.efeito}" href="${DESTINO[x.id] || '#/mercado/hoje'}">
         <span class="hoje-rot">${esc(x.rotulo)}</span>
@@ -39,7 +50,7 @@ export function blocoMercadoHoje(D, h) {
         <span class="hoje-nota">${esc(x.nota)}</span>
       </a>`).join('')}
     </div>
-    ${m.fato ? `<a class="fato-linha" href="#/mercado/hoje"><span class="fato-tag">Fato do dia</span><span>${esc(m.fato.titulo)}</span></a>` : ''}
+    ${m.fato ? `<div class="fato-linha"><a href="#/mercado/hoje"><span class="fato-tag">Fato do dia</span><span>${esc(m.fato.titulo)}</span></a><button class="fato-enviar" data-compartilhar="fato" aria-label="Enviar o fato do dia no WhatsApp">${h.ic(h.I.enviar)}</button></div>` : ''}
     ${h.patrocinio ? h.patrocinio('mercado-hoje') : ''}
   </section>`;
 }
@@ -53,7 +64,7 @@ export function blocoMercadoFisico(D, h) {
     <div class="cartao-cab"><span class="rotulo">Mercado físico · diário</span><span class="pilula pilula-verde">Hoje</span></div>
     <b style="font-size:18px;line-height:1.3">Quanto o mercado está pagando hoje?</b>
     <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">IEA e Conab mostram médias oficiais. O preço de negócio muda todo dia conforme o comprador, a qualidade e o volume. Peça o preço do dia direto com o Helder.</p>
-    <a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Receber o preço do mercado físico</a>
+    <a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener" data-ev="fisico">${ic(I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Receber o preço do mercado físico</a>
     <span class="mini" style="text-align:center">Resposta pelo WhatsApp · sem compromisso</span>
   </section>`;
 }
@@ -66,7 +77,7 @@ export function blocoMercadoHojeDetalhe(D, h) {
   const itens = itensHoje(D, h);
   return `${blocoMercadoFisico(D, h)}
   <section class="cartao" id="sec-hoje">
-    <div class="cartao-cab"><span class="rotulo">Mercado hoje · o que mudou</span><span class="mini">${esc(m.atualizado)}</span></div>
+    <div class="cartao-cab"><span class="rotulo">Mercado hoje · o que mudou</span><span class="mini">Atualizado ${esc(quando(m.atualizado))} · ${esc(m.atualizado)}</span></div>
     <div class="hoje-lista">${itens.map((x) => `
       <details class="hoje-item">
         <summary>
@@ -77,7 +88,7 @@ export function blocoMercadoHojeDetalhe(D, h) {
         <p>${esc(x.detalhe)}${h.linkSeguro(x.link) ? ` <a class="link-mini" href="${esc(x.link)}" target="_blank" rel="noopener">Ver na fonte</a>` : ''}</p>
       </details>`).join('')}
     </div>
-    ${m.fato ? `<div class="fato"><span class="fato-tag">Fato do dia</span><b>${esc(m.fato.titulo)}</b><span>${esc(m.fato.texto)}</span></div>` : ''}
+    ${m.fato ? `<div class="fato"><span class="fato-tag">Fato do dia</span><b>${esc(m.fato.titulo)}</b><span>${esc(m.fato.texto)}</span><button class="link-enviar" data-compartilhar="fato">${h.ic(h.I.enviar)}Enviar no WhatsApp</button></div>` : ''}
     <span class="mini legenda-ef">${seta(h, 'alta')} sustenta o preço · ${seta(h, 'baixa')} pressiona · toque para ver o porquê</span>
   </section>`;
 }
@@ -97,8 +108,8 @@ export function blocoOportunidades(D, h) {
       </a>`).join('')}
     </div>
     <div class="duas-acoes">
-      ${vender ? `<a class="btn btn-verde btn-pequeno" href="${vender}" target="_blank" rel="noopener">Quero vender</a>` : ''}
-      ${comprar ? `<a class="btn btn-escuro btn-pequeno" href="${comprar}" target="_blank" rel="noopener">Quero comprar</a>` : ''}
+      ${vender ? `<a class="btn btn-verde btn-pequeno" href="${vender}" target="_blank" rel="noopener" data-ev="vender">Quero vender</a>` : ''}
+      ${comprar ? `<a class="btn btn-escuro btn-pequeno" href="${comprar}" target="_blank" rel="noopener" data-ev="comprar">Quero comprar</a>` : ''}
     </div>
     <span class="mini">A outra parte não aparece: o contato e a negociação passam pela Amendoim Brasil.</span>
   </section>`;
@@ -135,7 +146,57 @@ export function telaAlertas(D, h) {
   <section class="cartao" style="gap:0;padding:4px 16px">
     ${tipos.map(([t, d]) => `<label class="alerta-linha"><span class="cresce"><b>${esc(t)}</b><small>${esc(d)}</small></span><input type="checkbox" disabled aria-label="${esc(t)}"><span class="chave" aria-hidden="true"></span></label>`).join('')}
   </section>
-  ${grupo ? `<a class="btn btn-verde" href="${esc(grupo)}" target="_blank" rel="noopener">${ic(I.grupo, 'style="width:20px;height:20px;stroke:#fff"')}Entrar no grupo do WhatsApp</a>` : ''}`;
+  ${grupo ? `<a class="btn btn-verde" href="${esc(grupo)}" target="_blank" rel="noopener" data-ev="grupo">${ic(I.grupo, 'style="width:20px;height:20px;stroke:#fff"')}Entrar no grupo do WhatsApp</a>` : ''}`;
+}
+
+// ---------- NÚMEROS (só para o Helder, com chave) ----------
+export function telaNumeros(h) {
+  const { esc, ic, I } = h;
+  let k = '';
+  try { k = localStorage.getItem('ab-chave-numeros') || ''; } catch (e) { /* sem armazenamento */ }
+  return `<header class="topo">
+    <a class="link-mini" href="#/inicio" style="display:flex;align-items:center;gap:4px">${ic(I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Início</a>
+    <div><h1>Números do app</h1><div class="sub">Acessos e cliques por dia (sem dados pessoais)</div></div>
+  </header>
+  <form id="form-numeros" class="cartao" style="gap:10px">
+    <label class="rotulo" for="chave-numeros">Chave de acesso</label>
+    <div style="display:flex;gap:8px"><input id="chave-numeros" type="password" autocomplete="off" value="${esc(k)}" style="flex:1"><button class="btn btn-verde btn-pequeno" type="submit">Ver</button></div>
+  </form>
+  <div id="numeros-saida"></div>`;
+}
+
+const COLUNAS = [
+  ['aparelho-dia', 'Aparelhos'], ['aparelho-novo', 'Novos'], ['voltou', 'Voltaram'], ['abriu', 'Aberturas'],
+  ['fisico', 'Mercado físico'], ['vender', 'Vender'], ['comprar', 'Comprar'], ['compartilhar', 'Enviou'], ['pdf', 'PDF'], ['grupo', 'Grupo']
+];
+const somaPref = (dia, pref) => Object.entries(dia || {}).reduce((s, [k, v]) => (k === pref || k.startsWith(pref + '-') ? s + v : s), 0);
+
+export function desenharNumeros(dados, h) {
+  const { numBr } = h;
+  const dias = Object.keys(dados || {}).sort().reverse().slice(0, 30);
+  if (!dias.length) return '<div class="vazio">Ainda não há números. Eles começam a aparecer quando o app oficial for aberto.</div>';
+  const ult7 = dias.slice(0, 7);
+  const tot = (pref) => ult7.reduce((s, d) => s + somaPref(dados[d], pref), 0);
+  const abas = {};
+  dias.slice(0, 7).forEach((d) => Object.entries(dados[d]).forEach(([k, v]) => { if (k.startsWith('aba-')) abas[k.slice(4)] = (abas[k.slice(4)] || 0) + v; }));
+  return `<section class="cartao">
+    <div class="cartao-cab"><span class="rotulo">Últimos 7 dias</span></div>
+    <div class="placares">
+      <div class="placar"><span>Aparelhos por dia (média)</span><b class="num">${numBr(tot('aparelho-dia') / ult7.length, 1)}</b></div>
+      <div class="placar"><span>Pedidos de preço físico</span><b class="num">${numBr(tot('fisico'))}</b></div>
+      <div class="placar"><span>Vender + comprar</span><b class="num">${numBr(tot('vender') + tot('comprar'))}</b></div>
+      <div class="placar"><span>Envios no WhatsApp</span><b class="num">${numBr(tot('compartilhar') + tot('pdf'))}</b></div>
+    </div>
+    ${Object.keys(abas).length ? `<span class="mini">Abas mais abertas: ${Object.entries(abas).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} (${numBr(v)})`).join(' · ')}</span>` : ''}
+  </section>
+  <section class="cartao">
+    <div class="cartao-cab"><span class="rotulo">Dia a dia</span></div>
+    <div class="tabela-rolar"><table class="tabela">
+      <thead><tr><th>Dia</th>${COLUNAS.map(([, t]) => `<th>${t}</th>`).join('')}</tr></thead>
+      <tbody>${dias.map((d) => `<tr><th>${d.slice(8, 10)}/${d.slice(5, 7)}</th>${COLUNAS.map(([k]) => `<td>${numBr(somaPref(dados[d], k))}</td>`).join('')}</tr>`).join('')}</tbody>
+    </table></div>
+    <span class="mini">Aparelhos = celulares diferentes que abriram o app no dia. Voltaram = já tinham aberto antes.</span>
+  </section>`;
 }
 
 // ---------- MERCADO ----------
@@ -203,7 +264,7 @@ export function blocoExportacao(D, h) {
       <span class="mini">Participação no volume de grão exportado em ${esc(e.periodo)}.</span>
     </details>
     ${e.fonte ? `<span class="mini">Fonte: ${h.linkSeguro(e.fonteLink) ? `<a class="link-mini" href="${esc(e.fonteLink)}" target="_blank" rel="noopener">${esc(e.fonte)}</a>` : esc(e.fonte)}</span>` : ''}
-    <a href="#/mercado/consultoria" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
+    <a href="${h.wa('Olá Helder, quero assinar a consultoria para ver a paridade de exportação em R$/saca.') || '#/mercado/consultoria'}" target="_blank" rel="noopener" data-ev="assinar" class="trava">${ic(I.cadeado, 'style="width:18px;height:18px"')}<span class="cresce"><b>Paridade de exportação em R$/saca</b><span class="mini">Exclusivo para assinantes</span></span><span class="link-mini">Assinar</span></a>
   </section>`;
 }
 
@@ -237,6 +298,7 @@ export function cartaoTermometroDetalhe(D, h, medidor) {
     </div>
     <span class="mini">${ic(I.sobe, 'style="width:12px;height:12px;stroke:#007731;stroke-width:2.6;vertical-align:-1px"')} segura o preço · ${ic(I.cai, 'style="width:12px;height:12px;stroke:#B3261E;stroke-width:2.6;vertical-align:-1px"')} pressiona · toque no fator para ver os dados</span>
     <span class="mini" style="font-weight:600">Helder Lamberti · Amendoim Brasil</span>
+    <span class="mini aviso-rec">Leitura de mercado, não é recomendação de compra ou venda.</span>
   </section>`;
 }
 
@@ -247,7 +309,7 @@ export function seloPatrocinio(D, local, h) {
   const { esc, linkSeguro } = h;
   const p = (D.patrocinadores || []).find((x) => (x.locais || []).includes(local));
   if (!p) return '';
-  if (p.exemplo || !p.logo) return `<div class="patrocinio vago"><span>Oferecimento</span><b>Espaço para patrocinador</b></div>`;
+  if (p.exemplo || !p.logo) return '';
   const href = linkSeguro(p.link);
   const dentro = `<span>Oferecimento</span><img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
   return href ? `<a class="patrocinio" href="${esc(href)}" target="_blank" rel="noopener sponsored">${dentro}</a>` : `<div class="patrocinio">${dentro}</div>`;
@@ -260,7 +322,7 @@ export function blocoPatrocinadores(D, h) {
   return `<section class="parceiros">
     <span class="rotulo">Patrocinadores</span>
     <div class="patro-grade">${lista.map((p) => {
-      if (p.exemplo || !p.logo) return '<span class="parceiro vago">Seu logo aqui</span>';
+      if (p.exemplo || !p.logo) { const z = h.wa('Olá Helder, quero anunciar a minha empresa no app Amendoim Brasil.'); return z ? `<a class="parceiro vago" href="${z}" target="_blank" rel="noopener" data-ev="anunciar">Anuncie aqui</a>` : ''; }
       const href = linkSeguro(p.link);
       const img = `<img src="${esc(p.logo)}" alt="${esc(p.nome)}">`;
       return href ? `<a class="parceiro" href="${esc(href)}" target="_blank" rel="noopener sponsored">${img}</a>` : `<span class="parceiro">${img}</span>`;
