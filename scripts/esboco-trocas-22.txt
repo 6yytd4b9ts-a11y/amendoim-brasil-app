@@ -1,0 +1,10 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v31';
+=======
+const VERSAO = 'ab-v32';
+>>>>>>>
+<<<<<<< public/auth.js
+  setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - ultimoToque < 60000) reg('beat'); }, 30000);
+=======
+  setInterval(() => { if (document.visibilityState === 'visible' && Date.now() - ultimoToque < 60000) reg('beat', telaAtual()); }, 30000); // cada batida diz em que tela a pessoa está
+>>>>>>>
