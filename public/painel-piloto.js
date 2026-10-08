@@ -263,6 +263,70 @@ function abaOpinioes() {
   </section>`;
 }
 
+// ---------- aba Pessoas: quem está ativo, quem foi cortado e o prazo de cada um ----------
+const ETAPAS = {
+  agora: ['Acessou há pouco', 'background:#DDF0E1;color:#0B5E2B'],
+  ativo: ['Ativo', 'background:#E6F2E9;color:#0B5E2B'],
+  pediu: ['Pediu o código, ainda não entrou', 'background:#FBF1DC;color:#5C3A06'],
+  convidado: ['Convidado, ainda não pediu código', 'background:#E4EDF7;color:#1F4E79'],
+  vencido: ['Prazo vencido', 'background:#FBE3E0;color:#B3261E'],
+  cortado: ['Acesso cortado', 'background:#FBE3E0;color:#B3261E']
+};
+const ORDEM_ETAPA = ['agora', 'ativo', 'pediu', 'convidado', 'vencido', 'cortado'];
+function etapaDe(c) {
+  if (!c.ativo) return 'cortado';
+  if (c.expira_em && new Date(c.expira_em) < new Date()) return 'vencido';
+  const ult = c.ultimo_acesso ? new Date(c.ultimo_acesso).getTime() : 0;
+  if (ult && Date.now() - ult < 15 * 60000) return 'agora';
+  if (c.entrou || ult) return 'ativo';
+  if (c.ultimo_pedido) return 'pediu';
+  return 'convidado';
+}
+const dataBR = (iso) => new Date(iso).toLocaleDateString('pt-BR');
+function linhaPessoa(c) {
+  const k = etapaDe(c), [rot, cor] = ETAPAS[k];
+  const prazo = c.expira_em ? String(c.expira_em).slice(0, 10) : '';
+  const info = [fmtCel(c.celular), c.expira_em ? (k === 'vencido' ? 'venceu em ' : 'acesso até ') + dataBR(c.expira_em) : 'sem prazo',
+    c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : c.ultimo_pedido ? 'pediu o código ' + quando(c.ultimo_pedido) : ''].filter(Boolean).join(' · ');
+  const corta = est.cortando === c.id;
+  return `<section class="cartao" data-pp-linha="${esc(c.id)}" style="gap:8px">
+    <div style="display:flex;gap:8px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><b style="font-size:16px">${esc(c.nome)}</b><span style="${cor};font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px">${rot}</span></div>
+    <span class="mini">${esc(info)}${c.observacao ? ' · ' + esc(c.observacao) : ''}</span>
+    ${corta
+      ? `<span class="es-txt">Cortar o acesso de <b>${esc(c.nome)}</b> agora? Ele sai do app na hora e não consegue pedir outro código.</span>
+         <div class="es-botoes"><button class="btn btn-pequeno btn-perigo" type="button" data-pp-cortar-sim="${esc(c.id)}">Sim, cortar o acesso</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-cortar-nao>Cancelar</button></div>`
+      : `<div class="es-botoes">${c.ativo
+          ? `<button class="chip" type="button" data-pp-cortar="${esc(c.id)}" style="color:#B3261E;border-color:#E3B5B0">Cortar acesso</button>`
+          : `<button class="chip" type="button" data-pp-reativar="${esc(c.id)}" style="color:#0B5E2B;border-color:#9CC9A8">Reativar acesso</button>`}
+         <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a>
+         <button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar tudo</button></div>
+         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label class="mini" for="pp-prazo-${esc(c.id)}" style="font-weight:700">Acesso até</label>
+           <input id="pp-prazo-${esc(c.id)}" type="date" value="${esc(prazo)}" style="height:40px;border:1.5px solid var(--borda);border-radius:10px;padding:0 8px;font:inherit;font-size:15px;background:#fff">
+           <button class="chip" type="button" data-pp-prazo="${esc(c.id)}">Salvar prazo</button>${c.expira_em ? `<button class="chip" type="button" data-pp-prazo-limpar="${esc(c.id)}">Sem prazo</button>` : ''}</div>`}
+  </section>`;
+}
+function abaPessoas(convs) {
+  const por = (...ks) => convs.filter((c) => ks.includes(etapaDe(c))).length;
+  const ord = [...convs].sort((a, b) => ORDEM_ETAPA.indexOf(etapaDe(a)) - ORDEM_ETAPA.indexOf(etapaDe(b)) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
+  return `<section class="cartao" style="gap:10px"><div class="cartao-cab"><span class="rotulo">Quem tem acesso</span><button class="chip" type="button" data-pp-recarregar>Atualizar</button></div>
+    <div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Já entraram', por('agora', 'ativo'), `de ${convs.length}`)}${tile('Aguardando', por('pediu', 'convidado'), 'ainda não entrou')}${tile('Cortados', por('cortado', 'vencido'), 'sem acesso')}</div>
+    <span class="mini">Cortar tira o acesso na hora, mas a pessoa continua na lista e você pode reativar. O prazo encerra o acesso sozinho na data escolhida (fim do dia).</span>
+    ${est.pMsg ? `<div class="mini" role="status" style="font-weight:700">${esc(est.pMsg)}</div>` : ''}</section>
+  ${ord.map(linhaPessoa).join('') || '<div class="vazio">Ninguém foi convidado ainda. Use a aba Convidar.</div>'}`;
+}
+async function mudarPessoa(id, m, ok) {
+  const c = (est.dados?.convidados || []).find((y) => y.id === id);
+  if (!c) return;
+  est.cortando = null; est.pMsg = 'Salvando…'; redesenhar();
+  const r = await chamar('admin_salvar', { nome: c.nome, celular: c.celular, plano: c.plano, papel: c.papel || 'usuario', ativo: c.ativo, expira_em: c.expira_em, observacao: c.observacao || '', ...m });
+  if (r.ok) {
+    const [l, u] = await Promise.all([chamar('admin_listar'), chamar('admin_uso')]);
+    if (l.ok) est.dados = l; if (u.ok) est.uso = u;
+    est.pMsg = `${c.nome}: ${ok}`;
+  } else est.pMsg = r.mensagem || 'Não foi possível salvar agora.';
+  redesenhar();
+}
+
 function abaConvidar(convs) {
   const e = est.editando;
   return `${blocoConvite()}
@@ -285,7 +349,7 @@ function abaConvidar(convs) {
 }
 
 // ---------- a aba ----------
-const SUBS = [['codigos', 'Códigos'], ['convidar', 'Convidar'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
+const SUBS = [['codigos', 'Códigos'], ['pessoas', 'Acessos'], ['convidar', 'Convidar'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
 export function telaTeste() {
   if (!est.dados) return `<section class="cartao"><div class="vazio">${est.erro ? `${esc(est.erro)} <button class="link-mini" type="button" data-pp-recarregar>Tentar de novo</button>` : 'Carregando…'}</div></section>`;
   clearInterval(timer);
@@ -333,6 +397,7 @@ export function telaTeste() {
       <span class="mini">Campos em branco mantêm o valor que já está salvo.</span>
     </form>
   </details>`;
+  else if (est.sub === 'pessoas') corpo = abaPessoas(convs);
   else if (est.sub === 'convidar') corpo = abaConvidar(convs);
   else if (est.sub === 'uso') corpo = abaUso(convs, usoPor);
   else corpo = abaOpinioes();
@@ -489,6 +554,20 @@ export function ligarPainelPiloto(desenhar, getChave) {
     if ((x = t.closest('[data-pp-editar]'))) {
       est.editando = (est.dados?.convidados || []).find((c) => c.id === x.dataset.ppEditar) || null; est.msg = ''; est.sub = 'convidar';
       redesenhar(); document.getElementById('pp-det-novo')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
+    }
+    if ((x = t.closest('[data-pp-cortar]'))) { est.cortando = x.dataset.ppCortar; est.pMsg = ''; redesenhar(); return; }
+    if (t.closest('[data-pp-cortar-nao]')) { est.cortando = null; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-cortar-sim]'))) { x.disabled = true; await mudarPessoa(x.dataset.ppCortarSim, { ativo: false }, 'acesso cortado.'); return; }
+    if ((x = t.closest('[data-pp-reativar]'))) {
+      const c = (est.dados?.convidados || []).find((y) => y.id === x.dataset.ppReativar);
+      const vencido = c?.expira_em && new Date(c.expira_em) < new Date();
+      x.disabled = true; await mudarPessoa(x.dataset.ppReativar, vencido ? { ativo: true, expira_em: null } : { ativo: true }, vencido ? 'acesso reativado (o prazo vencido foi retirado).' : 'acesso reativado.'); return;
+    }
+    if ((x = t.closest('[data-pp-prazo-limpar]'))) { x.disabled = true; await mudarPessoa(x.dataset.ppPrazoLimpar, { expira_em: null }, 'sem prazo.'); return; }
+    if ((x = t.closest('[data-pp-prazo]'))) {
+      const dia = document.getElementById('pp-prazo-' + x.dataset.ppPrazo)?.value;
+      if (!dia) { est.pMsg = 'Escolha a data primeiro.'; redesenhar(); return; }
+      x.disabled = true; await mudarPessoa(x.dataset.ppPrazo, { expira_em: dia + 'T23:59:59-03:00' }, 'acesso até ' + dia.split('-').reverse().join('/') + '.'); return;
     }
     if (t.closest('[data-pp-cancelar]')) { est.editando = null; est.novo = false; est.msg = ''; redesenhar(); return; }
     if ((x = t.closest('[data-pp-piloto]'))) {

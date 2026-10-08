@@ -318,10 +318,13 @@ async function admin(req: Request, b: any) {
     const c = await cfg();
     const nomes: Record<string, string> = {};
     (convs ?? []).forEach((x: any) => (nomes[x.celular] = x.nome));
+    const { data: peds } = await db.from("codigos_login").select("celular, criado_em").order("criado_em", { ascending: false }).limit(500);
+    const ultPedido: Record<string, string> = {};
+    (peds ?? []).forEach((x: any) => { if (!ultPedido[x.celular]) ultPedido[x.celular] = x.criado_em; });
     return resp(req, 200, {
       ok: true,
       piloto: pilotoDe(c),
-      convidados: (convs ?? []).map((x: any) => ({ ...x, ultimo_acesso: x.perfis?.[0]?.ultimo_acesso ?? x.perfis?.ultimo_acesso ?? null, perfis: undefined })),
+      convidados: (convs ?? []).map((x: any) => ({ ...x, ultimo_acesso: x.perfis?.[0]?.ultimo_acesso ?? x.perfis?.ultimo_acesso ?? null, entrou: Array.isArray(x.perfis) ? x.perfis.length > 0 : !!x.perfis, ultimo_pedido: ultPedido[x.celular] ?? null, perfis: undefined })),
       codigos: (pend ?? []).map((x: any) => ({ celular: x.celular, nome: nomes[x.celular] ?? "", codigo: x.codigo_manual, criado_em: x.criado_em, expira_em: x.expira_em })),
       whatsapp: { provedor: c.whatsapp_provedor || "manual" },
     });
