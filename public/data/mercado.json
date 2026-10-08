@@ -50,28 +50,44 @@
   "ofertaDemanda": [
     {
       "nome": "Oferta de casca",
-      "escala": ["Baixa", "Média", "Alta"],
+      "escala": [
+        "Baixa",
+        "Média",
+        "Alta"
+      ],
       "nivel": 1,
       "efeito": "neutro",
       "detalhe": "Oferta equilibrada na entressafra: tem produto, mas sem pressão de venda."
     },
     {
       "nome": "Demanda industrial",
-      "escala": ["Fraca", "Normal", "Forte"],
+      "escala": [
+        "Fraca",
+        "Normal",
+        "Forte"
+      ],
       "nivel": 0,
       "efeito": "baixa",
       "detalhe": "Indústrias comprando só o necessário para as próximas semanas, esperando o preço ceder."
     },
     {
       "nome": "Exportação",
-      "escala": ["Fraca", "Normal", "Forte"],
+      "escala": [
+        "Fraca",
+        "Normal",
+        "Forte"
+      ],
       "nivel": 2,
       "efeito": "alta",
       "detalhe": "Embarques 16% acima de 2025 no acumulado até setembro, apesar de setembro mais fraco."
     },
     {
       "nome": "Disponibilidade de produto",
-      "escala": ["Baixa", "Média", "Alta"],
+      "escala": [
+        "Baixa",
+        "Média",
+        "Alta"
+      ],
       "nivel": 1,
       "efeito": "neutro",
       "detalhe": "Lotes disponíveis em volume médio; produto de boa qualidade ainda consegue prêmio."
@@ -103,20 +119,94 @@
     "ritmo": "O primeiro semestre e julho puxaram o acumulado; agosto e setembro vieram abaixo de 2025, típico da entressafra.",
     "mensal": {
       "exemplo": false,
-      "meses": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set"],
-      "atual": [24184, 17741, 18882, 23370, 30733, 39657, 34262, 26460, 25544],
-      "anterior": [21356, 13005, 15091, 23620, 23544, 20094, 32317, 29580, 29640]
+      "meses": [
+        "jan",
+        "fev",
+        "mar",
+        "abr",
+        "mai",
+        "jun",
+        "jul",
+        "ago",
+        "set"
+      ],
+      "atual": [
+        24184,
+        17741,
+        18882,
+        23370,
+        30733,
+        39657,
+        34262,
+        26460,
+        25544
+      ],
+      "anterior": [
+        21356,
+        13005,
+        15091,
+        23620,
+        23544,
+        20094,
+        32317,
+        29580,
+        29640
+      ]
     },
     "destinos": {
       "exemplo": false,
       "lista": [
-        ["Rússia", 28.6],
-        ["Argélia", 17.8],
-        ["África do Sul", 9.1],
-        ["Holanda", 7.3],
-        ["Egito", 5.2],
-        ["Outros", 32.0]
+        [
+          "Rússia",
+          28.6
+        ],
+        [
+          "Argélia",
+          17.8
+        ],
+        [
+          "África do Sul",
+          9.1
+        ],
+        [
+          "Holanda",
+          7.3
+        ],
+        [
+          "Egito",
+          5.2
+        ],
+        [
+          "Outros",
+          32.0
+        ]
       ]
     }
-  }
+  },
+  "noticias": [
+    {
+      "id": "2026-10-08-usda",
+      "dia": "2026-10-08",
+      "titulo": "Colheita nos EUA já passa de 20% da área, quase o dobro de 2025",
+      "fonte": "USDA · Crop Progress",
+      "link": "https://www.nass.usda.gov/Publications/National_Crop_Progress/",
+      "texto": "O USDA informou 23% do amendoim americano colhido em 04/10, contra 12% na mesma data de 2025, com 57% das lavouras em condição boa ou excelente. A colheita adiantada põe o produto novo deles no mercado mais cedo. O que pesa para o preço aqui não é o ritmo, é o tamanho da safra americana, que vem menor este ano."
+    },
+    {
+      "id": "2026-10-07-argentina",
+      "dia": "2026-10-07",
+      "titulo": "Argentina deve plantar 8% menos amendoim na safra 26/27",
+      "fonte": "Bolsa de Cereales de Córdoba",
+      "link": "",
+      "texto": "O primeiro levantamento da Bolsa de Cereales de Córdoba aponta área 8% menor para a safra 26/27. A colheita atrasada da safra atual afetou a qualidade e deixa a oferta argentina curta até janeiro. Para o Brasil, menos amendoim argentino significa menos concorrência na Europa, o principal destino dos dois países, e ajuda a sustentar o preço da casca por aqui."
+    },
+    {
+      "id": "2026-10-06-conab",
+      "dia": "2026-10-06",
+      "titulo": "Conab divulga o 1º levantamento da safra 26/27 em 15/10",
+      "fonte": "Conab",
+      "link": "https://www.conab.gov.br/info-agro/safras",
+      "texto": "No dia 15 de outubro a Conab publica a primeira estimativa oficial de área e produção de amendoim da safra 26/27. O mercado espera a confirmação de área menor em São Paulo. Se o corte vier abaixo de 25%, reforça a leitura de oferta apertada e preço firme; se vier mais forte, pode mexer no preço já na semana seguinte."
+    }
+  ]
 }
