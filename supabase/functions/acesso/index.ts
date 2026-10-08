@@ -450,6 +450,29 @@ async function admin(req: Request, b: any) {
     await registra(uid, "admin_zerar_uso", b.opinioes === true ? "com opiniões" : "só uso");
     return resp(req, 200, { ok: true, desde, opinioes });
   }
+  if (acao === "admin_excluir") {
+    // Apaga um convidado de vez (ex.: cadastro de teste): conta de login, uso, opiniões, áudios e códigos. Administrador não pode ser apagado.
+    const id = String(b.id ?? "");
+    const { data: c } = await db.from("convidados").select("id, celular, nome, papel, perfis(user_id)").eq("id", id).maybeSingle();
+    if (!c) return resp(req, 404, { ok: false, mensagem: "Convidado não encontrado." });
+    if ((c as any).papel === "admin") return resp(req, 403, { ok: false, mensagem: "O administrador não pode ser apagado." });
+    const uids = ((Array.isArray((c as any).perfis) ? (c as any).perfis : (c as any).perfis ? [(c as any).perfis] : []).map((p: any) => p.user_id).filter(Boolean)) as string[];
+    if (uids.length) {
+      const { data: fb } = await db.from("feedback").select("audio_path").in("user_id", uids);
+      const caminhos = (fb ?? []).map((f: any) => f.audio_path).filter(Boolean) as string[];
+      if (caminhos.length) await db.storage.from("feedback-audio").remove(caminhos);
+      await db.from("feedback").delete().in("user_id", uids);
+      await db.from("uso").delete().in("user_id", uids);
+      await db.from("acessos").delete().in("user_id", uids);
+      await db.from("perfis").delete().in("user_id", uids);
+      for (const u of uids) await db.auth.admin.deleteUser(u).catch(() => {});
+    }
+    await db.from("codigos_login").delete().eq("celular", (c as any).celular);
+    const { error } = await db.from("convidados").delete().eq("id", id);
+    if (error) return resp(req, 500, { ok: false, mensagem: "Não foi possível apagar agora." });
+    await registra(uid, "admin_excluir", `${String((c as any).celular).slice(-4)} ${(c as any).nome}`.slice(0, 200));
+    return resp(req, 200, { ok: true });
+  }
   if (acao === "admin_audio") {
     const { data: f } = await db.from("feedback").select("audio_path").eq("id", Number(b.id) || -1).maybeSingle();
     if (!f?.audio_path) return resp(req, 404, { ok: false, mensagem: "Áudio não encontrado." });

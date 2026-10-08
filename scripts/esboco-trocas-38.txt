@@ -1,0 +1,34 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v47';
+=======
+const VERSAO = 'ab-v48';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+        <input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''} hidden></div>` : ''}
+=======
+        <input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''} hidden></div>` : ''}
+      ${e && e.papel !== 'admin' ? `<div class="cartao" style="background:#FDF3F1;border-color:#E3B5B0;gap:6px;padding:12px"><span class="rotulo" style="color:#8E1F15">Apagar de vez</span>
+        ${est.apagando === e.id
+          ? `<span class="es-txt">Apagar <b>${esc(e.nome)}</b> do painel? Some da lista e do Uso, junto com o uso registrado e as opiniões dele. <b>Não dá para desfazer.</b></span>
+             <div class="es-botoes"><button class="btn btn-pequeno btn-perigo" type="button" data-pp-ed-apagar-sim>Sim, apagar de vez</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-ed-apagar-nao>Cancelar</button></div>`
+          : `<span class="mini">Para cadastros de teste ou feitos por engano. Para só tirar o acesso, use o botão acima.</span><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-ed-apagar style="align-self:flex-start;color:#B3261E;border-color:#E3B5B0">Apagar este convidado</button>`}</div>` : ''}
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    if ((x = t.closest('[data-pp-ed-ativo]'))) {
+=======
+    if (t.closest('[data-pp-ed-apagar]')) { est.apagando = est.editando?.id || null; redesenhar(); return; }
+    if (t.closest('[data-pp-ed-apagar-nao]')) { est.apagando = null; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-ed-apagar-sim]'))) {
+      const ed = est.editando; if (!ed || est.apagando !== ed.id) return;
+      x.disabled = true; x.textContent = 'Apagando…';
+      const r = await chamar('admin_excluir', { id: ed.id });
+      est.apagando = null;
+      if (r.ok) {
+        est.editando = null; est.novo = false; est.abertos.delete(ed.id); est.sub = 'pessoas'; est.pMsg = `${ed.nome}: apagado do painel.`;
+        const [l, u] = await Promise.all([chamar('admin_listar'), chamar('admin_uso')]);
+        if (l.ok) est.dados = l; if (u.ok) est.uso = u;
+      } else est.msg = r.mensagem || 'Não foi possível apagar agora.';
+      redesenhar(); return;
+    }
+    if ((x = t.closest('[data-pp-ed-ativo]'))) {
+>>>>>>>
