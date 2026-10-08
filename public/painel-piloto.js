@@ -105,9 +105,10 @@ const rankToques = (l) => rankBarras((l || []).map(([k, n]) => ({ rot: esc(k), n
 
 // ---------- convite pelo WhatsApp ----------
 const primeiroNome = (n) => String(n || '').trim().split(/\s+/)[0] || '';
-const msgConvite = (nome) => `Olá${primeiroNome(nome) ? ', ' + primeiroNome(nome) : ''}! Você foi escolhido para testar o Amendoim Brasil antes de todo mundo.\n\n1) Abra este link: ${SITE}\n2) Digite o seu celular e peça o código.\n3) O código chega para você aqui no WhatsApp, em seguida.\n\nNo iPhone, abra pelo Safari. Qualquer dúvida, é só responder esta mensagem.`;
+const dataMsg = (d) => (!d ? '' : /^\d{4}-\d\d-\d\d$/.test(d) ? d.split('-').reverse().join('/') : new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+const msgConvite = (nome, ate) => `${primeiroNome(nome) || 'Olá'}, aqui está o acesso ao teste do app Amendoim Brasil:\n${SITE}\n\nComo entrar:\n\n1. Abra o link e digite o seu celular.\n2. Peça o código e eu te envio na hora.\n3. Coloque o app na tela inicial, que ele fica igual a um aplicativo. Ele mesmo te ensina a fazer isso assim que você abrir.\n\nSua opinião é muito importante. Estou trazendo clientes e amigos que vão dar opinião sincera, criticar o que não estiver legal e me ajudar a melhorar antes do lançamento. Manda tudo pelo botão Opinar, até o que parecer bobeira.\n${ate ? `O teste vai até ${dataMsg(ate)}. ` : 'O teste '}${ate ? 'É' : 'é'} fechado: sem prints, sem gravar a tela e sem comentar com ninguém.\nObrigado por fazer parte.`;
 const celConvite = () => { const d = String(est.inv.cel || '').replace(/\D/g, ''); const n = d.length === 10 || d.length === 11 ? '55' + d : d; return n.length >= 12 && n.length <= 13 ? n : ''; };
-const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome));
+const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome, ateConvite()));
 const linkConvite = () => { const n = celConvite(); return n ? `https://wa.me/${n}?text=${encodeURIComponent(textoConvite())}` : '#'; };
 const mais21 = () => new Date(Date.now() + 21 * 864e5).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
 const ateConvite = () => (est.inv.ate === null ? mais21() : est.inv.ate);
@@ -356,7 +357,7 @@ function linhaPessoa(c) {
       : `<div class="es-botoes">${c.ativo
           ? `<button class="chip" type="button" data-pp-cortar="${esc(c.id)}" style="color:#B3261E;border-color:#E3B5B0">Cortar acesso</button>`
           : `<button class="chip" type="button" data-pp-reativar="${esc(c.id)}" style="color:#0B5E2B;border-color:#9CC9A8">Reativar acesso</button>`}
-         <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a>
+         <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome, c.expira_em))}">Convite</a>
          <button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar tudo</button></div>
          <div style="display:flex;gap:8px;align-items:center"><span class="mini" style="font-weight:700">Plano</span><div class="segmento" role="group" aria-label="Plano de ${esc(c.nome)}" style="flex:1;max-width:280px"><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="produtor" aria-pressed="${c.plano !== 'empresa'}">Produtor</button><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="empresa" aria-pressed="${c.plano === 'empresa'}">Empresa</button></div></div>
          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label class="mini" for="pp-prazo-${esc(c.id)}" style="font-weight:700">Acesso até</label>
@@ -390,7 +391,7 @@ function abaConvidar(convs) {
   const e = est.editando;
   return `${blocoConvite()}
   <section class="cartao" style="gap:6px"><span class="rotulo">Convidados (${convs.length})</span>
-    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${rotPlano(c.plano)} · ${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
+    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${rotPlano(c.plano)} · ${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome, c.expira_em))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
   </section>
   <details class="cartao" id="pp-det-novo" ${e || est.novo ? 'open' : ''}><summary class="rotulo" style="cursor:pointer">${e ? 'Editar convidado' : '＋ Liberar um convidado (sem convite)'}</summary>
     <form id="pp-form" class="es-campos" style="margin-top:10px">
@@ -408,7 +409,7 @@ function abaConvidar(convs) {
 }
 
 // ---------- a aba ----------
-const SUBS = [['codigos', 'Códigos'], ['pessoas', 'Acessos'], ['convidar', 'Convidar'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
+const SUBS = [['convidar', 'Convidar'], ['codigos', 'Códigos'], ['pessoas', 'Acessos'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
 export function telaTeste() {
   if (!est.dados) return `<section class="cartao"><div class="vazio">${est.erro ? `${esc(est.erro)} <button class="link-mini" type="button" data-pp-recarregar>Tentar de novo</button>` : 'Carregando…'}</div></section>`;
   clearInterval(timer);
@@ -511,7 +512,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     else if (id === 'pp-inv-cel') i.cel = e.target.value;
     else if (id === 'pp-inv-ate') i.ate = e.target.value;
     else if (id === 'pp-inv-msg') { i.msg = e.target.value; i.editou = true; }
-    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome); }
+    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome, ateConvite()); }
     sincConvite();
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'pp-zerar-op') est.zerarOp = e.target.checked; });
