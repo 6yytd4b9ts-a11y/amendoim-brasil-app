@@ -1,0 +1,25 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v34';
+=======
+const VERSAO = 'ab-v35';
+>>>>>>>
+<<<<<<< public/index.html
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.4, viewport-fit=cover">
+>>>>>>>
+<<<<<<< public/app.js
+// App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
+=======
+// App Amendoim Brasil — sem dependências. Conteúdo vem de /data/*.json.
+// iPhone: na primeira vez que se vira o celular o Safari às vezes mantém a escala da tela em pé e a tabela fica grande demais.
+// Ao virar, a escala é fixada em 1 por um instante e depois solta de novo, então o zoom continua livre para o usuário.
+(() => {
+  const m = document.querySelector('meta[name=viewport]');
+  if (!m) return;
+  const livre = m.content; let t;
+  const acertar = () => { m.content = 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover'; clearTimeout(t); t = setTimeout(() => { m.content = livre; }, 400); };
+  addEventListener('orientationchange', acertar);
+  try { screen.orientation?.addEventListener('change', acertar); } catch (e) { /* sem suporte */ }
+})();
+>>>>>>>
