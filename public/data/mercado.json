@@ -1,13 +1,13 @@
 {
-  "atualizado": "07/10/2026",
+  "atualizado": "08/10/2026",
   "hoje": [
     {
       "id": "fisico",
       "rotulo": "Preço da casca",
-      "valor": "R$ 80,00",
-      "nota": "IEA · Tupã · 06/10 · +R$ 3,00",
-      "efeito": "alta",
-      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP): R$ 80,00 em 06/10, R$ 3,00 acima do dia anterior. No mesmo boletim, Marília R$ 79,00, Ribeirão Preto R$ 77,00 e Jaboticabal R$ 75,00. A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
+      "valor": "R$ 77,00",
+      "nota": "IEA · Tupã · 07/10 · −R$ 3,00",
+      "efeito": "baixa",
+      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP): R$ 77,00 em 07/10, R$ 3,00 abaixo do dia anterior. No mesmo boletim, Presidente Prudente R$ 80,00. A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
       "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
     },
     {
@@ -44,8 +44,8 @@
     }
   ],
   "fato": {
-    "titulo": "Argentina deve plantar 8% menos amendoim na safra 26/27",
-    "texto": "Primeiro levantamento argentino aponta área 8% menor. Menos amendoim argentino reduz a concorrência com o Brasil na Europa e ajuda a sustentar o preço da casca aqui."
+    "titulo": "Colheita nos EUA já passa de 20% da área, quase o dobro de 2025",
+    "texto": "O USDA informou 23% do amendoim americano colhido em 04/10, contra 12% na mesma data de 2025, com 57% das lavouras em condição boa ou excelente. A colheita adiantada põe o produto novo deles no mercado mais cedo; o que pesa para o preço aqui é o tamanho da safra americana, que vem menor este ano."
   },
   "ofertaDemanda": [
     {
