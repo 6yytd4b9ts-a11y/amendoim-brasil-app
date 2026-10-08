@@ -1,0 +1,32 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v39';
+=======
+const VERSAO = 'ab-v40';
+>>>>>>>
+<<<<<<< public/auth.js
+  const txt = s.plano === 'empresa' ? 'Central de Mercado, estimativas e histórico' : 'Estimativas, exportação e histórico';
+=======
+  const txt = s.plano === 'empresa' ? 'Painel de Mercado, estimativas e histórico' : 'Estimativas, exportação e histórico';
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <a class="btn btn-escuro btn-pequeno" href="#/terminal" style="align-self:flex-start">Abrir a Central de Mercado: mês a mês, por tipo e ranking</a>
+=======
+      <a class="btn btn-escuro btn-pequeno" href="#/terminal" style="align-self:flex-start">Abrir o Painel de Mercado: mês a mês, por tipo e ranking</a>
+>>>>>>>
+<<<<<<< public/terminal.js
+    <div><h1>Central de Mercado</h1><div class="sub">Análise do mercado: exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+=======
+    <div><h1>Painel de Mercado</h1><div class="sub">Análise do mercado: exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${empresa ? card('#/terminal', navio, 'Central de Mercado', 'Análise do mercado: exportação, preço por destino e por tipo, mundo') : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+=======
+  ${card('#/terminal', navio, 'Painel de Mercado', empresa ? 'Análise do mercado: exportação, preço por destino e por tipo, mundo' : 'Fechado no seu plano · exclusivo do plano Empresa', !empresa)}
+  ${empresa ? '' : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+>>>>>>>
+<<<<<<< public/terminal.js
+  if (!ok) return topo + cartaoExclusivo(h, 'A mesa de decisão de quem exporta', 'Exportação mês a mês com recorde e projeção, preço FOB por destino e por tipo de grão (cru, blancheado, banda, calibre), ranking de compradores e a leitura da Amendoim Brasil. Atualizado todo mês.', ['Tabela de 5 anos, estilo mesa de exportação', 'Preço por destino, mês a mês', 'Preço por tipo e calibre', 'Leitura de mercado da Amendoim Brasil'], '#/conta/planos', 'Conhecer o plano Empresa');
+=======
+  if (!ok && s?.remoto) return topo + cartaoExclusivo(h, 'Fechado no seu plano', 'O Painel de Mercado faz parte do plano Empresa. No seu acesso de teste (plano Produtor) esta área fica fechada. Se o seu plano for ampliado, ela abre aqui, sem precisar entrar de novo.', ['Exportação mês a mês, com recorde e projeção', 'Preço por destino e por tipo de grão', 'Ranking de compradores e leitura de mercado'], '#/mercado/consultoria', 'Voltar à minha área');
+  if (!ok) return topo + cartaoExclusivo(h, 'A mesa de decisão de quem exporta', 'Exportação mês a mês com recorde e projeção, preço FOB por destino e por tipo de grão (cru, blancheado, banda, calibre), ranking de compradores e a leitura da Amendoim Brasil. Atualizado todo mês.', ['Tabela de 5 anos, estilo mesa de exportação', 'Preço por destino, mês a mês', 'Preço por tipo e calibre', 'Leitura de mercado da Amendoim Brasil'], '#/conta/planos', 'Conhecer o plano Empresa');
+>>>>>>>

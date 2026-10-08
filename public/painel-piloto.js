@@ -25,7 +25,7 @@ const quando = (iso, vazio = 'nunca entrou') => {
   return m < 2 ? 'agora' : m < 60 ? `há ${m} min` : m < 1440 ? `há ${Math.round(m / 60)} h` : `há ${Math.round(m / 1440)} d`;
 };
 const msgCodigo = (cod) => `Amendoim Brasil\nSeu código de acesso: ${cod}\nVale por 10 minutos. Não compartilhe com ninguém.`;
-const NOMES = { '/inicio': 'Início', '/mercado': 'Mercado', '/mercado/consultoria': 'Área do assinante', '/mercado/hoje': 'Mercado hoje', '/mercado/dados': 'Exportação do Brasil', '/mercado/historico': 'Histórico de preço', '/mercado/termometro': 'Termômetro', '/estimativas': 'Estimativas', '/agenda': 'Agenda', '/terminal': 'Central de Mercado', '/destinos': 'Preço por destino', '/dolar': 'Dólar', '/clima': 'Clima', '/ferramentas': 'Ferramentas', '/negociar': 'Negociar', '/alertas': 'Alertas', '/conta': 'Minha conta', '/perfil': 'Perfil' };
+const NOMES = { '/inicio': 'Início', '/mercado': 'Mercado', '/mercado/consultoria': 'Área do assinante', '/mercado/hoje': 'Mercado hoje', '/mercado/dados': 'Exportação do Brasil', '/mercado/historico': 'Histórico de preço', '/mercado/termometro': 'Termômetro', '/estimativas': 'Estimativas', '/agenda': 'Agenda', '/terminal': 'Painel de Mercado', '/destinos': 'Preço por destino', '/dolar': 'Dólar', '/clima': 'Clima', '/ferramentas': 'Ferramentas', '/negociar': 'Negociar', '/alertas': 'Alertas', '/conta': 'Minha conta', '/perfil': 'Perfil' };
 const nomeTela = (r) => NOMES[r] || r;
 const TAGS = { confuso: ['Achei confuso', 'pilula-amendoim'], faltou: ['Faltou algo', 'pilula-azul'], ideia: ['Tenho uma ideia', 'pilula-verde'], gostei: ['Gostei', 'pilula-verde'] };
 const mmss = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, '0')}`;
@@ -105,9 +105,10 @@ const rankToques = (l) => rankBarras((l || []).map(([k, n]) => ({ rot: esc(k), n
 
 // ---------- convite pelo WhatsApp ----------
 const primeiroNome = (n) => String(n || '').trim().split(/\s+/)[0] || '';
-const msgConvite = (nome) => `Olá${primeiroNome(nome) ? ', ' + primeiroNome(nome) : ''}! Você foi escolhido para testar o Amendoim Brasil antes de todo mundo.\n\n1) Abra este link: ${SITE}\n2) Digite o seu celular e peça o código.\n3) O código chega para você aqui no WhatsApp, em seguida.\n\nNo iPhone, abra pelo Safari. Qualquer dúvida, é só responder esta mensagem.`;
+const dataMsg = (d) => (!d ? '' : /^\d{4}-\d\d-\d\d$/.test(d) ? d.split('-').reverse().join('/') : new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+const msgConvite = (nome, ate) => `${primeiroNome(nome) || 'Olá'}, aqui está o acesso ao teste do app Amendoim Brasil:\n${SITE}\n\nComo entrar:\n\n1. Abra o link e digite o seu celular.\n2. Peça o código e eu te envio na hora.\n3. Coloque o app na tela inicial, que ele fica igual a um aplicativo. Ele mesmo te ensina a fazer isso assim que você abrir.\n\nSua opinião é muito importante. Estou trazendo clientes e amigos que vão dar opinião sincera, criticar o que não estiver legal e me ajudar a melhorar antes do lançamento. Manda tudo pelo botão Opinar, até o que parecer bobeira.\n${ate ? `O teste vai até ${dataMsg(ate)}. ` : 'O teste '}${ate ? 'É' : 'é'} fechado: sem prints, sem gravar a tela e sem comentar com ninguém.\nObrigado por fazer parte.`;
 const celConvite = () => { const d = String(est.inv.cel || '').replace(/\D/g, ''); const n = d.length === 10 || d.length === 11 ? '55' + d : d; return n.length >= 12 && n.length <= 13 ? n : ''; };
-const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome));
+const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome, ateConvite()));
 const linkConvite = () => { const n = celConvite(); return n ? `https://wa.me/${n}?text=${encodeURIComponent(textoConvite())}` : '#'; };
 const mais21 = () => new Date(Date.now() + 21 * 864e5).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
 const ateConvite = () => (est.inv.ate === null ? mais21() : est.inv.ate);
@@ -127,7 +128,7 @@ function blocoConvite() {
     <div class="campo"><label for="pp-inv-nome">Nome</label><input id="pp-inv-nome" maxlength="80" autocomplete="off" value="${esc(i.nome)}" placeholder="ex.: João da Silva"></div>
     <div class="campo"><label for="pp-inv-cel">Celular com WhatsApp</label><input id="pp-inv-cel" type="tel" inputmode="tel" autocomplete="off" placeholder="(18) 90000-0000" value="${esc(i.cel)}"></div>
     <div class="campo"><label>Plano <b style="color:#B3261E">(escolha um)</b></label><div class="segmento pn-abas" role="group" aria-label="Plano do convidado"><button type="button" data-pp-inv-plano="produtor" aria-pressed="${i.plano === 'produtor'}">Produtor</button><button type="button" data-pp-inv-plano="empresa" aria-pressed="${i.plano === 'empresa'}">Empresa</button></div>
-      <span class="mini">${i.plano === 'produtor' ? 'Produtor: estimativas, exportação e histórico.' : i.plano === 'empresa' ? 'Empresa: tudo, inclusive a Central de Mercado.' : 'Nenhum plano escolhido ainda. Sem escolher, o acesso não é liberado.'}</span></div>
+      <span class="mini">${i.plano === 'produtor' ? 'Produtor: estimativas, exportação e histórico.' : i.plano === 'empresa' ? 'Empresa: tudo, inclusive o Painel de Mercado.' : 'Nenhum plano escolhido ainda. Sem escolher, o acesso não é liberado.'}</span></div>
     <div class="campo"><label for="pp-inv-ate">Acesso até</label><input id="pp-inv-ate" type="date" value="${esc(ateConvite())}"><span class="mini">Já vem com 21 dias a partir de hoje. Pode mudar a data. Se apagar, fica sem prazo.</span></div>
     <div class="campo"><label for="pp-inv-msg">Mensagem do convite (pode editar)</label><textarea id="pp-inv-msg" rows="8" style="width:100%;font:inherit;font-size:14px;line-height:1.4;padding:10px;border:1px solid var(--linha);border-radius:12px;background:#fff">${esc(textoConvite())}</textarea></div>
     <a class="btn btn-verde" id="pp-inv-wa" data-pp-inv-wa target="_blank" rel="noopener" href="${esc(linkConvite())}" ${ok ? '' : 'aria-disabled="true" style="opacity:.45"'}>Liberar e enviar pelo WhatsApp</a>
@@ -348,7 +349,7 @@ function linhaPessoa(c) {
     <div style="display:flex;gap:8px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><span><b style="font-size:16px">${esc(c.nome)}</b> <span class="pilula ${c.plano === 'empresa' ? 'pilula-azul' : 'pilula-verde'}">${rotPlano(c.plano)}</span></span><span style="${cor};font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px">${rot}</span></div>
     <span class="mini">${esc(info)}${c.observacao ? ' · ' + esc(c.observacao) : ''}</span>
     ${tp
-      ? `<span class="es-txt">Passar <b>${esc(c.nome)}</b> para o plano <b>${rotPlano(tp.plano)}</b>? ${tp.plano === 'empresa' ? 'A pessoa passa a ver também a Central de Mercado.' : 'A pessoa deixa de ver a Central de Mercado.'} Vale na próxima vez que abrir o app, sem sair e sem pedir código novo.</span>
+      ? `<span class="es-txt">Passar <b>${esc(c.nome)}</b> para o plano <b>${rotPlano(tp.plano)}</b>? ${tp.plano === 'empresa' ? 'A pessoa passa a ver também o Painel de Mercado.' : 'A pessoa deixa de ver o Painel de Mercado.'} Vale na próxima vez que abrir o app, sem sair e sem pedir código novo.</span>
          <div class="es-botoes"><button class="btn btn-pequeno btn-verde" type="button" data-pp-plano-sim>Sim, passar para ${rotPlano(tp.plano)}</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-plano-nao>Cancelar</button></div>`
       : corta
       ? `<span class="es-txt">Cortar o acesso de <b>${esc(c.nome)}</b> agora? Ele sai do app na hora e não consegue pedir outro código.</span>
@@ -356,7 +357,7 @@ function linhaPessoa(c) {
       : `<div class="es-botoes">${c.ativo
           ? `<button class="chip" type="button" data-pp-cortar="${esc(c.id)}" style="color:#B3261E;border-color:#E3B5B0">Cortar acesso</button>`
           : `<button class="chip" type="button" data-pp-reativar="${esc(c.id)}" style="color:#0B5E2B;border-color:#9CC9A8">Reativar acesso</button>`}
-         <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a>
+         <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome, c.expira_em))}">Convite</a>
          <button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar tudo</button></div>
          <div style="display:flex;gap:8px;align-items:center"><span class="mini" style="font-weight:700">Plano</span><div class="segmento" role="group" aria-label="Plano de ${esc(c.nome)}" style="flex:1;max-width:280px"><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="produtor" aria-pressed="${c.plano !== 'empresa'}">Produtor</button><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="empresa" aria-pressed="${c.plano === 'empresa'}">Empresa</button></div></div>
          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label class="mini" for="pp-prazo-${esc(c.id)}" style="font-weight:700">Acesso até</label>
@@ -390,13 +391,13 @@ function abaConvidar(convs) {
   const e = est.editando;
   return `${blocoConvite()}
   <section class="cartao" style="gap:6px"><span class="rotulo">Convidados (${convs.length})</span>
-    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${rotPlano(c.plano)} · ${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
+    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${rotPlano(c.plano)} · ${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome, c.expira_em))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
   </section>
   <details class="cartao" id="pp-det-novo" ${e || est.novo ? 'open' : ''}><summary class="rotulo" style="cursor:pointer">${e ? 'Editar convidado' : '＋ Liberar um convidado (sem convite)'}</summary>
     <form id="pp-form" class="es-campos" style="margin-top:10px">
       <div class="campo"><label for="pp-nome">Nome</label><input id="pp-nome" required maxlength="80" value="${esc(e?.nome || '')}"></div>
       <div class="campo"><label for="pp-cel2">Celular com WhatsApp</label><input id="pp-cel2" type="tel" inputmode="tel" required placeholder="(18) 90000-0000" value="${esc(e ? fmtCel(e.celular) : '')}" ${e ? 'readonly' : ''}></div>
-      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano" required>${e ? '' : '<option value="" selected disabled>Escolha o plano…</option>'}<option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option><option value="empresa" ${e?.plano === 'empresa' ? 'selected' : ''}>Empresa (tudo, inclusive a Central de Mercado)</option></select></div>
+      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano" required>${e ? '' : '<option value="" selected disabled>Escolha o plano…</option>'}<option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option><option value="empresa" ${e?.plano === 'empresa' ? 'selected' : ''}>Empresa (tudo, inclusive o Painel de Mercado)</option></select></div>
       <div class="campo"><label for="pp-ate">Acesso até${e ? ' (opcional)' : ''}</label><input id="pp-ate" type="date" value="${esc(e ? (e.expira_em ? String(e.expira_em).slice(0, 10) : '') : mais21())}"></div>
       <div class="campo"><label for="pp-obs">Observação (opcional)</label><input id="pp-obs" maxlength="200" placeholder="ex.: amigo da Dreyfus" value="${esc(e?.observacao || '')}"></div>
       ${e ? `<label class="es-check"><input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''}><span>Acesso ativo (desmarque para encerrar na hora)</span></label>` : ''}
@@ -408,7 +409,7 @@ function abaConvidar(convs) {
 }
 
 // ---------- a aba ----------
-const SUBS = [['codigos', 'Códigos'], ['pessoas', 'Acessos'], ['convidar', 'Convidar'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
+const SUBS = [['convidar', 'Convidar'], ['codigos', 'Códigos'], ['pessoas', 'Acessos'], ['uso', 'Uso'], ['opinioes', 'Opiniões']];
 export function telaTeste() {
   if (!est.dados) return `<section class="cartao"><div class="vazio">${est.erro ? `${esc(est.erro)} <button class="link-mini" type="button" data-pp-recarregar>Tentar de novo</button>` : 'Carregando…'}</div></section>`;
   clearInterval(timer);
@@ -511,7 +512,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     else if (id === 'pp-inv-cel') i.cel = e.target.value;
     else if (id === 'pp-inv-ate') i.ate = e.target.value;
     else if (id === 'pp-inv-msg') { i.msg = e.target.value; i.editou = true; }
-    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome); }
+    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome, ateConvite()); }
     sincConvite();
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'pp-zerar-op') est.zerarOp = e.target.checked; });
