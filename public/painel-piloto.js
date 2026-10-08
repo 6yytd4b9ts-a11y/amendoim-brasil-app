@@ -6,7 +6,7 @@ const SITE = 'https://amendoim-brasil.netlify.app';
 const est = {
   dados: null, uso: null, carregando: false, erro: '', msg: '', editando: null, novo: false, ver: false, confirma: false,
   sub: 'codigos', usoVis: 'geral', abertos: new Set(), zerar: false, zerarOp: false, zMsg: '',
-  inv: { nome: '', cel: '', plano: 'empresa', msg: '', editou: false, aviso: '' },
+  inv: { nome: '', cel: '', plano: '', ate: null, msg: '', editou: false, aviso: '' }, trocandoPlano: null, usoPlano: 'todos',
   push: { estado: 'verificando', msg: '', ocupado: false }
 };
 let redesenhar = () => {};
@@ -109,13 +109,26 @@ const msgConvite = (nome) => `Olá${primeiroNome(nome) ? ', ' + primeiroNome(nom
 const celConvite = () => { const d = String(est.inv.cel || '').replace(/\D/g, ''); const n = d.length === 10 || d.length === 11 ? '55' + d : d; return n.length >= 12 && n.length <= 13 ? n : ''; };
 const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome));
 const linkConvite = () => { const n = celConvite(); return n ? `https://wa.me/${n}?text=${encodeURIComponent(textoConvite())}` : '#'; };
+const mais21 = () => new Date(Date.now() + 21 * 864e5).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+const ateConvite = () => (est.inv.ate === null ? mais21() : est.inv.ate);
+const rotPlano = (p) => (p === 'produtor' ? 'Produtor' : 'Empresa');
+const faltaConvite = () => (!celConvite() || est.inv.nome.trim().length < 2 ? 'Preencha o nome e o celular com DDD.' : !est.inv.plano ? 'Escolha o plano: Produtor ou Empresa.' : '');
+const sincConvite = () => {
+  const a = document.getElementById('pp-inv-wa'); if (!a) return;
+  const ok = !faltaConvite();
+  a.href = linkConvite();
+  if (ok) { a.removeAttribute('aria-disabled'); a.style.opacity = ''; } else { a.setAttribute('aria-disabled', 'true'); a.style.opacity = '.45'; }
+  const b = document.querySelector('[data-pp-inv-liberar]'); if (b) b.disabled = !ok;
+};
 function blocoConvite() {
-  const i = est.inv, ok = !!celConvite() && i.nome.trim().length >= 2, auto = est.dados?.whatsapp?.provedor !== 'manual';
+  const i = est.inv, ok = !faltaConvite(), auto = est.dados?.whatsapp?.provedor !== 'manual';
   return `<section class="cartao" style="gap:10px"><span class="rotulo">Convidar para o teste</span>
     <span class="es-txt">Escreva o nome e o celular de quem você quer convidar. O botão libera o acesso e abre o WhatsApp já com a mensagem pronta. ${auto ? '' : 'Quando a pessoa pedir o código, você recebe o aviso aqui no painel e repassa.'}</span>
     <div class="campo"><label for="pp-inv-nome">Nome</label><input id="pp-inv-nome" maxlength="80" autocomplete="off" value="${esc(i.nome)}" placeholder="ex.: João da Silva"></div>
     <div class="campo"><label for="pp-inv-cel">Celular com WhatsApp</label><input id="pp-inv-cel" type="tel" inputmode="tel" autocomplete="off" placeholder="(18) 90000-0000" value="${esc(i.cel)}"></div>
-    <div class="campo"><label for="pp-inv-plano">Plano</label><select id="pp-inv-plano"><option value="empresa" ${i.plano !== 'produtor' ? 'selected' : ''}>Empresa (tudo, inclusive a Central de Mercado)</option><option value="produtor" ${i.plano === 'produtor' ? 'selected' : ''}>Produtor</option></select></div>
+    <div class="campo"><label>Plano <b style="color:#B3261E">(escolha um)</b></label><div class="segmento pn-abas" role="group" aria-label="Plano do convidado"><button type="button" data-pp-inv-plano="produtor" aria-pressed="${i.plano === 'produtor'}">Produtor</button><button type="button" data-pp-inv-plano="empresa" aria-pressed="${i.plano === 'empresa'}">Empresa</button></div>
+      <span class="mini">${i.plano === 'produtor' ? 'Produtor: estimativas, exportação e histórico.' : i.plano === 'empresa' ? 'Empresa: tudo, inclusive a Central de Mercado.' : 'Nenhum plano escolhido ainda. Sem escolher, o acesso não é liberado.'}</span></div>
+    <div class="campo"><label for="pp-inv-ate">Acesso até</label><input id="pp-inv-ate" type="date" value="${esc(ateConvite())}"><span class="mini">Já vem com 21 dias a partir de hoje. Pode mudar a data. Se apagar, fica sem prazo.</span></div>
     <div class="campo"><label for="pp-inv-msg">Mensagem do convite (pode editar)</label><textarea id="pp-inv-msg" rows="8" style="width:100%;font:inherit;font-size:14px;line-height:1.4;padding:10px;border:1px solid var(--linha);border-radius:12px;background:#fff">${esc(textoConvite())}</textarea></div>
     <a class="btn btn-verde" id="pp-inv-wa" data-pp-inv-wa target="_blank" rel="noopener" href="${esc(linkConvite())}" ${ok ? '' : 'aria-disabled="true" style="opacity:.45"'}>Liberar e enviar pelo WhatsApp</a>
     <div class="es-botoes"><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-inv-share>Só compartilhar a mensagem</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-inv-liberar ${ok ? '' : 'disabled'}>Só liberar o acesso</button></div>
@@ -245,13 +258,55 @@ function blocoZerar() {
     ${est.zMsg ? `<div class="mini" role="status">${esc(est.zMsg)}</div>` : ''}</section>`;
 }
 
-function abaUso(convs, usoPor) {
-  const entraram = convs.filter((c) => c.ultimo_acesso).length, hoje = (est.uso?.convidados || []).filter((c) => c.hoje).length;
+// soma o uso de um grupo de pessoas (por plano) a partir dos números de cada uma
+function somaGrupo(cs, usoPor) {
+  const us = cs.map((c) => usoPor.get(c.id)).filter(Boolean);
+  const telas = new Map(), cliques = new Map(), dias = new Map();
+  us.forEach((u) => {
+    (u.telasDet || []).forEach((t) => { const x = telas.get(t.t) || { t: t.t, v: 0, s: 0 }; x.v += t.v || 0; x.s += t.s || 0; telas.set(t.t, x); });
+    (u.cliques || []).forEach(([k, n]) => cliques.set(k, (cliques.get(k) || 0) + n));
+    (u.porDia || []).forEach(([d, a, sg]) => { const x = dias.get(d) || [d, 0, 0]; x[1] += a || 0; x[2] += sg || 0; dias.set(d, x); });
+  });
+  const entraram = cs.filter((c) => c.ultimo_acesso || (usoPor.get(c.id)?.sessoes || 0) > 0).length;
+  const aberturas = us.reduce((n, u) => n + (u.sessoes || 0), 0), seg = us.reduce((n, u) => n + (u.seg || 0), 0);
+  return {
+    pessoas: cs.length, entraram, hoje: us.filter((u) => u.hoje).length, aberturas, seg,
+    medio: entraram ? seg / entraram : 0, abPessoa: entraram ? aberturas / entraram : 0,
+    telas: [...telas.values()].sort((a, b) => b.s - a.s || b.v - a.v).slice(0, 8),
+    cliques: [...cliques.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8),
+    porDia: [...dias.values()].sort((a, b) => (a[0] < b[0] ? -1 : 1))
+  };
+}
+function blocoComparar(convs, usoPor) {
+  const p = somaGrupo(convs.filter((c) => c.plano !== 'empresa'), usoPor), e = somaGrupo(convs.filter((c) => c.plano === 'empresa'), usoPor);
+  const linha = (rot, a, b) => `<div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px;padding:7px 0;border-top:1px solid var(--linha);align-items:baseline"><span class="mini" style="font-size:13px">${rot}</span><b class="num" style="font-size:14px;text-align:right">${a}</b><b class="num" style="font-size:14px;text-align:right">${b}</b></div>`;
+  const nf1 = (n) => (Math.round(n * 10) / 10).toString().replace('.', ',');
+  const topo = (g) => (g.telas[0] ? esc(nomeTela(g.telas[0].t)) : '—');
+  return `<section class="cartao" style="gap:2px"><div class="cartao-cab"><span class="rotulo">Produtor × Empresa</span><span class="mini">compare os dois grupos</span></div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:6px;padding:4px 0"><span></span><span class="pilula pilula-verde" style="justify-self:end">Produtor</span><span class="pilula pilula-azul" style="justify-self:end">Empresa</span></div>
+    ${linha('Pessoas', p.pessoas, e.pessoas)}${linha('Já entraram', p.entraram, e.entraram)}${linha('Usaram hoje', p.hoje, e.hoje)}${linha('Aberturas', p.aberturas, e.aberturas)}${linha('Aberturas por pessoa', nf1(p.abPessoa), nf1(e.abPessoa))}${linha('Tempo total', fmtTempo(p.seg), fmtTempo(e.seg))}${linha('Tempo por pessoa', fmtTempo(p.medio), fmtTempo(e.medio))}${linha('Tela em que mais ficam', topo(p), topo(e))}
+    <span class="mini" style="margin-top:6px">“Por pessoa” conta só quem já entrou. Para ver um grupo em detalhe, escolha o plano no filtro acima.</span></section>`;
+}
+function blocoUsoGrupo(cs, usoPor, plano) {
+  const g = somaGrupo(cs, usoPor), rot = plano === 'empresa' ? 'Empresa' : 'Produtor';
+  if (!g.pessoas) return `<section class="cartao"><span class="mini">Ninguém no plano ${rot} ainda.</span></section>`;
+  if (!g.aberturas && !g.seg) return `<section class="cartao" style="gap:6px"><span class="rotulo">Uso do plano ${rot}</span><span class="mini">Ainda sem uso. Quando entrarem, aqui aparece o que o grupo ${rot} mais usa.</span></section>`;
+  return `<section class="cartao" style="gap:10px"><div class="cartao-cab"><span class="rotulo">Uso do plano ${rot}</span><span class="mini">${g.pessoas} pessoa(s)</span></div>
+    <div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Aberturas', g.aberturas)}${tile('Tempo total', fmtTempo(g.seg))}${tile('Por pessoa', fmtTempo(g.medio), 'de quem entrou')}</div>
+    <span class="rotulo">Aberturas por dia · 14 dias</span>${barrasDia(g.porDia)}</section>
+  <section class="cartao" style="gap:6px"><span class="rotulo">Onde mais ficaram</span><span class="mini">somando as telas principais de cada pessoa do grupo</span>${rankTelas(g.telas)}</section>
+  <section class="cartao" style="gap:6px"><span class="rotulo">Botões mais tocados</span>${rankToques(g.cliques)}</section>`;
+}
+function abaUso(todos, usoPor) {
+  const nP = todos.filter((c) => c.plano !== 'empresa').length, nE = todos.filter((c) => c.plano === 'empresa').length;
+  const convs = est.usoPlano === 'produtor' ? todos.filter((c) => c.plano !== 'empresa') : est.usoPlano === 'empresa' ? todos.filter((c) => c.plano === 'empresa') : todos;
+  const entraram = convs.filter((c) => c.ultimo_acesso).length, hoje = convs.filter((c) => usoPor.get(c.id)?.hoje).length;
   return `<section class="cartao" style="gap:10px"><div class="cartao-cab"><span class="rotulo">Quem está no teste</span><button class="chip" type="button" data-pp-recarregar>Atualizar</button></div>
+    <div class="segmento pn-abas" role="group" aria-label="Filtrar por plano"><button type="button" data-pp-usoplano="todos" aria-pressed="${est.usoPlano === 'todos'}">Todos (${todos.length})</button><button type="button" data-pp-usoplano="produtor" aria-pressed="${est.usoPlano === 'produtor'}">Produtor (${nP})</button><button type="button" data-pp-usoplano="empresa" aria-pressed="${est.usoPlano === 'empresa'}">Empresa (${nE})</button></div>
     <div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Convidados', convs.length)}${tile('Já entraram', entraram, `de ${convs.length}`)}${tile('Usaram hoje', hoje)}</div>
     <span class="mini">Só conta quem foi convidado. O seu uso (administrador) não entra aqui.</span>
     <div class="segmento pn-abas"><button type="button" data-pp-usovis="geral" aria-pressed="${est.usoVis === 'geral'}">Geral</button><button type="button" data-pp-usovis="pessoas" aria-pressed="${est.usoVis === 'pessoas'}">Por pessoa</button></div></section>
-  ${est.usoVis === 'geral' ? blocoUsoGeral()
+  ${est.usoVis === 'geral' ? (est.usoPlano === 'todos' ? blocoComparar(todos, usoPor) + blocoUsoGeral() : blocoUsoGrupo(convs, usoPor, est.usoPlano))
     : `${convs.length ? `<div class="es-botoes" style="justify-content:flex-end"><button class="chip" type="button" data-pp-todos="abrir">Expandir todos</button><button class="chip" type="button" data-pp-todos="fechar">Recolher todos</button></div>` : ''}${convs.map((c) => pessoaUso(c, usoPor.get(c.id))).join('') || '<div class="vazio">Ninguém foi convidado ainda. Use a aba Convidar.</div>'}`}
   ${blocoZerar()}`;
 }
@@ -288,11 +343,14 @@ function linhaPessoa(c) {
   const prazo = c.expira_em ? String(c.expira_em).slice(0, 10) : '';
   const info = [fmtCel(c.celular), c.expira_em ? (k === 'vencido' ? 'venceu em ' : 'acesso até ') + dataBR(c.expira_em) : 'sem prazo',
     c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : c.ultimo_pedido ? 'pediu o código ' + quando(c.ultimo_pedido) : ''].filter(Boolean).join(' · ');
-  const corta = est.cortando === c.id;
+  const corta = est.cortando === c.id, tp = est.trocandoPlano?.id === c.id ? est.trocandoPlano : null;
   return `<section class="cartao" data-pp-linha="${esc(c.id)}" style="gap:8px">
-    <div style="display:flex;gap:8px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><b style="font-size:16px">${esc(c.nome)}</b><span style="${cor};font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px">${rot}</span></div>
+    <div style="display:flex;gap:8px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><span><b style="font-size:16px">${esc(c.nome)}</b> <span class="pilula ${c.plano === 'empresa' ? 'pilula-azul' : 'pilula-verde'}">${rotPlano(c.plano)}</span></span><span style="${cor};font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px">${rot}</span></div>
     <span class="mini">${esc(info)}${c.observacao ? ' · ' + esc(c.observacao) : ''}</span>
-    ${corta
+    ${tp
+      ? `<span class="es-txt">Passar <b>${esc(c.nome)}</b> para o plano <b>${rotPlano(tp.plano)}</b>? ${tp.plano === 'empresa' ? 'A pessoa passa a ver também a Central de Mercado.' : 'A pessoa deixa de ver a Central de Mercado.'} Vale na próxima vez que abrir o app, sem sair e sem pedir código novo.</span>
+         <div class="es-botoes"><button class="btn btn-pequeno btn-verde" type="button" data-pp-plano-sim>Sim, passar para ${rotPlano(tp.plano)}</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-plano-nao>Cancelar</button></div>`
+      : corta
       ? `<span class="es-txt">Cortar o acesso de <b>${esc(c.nome)}</b> agora? Ele sai do app na hora e não consegue pedir outro código.</span>
          <div class="es-botoes"><button class="btn btn-pequeno btn-perigo" type="button" data-pp-cortar-sim="${esc(c.id)}">Sim, cortar o acesso</button><button class="btn btn-pequeno es-btn-claro" type="button" data-pp-cortar-nao>Cancelar</button></div>`
       : `<div class="es-botoes">${c.ativo
@@ -300,6 +358,7 @@ function linhaPessoa(c) {
           : `<button class="chip" type="button" data-pp-reativar="${esc(c.id)}" style="color:#0B5E2B;border-color:#9CC9A8">Reativar acesso</button>`}
          <a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a>
          <button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar tudo</button></div>
+         <div style="display:flex;gap:8px;align-items:center"><span class="mini" style="font-weight:700">Plano</span><div class="segmento" role="group" aria-label="Plano de ${esc(c.nome)}" style="flex:1;max-width:280px"><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="produtor" aria-pressed="${c.plano !== 'empresa'}">Produtor</button><button type="button" data-pp-plano-trocar="${esc(c.id)}" data-plano="empresa" aria-pressed="${c.plano === 'empresa'}">Empresa</button></div></div>
          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><label class="mini" for="pp-prazo-${esc(c.id)}" style="font-weight:700">Acesso até</label>
            <input id="pp-prazo-${esc(c.id)}" type="date" value="${esc(prazo)}" style="height:40px;border:1.5px solid var(--borda);border-radius:10px;padding:0 8px;font:inherit;font-size:15px;background:#fff">
            <button class="chip" type="button" data-pp-prazo="${esc(c.id)}">Salvar prazo</button>${c.expira_em ? `<button class="chip" type="button" data-pp-prazo-limpar="${esc(c.id)}">Sem prazo</button>` : ''}</div>`}
@@ -317,7 +376,7 @@ function abaPessoas(convs) {
 async function mudarPessoa(id, m, ok) {
   const c = (est.dados?.convidados || []).find((y) => y.id === id);
   if (!c) return;
-  est.cortando = null; est.pMsg = 'Salvando…'; redesenhar();
+  est.cortando = null; est.trocandoPlano = null; est.pMsg = 'Salvando…'; redesenhar();
   const r = await chamar('admin_salvar', { nome: c.nome, celular: c.celular, plano: c.plano, papel: c.papel || 'usuario', ativo: c.ativo, expira_em: c.expira_em, observacao: c.observacao || '', ...m });
   if (r.ok) {
     const [l, u] = await Promise.all([chamar('admin_listar'), chamar('admin_uso')]);
@@ -331,14 +390,14 @@ function abaConvidar(convs) {
   const e = est.editando;
   return `${blocoConvite()}
   <section class="cartao" style="gap:6px"><span class="rotulo">Convidados (${convs.length})</span>
-    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
+    ${convs.length ? convs.map((c) => `<div class="lista-linha" style="gap:8px;align-items:center;${c.ativo ? '' : 'opacity:.55'}"><span class="cresce"><b style="font-size:14px">${esc(c.nome)}</b><br><span class="mini">${rotPlano(c.plano)} · ${esc(fmtCel(c.celular))} · ${c.ativo ? (c.ultimo_acesso ? 'visto ' + quando(c.ultimo_acesso) : 'ainda não entrou') : 'encerrado'}</span></span><a class="chip" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgConvite(c.nome))}">Convite</a><button class="chip" type="button" data-pp-editar="${esc(c.id)}">Editar</button></div>`).join('') : '<span class="mini">Ninguém foi convidado ainda.</span>'}
   </section>
   <details class="cartao" id="pp-det-novo" ${e || est.novo ? 'open' : ''}><summary class="rotulo" style="cursor:pointer">${e ? 'Editar convidado' : '＋ Liberar um convidado (sem convite)'}</summary>
     <form id="pp-form" class="es-campos" style="margin-top:10px">
       <div class="campo"><label for="pp-nome">Nome</label><input id="pp-nome" required maxlength="80" value="${esc(e?.nome || '')}"></div>
       <div class="campo"><label for="pp-cel2">Celular com WhatsApp</label><input id="pp-cel2" type="tel" inputmode="tel" required placeholder="(18) 90000-0000" value="${esc(e ? fmtCel(e.celular) : '')}" ${e ? 'readonly' : ''}></div>
-      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano"><option value="empresa" ${e?.plano !== 'produtor' ? 'selected' : ''}>Empresa (tudo, inclusive a Central de Mercado)</option><option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option></select></div>
-      <div class="campo"><label for="pp-ate">Acesso até (opcional)</label><input id="pp-ate" type="date" value="${esc(e?.expira_em ? String(e.expira_em).slice(0, 10) : '')}"></div>
+      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano" required>${e ? '' : '<option value="" selected disabled>Escolha o plano…</option>'}<option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option><option value="empresa" ${e?.plano === 'empresa' ? 'selected' : ''}>Empresa (tudo, inclusive a Central de Mercado)</option></select></div>
+      <div class="campo"><label for="pp-ate">Acesso até${e ? ' (opcional)' : ''}</label><input id="pp-ate" type="date" value="${esc(e ? (e.expira_em ? String(e.expira_em).slice(0, 10) : '') : mais21())}"></div>
       <div class="campo"><label for="pp-obs">Observação (opcional)</label><input id="pp-obs" maxlength="200" placeholder="ex.: amigo da Dreyfus" value="${esc(e?.observacao || '')}"></div>
       ${e ? `<label class="es-check"><input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''}><span>Acesso ativo (desmarque para encerrar na hora)</span></label>` : ''}
       <button class="btn btn-verde" type="submit">${e ? 'Salvar' : 'Liberar acesso'}</button>
@@ -450,16 +509,10 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const i = est.inv;
     if (id === 'pp-inv-nome') i.nome = e.target.value;
     else if (id === 'pp-inv-cel') i.cel = e.target.value;
-    else if (id === 'pp-inv-plano') i.plano = e.target.value;
+    else if (id === 'pp-inv-ate') i.ate = e.target.value;
     else if (id === 'pp-inv-msg') { i.msg = e.target.value; i.editou = true; }
     if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome); }
-    const a = document.getElementById('pp-inv-wa');
-    if (a) {
-      const ok = !!celConvite() && i.nome.trim().length >= 2;
-      a.href = linkConvite();
-      if (ok) { a.removeAttribute('aria-disabled'); a.style.opacity = ''; } else { a.setAttribute('aria-disabled', 'true'); a.style.opacity = '.45'; }
-      const b = document.querySelector('[data-pp-inv-liberar]'); if (b) b.disabled = !ok;
-    }
+    sincConvite();
   });
   document.addEventListener('change', (e) => { if (e.target.id === 'pp-zerar-op') est.zerarOp = e.target.checked; });
   // as pessoas do Uso abrem e fecham sem perder o estado quando a tela é atualizada
@@ -474,7 +527,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     if (t.id === 'pp-det-zap') est.ver = t.open;
   }, true);
   // a mensagem do convite pode ser enviada para um número novo: libera o acesso antes de sair do painel
-  const dadosConvite = () => ({ nome: est.inv.nome.trim(), celular: celConvite() || est.inv.cel, plano: est.inv.plano === 'produtor' ? 'produtor' : 'empresa', papel: 'usuario', ativo: true, expira_em: null, observacao: 'Convite pelo painel' });
+  const dadosConvite = () => ({ nome: est.inv.nome.trim(), celular: celConvite() || est.inv.cel, plano: est.inv.plano, papel: 'usuario', ativo: true, expira_em: ateConvite() ? ateConvite() + 'T23:59:59-03:00' : null, observacao: 'Convite pelo painel' });
   const jaExiste = () => (est.dados?.convidados || []).find((c) => c.celular === celConvite());
   const liberarConvite = async (keep) => {
     const j = jaExiste();
@@ -487,8 +540,10 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const t = e.target;
     const a = t.closest('[data-pp-inv-wa]');
     if (a) {
-      if (a.getAttribute('aria-disabled') === 'true') { e.preventDefault(); est.inv.aviso = 'Preencha o nome e o celular com DDD.'; redesenhar(); return; }
-      est.inv.aviso = 'Acesso liberado. Volte para cá depois de mandar a mensagem.'; // o link do WhatsApp abre sozinho
+      const falta = faltaConvite();
+      if (falta || a.getAttribute('aria-disabled') === 'true') { e.preventDefault(); est.inv.aviso = falta || 'Preencha o nome e o celular com DDD.'; redesenhar(); return; }
+      const ja = jaExiste();
+      est.inv.aviso = ja && ja.ativo ? `Este número já tinha acesso (plano ${rotPlano(ja.plano)}). Para mudar o plano, use a aba Acessos.` : 'Acesso liberado. Volte para cá depois de mandar a mensagem.'; // o link do WhatsApp abre sozinho
       liberarConvite(true).then((r) => { if (!r.ok) { est.inv.aviso = r.mensagem || 'Não consegui liberar o acesso agora. Use “Só liberar o acesso”.'; } carregar(); });
       return;
     }
@@ -498,6 +553,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const t = e.target;
     let x;
     if ((x = t.closest('[data-pp-sub]'))) { est.sub = x.dataset.ppSub; est.msg = ''; redesenhar(); window.scrollTo({ top: 0 }); return; }
+    if ((x = t.closest('[data-pp-usoplano]'))) { est.usoPlano = x.dataset.ppUsoplano; redesenhar(); return; }
     if ((x = t.closest('[data-pp-usovis]'))) { est.usoVis = x.dataset.ppUsovis; redesenhar(); return; }
     if ((x = t.closest('[data-pp-todos]'))) {
       if (x.dataset.ppTodos === 'abrir') (est.dados?.convidados || []).filter((c) => c.papel !== 'admin').forEach((c) => est.abertos.add(c.id)); else est.abertos.clear();
@@ -508,6 +564,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
       if (acao === 'ligar') await ligarPush(); else if (acao === 'desligar') await desligarPush(); else if (acao === 'teste') await testarPush();
       redesenhar(); return;
     }
+    if ((x = t.closest('[data-pp-inv-plano]'))) { est.inv.plano = x.dataset.ppInvPlano; est.inv.aviso = ''; redesenhar(); return; }
     if (t.closest('[data-pp-inv-share]')) {
       const texto = textoConvite();
       try {
@@ -517,10 +574,11 @@ export function ligarPainelPiloto(desenhar, getChave) {
       redesenhar(); return;
     }
     if (t.closest('[data-pp-inv-liberar]')) {
-      if (!celConvite() || est.inv.nome.trim().length < 2) { est.inv.aviso = 'Preencha o nome e o celular com DDD.'; redesenhar(); return; }
+      const falta = faltaConvite();
+      if (falta) { est.inv.aviso = falta; redesenhar(); return; }
       est.inv.aviso = 'Liberando…'; redesenhar();
       const r = await liberarConvite(false);
-      est.inv.aviso = r.ok ? (r.existente ? 'Este número já estava liberado.' : 'Acesso liberado. A pessoa já pode pedir o código.') : (r.mensagem || 'Não foi possível liberar agora.');
+      est.inv.aviso = r.ok ? (r.existente ? `Este número já estava liberado (plano ${rotPlano(jaExiste()?.plano)}). Para mudar o plano, use a aba Acessos.` : 'Acesso liberado. A pessoa já pode pedir o código.') : (r.mensagem || 'Não foi possível liberar agora.');
       if (r.ok) { const l = await chamar('admin_listar'); if (l.ok) est.dados = l; }
       redesenhar(); return;
     }
@@ -555,7 +613,14 @@ export function ligarPainelPiloto(desenhar, getChave) {
       est.editando = (est.dados?.convidados || []).find((c) => c.id === x.dataset.ppEditar) || null; est.msg = ''; est.sub = 'convidar';
       redesenhar(); document.getElementById('pp-det-novo')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
     }
-    if ((x = t.closest('[data-pp-cortar]'))) { est.cortando = x.dataset.ppCortar; est.pMsg = ''; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-plano-trocar]'))) {
+      const c = (est.dados?.convidados || []).find((y) => y.id === x.dataset.ppPlanoTrocar);
+      if (!c || (c.plano === 'empresa' ? 'empresa' : 'produtor') === x.dataset.plano) return;
+      est.trocandoPlano = { id: c.id, plano: x.dataset.plano }; est.cortando = null; est.pMsg = ''; redesenhar(); return;
+    }
+    if (t.closest('[data-pp-plano-nao]')) { est.trocandoPlano = null; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-plano-sim]'))) { const tp = est.trocandoPlano; if (!tp) return; x.disabled = true; await mudarPessoa(tp.id, { plano: tp.plano }, 'agora no plano ' + rotPlano(tp.plano) + '. Vale na próxima vez que abrir o app.'); return; }
+    if ((x = t.closest('[data-pp-cortar]'))) { est.cortando = x.dataset.ppCortar; est.trocandoPlano = null; est.pMsg = ''; redesenhar(); return; }
     if (t.closest('[data-pp-cortar-nao]')) { est.cortando = null; redesenhar(); return; }
     if ((x = t.closest('[data-pp-cortar-sim]'))) { x.disabled = true; await mudarPessoa(x.dataset.ppCortarSim, { ativo: false }, 'acesso cortado.'); return; }
     if ((x = t.closest('[data-pp-reativar]'))) {
@@ -588,6 +653,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const v = (k) => (document.getElementById(k)?.value || '').trim();
     if (id === 'pp-form') {
       const ed = est.editando;
+      if (!v('pp-plano')) { est.msg = 'Escolha o plano: Produtor ou Empresa.'; redesenhar(); return; }
       const corpo = {
         nome: v('pp-nome'), celular: v('pp-cel2'), plano: v('pp-plano'), papel: ed?.papel || 'usuario',
         ativo: ed ? !!document.getElementById('pp-ativo')?.checked : true,
