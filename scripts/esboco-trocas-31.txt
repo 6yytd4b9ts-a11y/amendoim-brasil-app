@@ -1,0 +1,98 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v40';
+=======
+const VERSAO = 'ab-v41';
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `<section class="cartao es-noticias">
+    <div class="cartao-cab"><span class="rotulo">Notícias do dia</span><span class="mini">${quando(lista[0].dia)}</span></div>
+    ${lista.slice(0, compacto ? 3 : 5).map((n) => { const href = /^https?:\/\//.test(n.link || '') ? n.link : ''; const tag = href ? 'a' : 'div'; return `<${tag} class="es-not" ${href ? `href="${h.esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="es-not-ponto"></span>
+      <span class="cresce"><b>${h.esc(n.titulo)}</b>${n.fonte || n.resumo ? `<small>${n.resumo ? h.esc(n.resumo) + ' · ' : ''}${h.esc(n.fonte || '')}</small>` : ''}</span>
+      ${href ? h.ic(h.I.seta, 'style="width:16px;height:16px;stroke:#5F5B52;flex-shrink:0"') : ''}
+    </${tag}>`; }).join('')}
+    <button class="link-enviar" data-compartilhar="noticias" type="button">${h.ic(h.I.enviar)}Enviar no WhatsApp</button>
+  </section>`;
+}
+=======
+  return `<section class="cartao es-noticias">
+    <div class="cartao-cab"><span class="rotulo">Notícias</span><a class="link-mini" href="#/mercado/noticias" style="display:flex;align-items:center;gap:4px">Ver todas ${h.ic(h.I.seta, 'style="width:14px;height:14px"')}</a></div>
+    ${lista.slice(0, compacto ? 3 : 5).map((n) => `<a class="es-not" href="#/mercado/noticias" data-ev="noticia">
+      <span class="es-not-ponto"></span>
+      <span class="cresce"><b>${h.esc(n.titulo)}</b><small>${quando(n.dia)}${n.fonte ? ' · ' + h.esc(n.fonte) : ''}</small></span>
+      ${h.ic(h.I.seta, 'style="width:16px;height:16px;stroke:#5F5B52;flex-shrink:0"')}
+    </a>`).join('')}
+    <button class="link-enviar" data-compartilhar="noticias" type="button">${h.ic(h.I.enviar)}Enviar no WhatsApp</button>
+  </section>`;
+}
+// Página de notícias (dentro de Mercado): o fato do dia com o texto inteiro e todas as notícias publicadas, cada uma abrindo o texto e a fonte.
+export function telaNoticias(D, h) {
+  const todas = (conteudo().noticias || []).filter((n) => n.titulo).sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0));
+  const hoje = new Date().toISOString().slice(0, 10);
+  const dia = (d) => (!d ? '' : d === hoje ? 'Hoje' : `${d.slice(8, 10)}/${d.slice(5, 7)}/${d.slice(0, 4)}`);
+  const m = D.mercado;
+  const grupos = [];
+  todas.forEach((n) => { const g = grupos[grupos.length - 1]; if (g && g.dia === n.dia) g.itens.push(n); else grupos.push({ dia: n.dia, itens: [n] }); });
+  const fonteLink = (fonte, link) => (/^https?:/.test(link || '') ? `<a href="${h.esc(link)}" target="_blank" rel="noopener">${h.esc(fonte || link)}</a>` : h.esc(fonte || ''));
+  return `${m?.fato ? `<section class="cartao es-fato"><div class="fato"><span class="fato-tag">Fato do dia</span><b>${h.esc(m.fato.titulo)}</b><span>${h.esc(m.fato.texto || '')}</span>${m.fato.fonte || m.fato.link ? `<small class="mini">Fonte: ${fonteLink(m.fato.fonte, m.fato.link)}</small>` : ''}<button class="link-enviar" data-compartilhar="fato">${h.ic(h.I.enviar)}Enviar no WhatsApp</button></div></section>` : ''}
+  ${grupos.length ? grupos.map((g) => `<span class="rotulo" style="padding:4px 4px 0">${dia(g.dia)}</span>
+    ${g.itens.map((n) => { const href = /^https?:\/\//.test(n.link || '') ? n.link : ''; return `<details class="cartao nt-item" style="gap:6px">
+      <summary style="cursor:pointer;list-style:none;display:flex;gap:10px;align-items:flex-start"><span class="es-not-ponto" style="margin-top:7px"></span><span class="cresce"><b style="font-size:15px;line-height:1.3;display:block">${h.esc(n.titulo)}</b>${n.fonte ? `<small class="mini">${h.esc(n.fonte)}</small>` : ''}</span><span aria-hidden="true" style="font-size:18px;color:var(--texto-3)">⌄</span></summary>
+      <div class="es-txt" style="padding-left:18px">${n.texto ? h.esc(n.texto) : n.resumo ? h.esc(n.resumo) : '<span class="mini">Sem texto ainda.</span>'}</div>
+      ${n.fonte || href ? `<span class="mini" style="padding-left:18px">Fonte: ${fonteLink(n.fonte, href)}</span>` : ''}
+      ${href ? `<a class="btn btn-pequeno es-btn-claro" href="${h.esc(href)}" target="_blank" rel="noopener" style="margin-left:18px;align-self:flex-start">Ler na fonte</a>` : ''}
+    </details>`; }).join('')}`).join('') : '<div class="vazio">Nenhuma notícia publicada ainda.</div>'}
+  <p class="mini dx-nota">Notícias selecionadas e resumidas pela Amendoim Brasil a partir das fontes indicadas.</p>`;
+}
+>>>>>>>
+<<<<<<< public/app.js
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3 } from '/esboco3.js';
+=======
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3, telaNoticias } from '/esboco3.js';
+>>>>>>>
+<<<<<<< public/app.js
+  const it = [['cotacoes', 'Cotações'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
+=======
+  const it = [['cotacoes', 'Cotações'], ['noticias', 'Notícias'], ['analises', 'Análises'], ['consultoria', 'Assinante']];
+>>>>>>>
+<<<<<<< public/app.js
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDadosAssinante(D, H(), telaDados) : telaCotacoes(),
+=======
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'noticias' ? topoMercado('noticias') + telaNoticias(D, H()) : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDadosAssinante(D, H(), telaDados) : telaCotacoes(),
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  ${rec ? `<section class="cartao fase-cartao">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Para a lavoura esta semana</span><span class="pilula pilula-verde">${esc(fase)}</span></div>
+    <b style="font-size:17px;line-height:1.3">${esc(rec.titulo)}</b>
+    ${rec.dica ? `<details class="abre"><summary>Ver orientação</summary><p class="es-txt" style="margin:0 0 10px">${esc(rec.dica)}</p></details>` : ''}
+    <span class="mini">Automática, pela previsão · confirme com seu agrônomo</span>
+  </section>` : ''}
+=======
+  <section class="cartao" style="gap:12px">
+    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · ${nomeLocal}</span>${dif != null ? `<span class="mini" style="font-weight:700">${Math.abs(dif) < 5 ? 'Igual à safra passada' : `${dif > 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm`}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? `
+    <div class="comp-linha"><div class="cartao-cab"><b>Esta safra</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
+    <div class="comp-linha"><div class="cartao-cab"><span>Safra passada</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
+    ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}` : '<span class="mini">carregando…</span>'}
+  </section>
+
+  ${rec ? `<section class="cartao fase-cartao" style="gap:4px;padding-top:12px;padding-bottom:12px">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Para a lavoura esta semana</span><span class="pilula pilula-verde">${esc(fase)}</span></div>
+    <b style="font-size:15px;line-height:1.3">${esc(rec.titulo)}</b>
+    ${rec.dica ? `<details class="abre"><summary>Ver orientação</summary><p class="es-txt" style="margin:0 0 10px">${esc(rec.dica)}</p></details>` : ''}
+    <span class="mini">Automática, pela previsão · confirme com seu agrônomo</span>
+  </section>` : ''}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  <section class="cartao" style="gap:12px">
+    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · ${nomeLocal}</span>${dif != null ? `<span class="mini" style="font-weight:700">${Math.abs(dif) < 5 ? 'Igual à safra passada' : `${dif > 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm`}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? `
+    <div class="comp-linha"><div class="cartao-cab"><b>Esta safra</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
+    <div class="comp-linha"><div class="cartao-cab"><span>Safra passada</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
+    ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}` : '<span class="mini">carregando…</span>'}
+  </section>
+
+  ${(() => { const e = conteudo().enso || {}; const regioes = e.regioes || []; return `<section class="cartao es-enso2">
+=======
+  ${(() => { const e = conteudo().enso || {}; const regioes = e.regioes || []; return `<section class="cartao es-enso2">
+>>>>>>>
