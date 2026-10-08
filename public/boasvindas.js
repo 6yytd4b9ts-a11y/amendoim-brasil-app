@@ -23,7 +23,11 @@ function estilo() {
   #ab-bv-teste .bv-so{align-self:flex-start;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--texto-3)}
   #ab-bv-teste .bv-linha{text-decoration:underline;text-decoration-color:#D9A93B;text-decoration-thickness:2px;text-underline-offset:4px}
   #ab-bv-teste .bv-ic{display:inline-block;width:18px;height:18px;vertical-align:-3px;stroke:#2F6FA3;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  #ab-bv-teste .es-ios{margin:0}`;
+  #ab-bv-teste .bv-peq{font-size:13px;color:var(--texto-3)}
+  #ab-bv-teste .bv-passos{display:flex;flex-direction:column;gap:7px;align-self:stretch;text-align:left}
+  #ab-bv-teste .bv-p{display:flex;gap:10px;align-items:center;background:var(--fundo);border-radius:12px;padding:8px 10px;font-size:14px;line-height:1.35;color:var(--texto-2)}
+  #ab-bv-teste .bv-n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--verde);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  #ab-bv-teste .bv-ic.cheio{fill:#2F6FA3;stroke:none}`;
   document.head.appendChild(st);
 }
 // o estilo que esconde o Opinar precisa valer desde o início
@@ -36,6 +40,9 @@ const ICONES = {
   conversa: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>'
 };
 const COMPARTILHAR = '<svg class="bv-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M5 12v7h14v-7"/></svg>';
+const PONTINHOS = '<svg class="bv-ic cheio" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+const ADICIONAR = '<svg class="bv-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>';
+const passos4 = (l) => `<div class="bv-passos">${l.map((x, k) => `<div class="bv-p"><span class="bv-n">${k + 1}</span><span>${x}</span></div>`).join('')}</div>`;
 
 export function boasVindas(forcar = false) {
   if (document.getElementById('ab-bv-teste')) return;
@@ -45,8 +52,17 @@ export function boasVindas(forcar = false) {
   const ua = navigator.userAgent || '';
   const ios = /iphone|ipad|ipod/i.test(ua), android = /android/i.test(ua);
   const instalado = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-  const passosIphone = `<ol class="es-ios"><li>Toque em <b>Compartilhar</b> ${COMPARTILHAR} na barra do Safari</li><li>Escolha <b>Adicionar à Tela de Início</b></li><li>Toque em <b>Adicionar</b></li></ol>`;
-  const passosAndroid = `<ol class="es-ios"><li>Toque nos <b>três pontinhos</b> do Chrome</li><li>Escolha <b>Instalar aplicativo</b> (ou <b>Adicionar à tela inicial</b>)</li><li>Toque em <b>Instalar</b></li></ol>`;
+  const passosIphone = passos4([
+    `Toque nos <b>três pontinhos</b> ${PONTINHOS} na barra de baixo do Safari (ou direto em <b>Compartilhar</b> ${COMPARTILHAR}, se ele já aparecer)`,
+    `Toque em <b>Compartilhar</b> ${COMPARTILHAR}`,
+    `Role e escolha <b>Adicionar à Tela de Início</b> ${ADICIONAR}`,
+    'Toque em <b>Adicionar</b>. O nome já vem como <b>Amendoim Brasil</b>'
+  ]);
+  const passosAndroid = passos4([
+    `Toque nos <b>três pontinhos</b> ${PONTINHOS} do Chrome`,
+    'Escolha <b>Instalar aplicativo</b> (ou <b>Adicionar à tela inicial</b>)',
+    'Toque em <b>Instalar</b>'
+  ]);
 
   const passos = [
     () => `${grande(ICONES.cadeado)}<b class="es-h1">${nome ? esc(nome) + ', este' : 'Este'} conteúdo é só para você</b>
@@ -59,10 +75,9 @@ export function boasVindas(forcar = false) {
         : ios ? passosIphone
         : android ? (pedidoInstalar ? '<button class="btn btn-verde" type="button" data-bv-inst>Instalar o app</button>' : passosAndroid)
         : `<span class="bv-so">iPhone (Safari)</span>${passosIphone}<span class="bv-so">Android (Chrome)</span>${passosAndroid}`}`,
-    () => `${grande(ICONES.conversa)}<b class="es-h1">Sua opinião ajuda muito</b>
-      <span class="es-txt">Em qualquer tela, toque em <b>Opinar</b> e conte o que achou: o que ficou confuso, o que faltou, uma ideia. Pode escrever ou gravar um áudio.</span>
-      <span class="es-txt">Quanto mais específico, melhor. Diga o que você esperava ver.</span>
-      <span class="bv-sub">O Helder vai ouvir todo o seu feedback para melhorar o aplicativo.</span>`
+    () => `${grande(ICONES.conversa)}<b class="es-h1">Precisamos da sua opinião</b>
+      <span class="es-txt">Em qualquer tela, toque em <b class="bv-linha">Opinar</b> e nos conte o que achou: o que ficou confuso, o que faltou, uma ideia. Você pode <span class="bv-linha">escrever ou gravar um áudio</span>.</span>
+      <span class="es-txt">Quanto mais específico, melhor: diga o que você esperava ver. <span class="bv-peq">(Vamos ouvir todo o seu feedback para melhorar o aplicativo.)</span></span>`
   ];
   let i = 0;
   const el = document.createElement('div');
