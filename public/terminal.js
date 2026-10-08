@@ -3,10 +3,11 @@
 // em /data/terminal.json) e a leitura da semana. Feito para a tela do computador; no celular as tabelas rolam de lado.
 import { conteudo, assinante, sessao } from '/esboco-dados.js';
 import { cartaoExclusivo } from '/esboco3.js';
+import { telaMundo } from '/exportacao.js';
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 const OLEO_EM_GRAO = 2.5; // 1 t de óleo ≈ 2,5 t de grão (rendimento de 40% no esmagamento)
-const est = { comex: null, dados: null, carregando: false, erro: '', prod: 'grao', tipoVisao: 'mes' };
+const est = { comex: null, mundo: null, dados: null, carregando: false, erro: '', prod: 'grao', tipoVisao: 'mes', aba: 'exportacao' };
 let ctx = { render: () => {}, evento: () => {} };
 
 const nf = (n, d = 0) => (n == null || !isFinite(n) ? '–' : Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -24,7 +25,7 @@ async function carregar() {
       fetch('/api/exportacao', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
       fetch('/data/terminal.json').then((r) => (r.ok ? r.json() : null)).catch(() => null)
     ]);
-    est.comex = c?.brasil || null; est.dados = t;
+    est.comex = c?.brasil || null; est.mundo = c?.mundo || null; est.dados = t;
     if (!c && !t) est.erro = 'Não foi possível carregar agora. Verifique a internet e tente de novo.';
     ctx.evento('terminal-abriu');
   } finally { est.carregando = false; ctx.render(false); }
@@ -56,7 +57,7 @@ function blocoExportacao(b, h) {
   const mediaMes = mesmosMes.length ? mesmosMes.reduce((x, v) => x + v, 0) / mesmosMes.length : null;
   const linha = (i) => {
     const vals = anos.map((a) => s[a]?.t[i] ?? null), max = Math.max(...vals.filter((v) => v != null));
-    return `<tr><th>${MESES[i]}</th>${vals.map((x) => `<td class="${x != null && x === max && vals.filter((y) => y != null).length > 1 ? 'dx-max' : ''}">${mil(x)}</td>`).join('')}<td class="dx-var">${i < n ? vc(varia(s[atual]?.t[i], s[atual - 1]?.t[i])) : ''}</td></tr>`;
+    return `<tr><th>${MESES[i]}</th>${vals.map((x, k) => `<td class="${k < anos.length - 3 ? 'tm-ant ' : ''}${x != null && x === max && vals.filter((y) => y != null).length > 1 ? 'dx-max' : ''}">${mil(x)}</td>`).join('')}<td class="dx-var">${i < n ? vc(varia(s[atual]?.t[i], s[atual - 1]?.t[i])) : ''}</td></tr>`;
   };
   const rot = { grao: 'Grão (NCM 1202)', oleo: 'Óleo (NCM 1508)', total: 'Total em grão' }[est.prod];
   const ate = MESES[n - 1].toLowerCase();
@@ -69,15 +70,15 @@ function blocoExportacao(b, h) {
       <div class="dx-tile"><span>Projeção ${atual} (sazonal)</span><b class="num">${nf(projSazonal)} t</b><small>${vc(varia(projSazonal, soma(atual - 1)))} vs ${atual - 1} · linear ${nf(projLinear)}</small></div>
     </div>
     <div class="tabela-rolar"><table class="tabela dx-tabela tm-tabela">
-      <thead><tr><th>${rot}</th>${anos.map((a) => `<th>${a}</th>`).join('')}<th>${String(atual).slice(2)}×${String(atual - 1).slice(2)}</th></tr></thead>
+      <thead><tr><th>${rot}</th>${anos.map((a, i) => `<th class="${i < anos.length - 3 ? 'tm-ant' : ''}">${a}</th>`).join('')}<th>${String(atual).slice(2)}×${String(atual - 1).slice(2)}</th></tr></thead>
       <tbody>${MESES.map((_, i) => linha(i)).join('')}</tbody>
       <tfoot>
-        <tr><th>Até ${ate}</th>${anos.map((a) => `<td>${mil(ytd[a])}</td>`).join('')}<td class="dx-var">${vc(varia(ytd[atual], ytd[atual - 1]))}</td></tr>
-        <tr><th>Ano x ano</th>${anos.map((a) => `<td class="dx-var">${ytd[a - 1] ? vc(varia(ytd[a], ytd[a - 1])) : ''}</td>`).join('')}<td></td></tr>
-        <tr><th>Ano todo</th>${anos.map((a) => `<td>${a === atual ? `<i>${mil(projSazonal)}</i>` : mil(soma(a))}</td>`).join('')}<td class="dx-var">${vc(varia(projSazonal, soma(atual - 1)))}</td></tr>
+        <tr><th>Até ${ate}</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'tm-ant' : ''}">${mil(ytd[a])}</td>`).join('')}<td class="dx-var">${vc(varia(ytd[atual], ytd[atual - 1]))}</td></tr>
+        <tr><th>Ano x ano</th>${anos.map((a, k) => `<td class="dx-var ${k < anos.length - 3 ? 'tm-ant' : ''}">${ytd[a - 1] ? vc(varia(ytd[a], ytd[a - 1])) : ''}</td>`).join('')}<td></td></tr>
+        <tr><th>Ano todo</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'tm-ant' : ''}">${a === atual ? `<i>${mil(projSazonal)}</i>` : mil(soma(a))}</td>`).join('')}<td class="dx-var">${vc(varia(projSazonal, soma(atual - 1)))}</td></tr>
       </tfoot>
     </table></div>
-    <span class="mini"><i class="dx-leg"></i> maior mês entre os anos (mil t) · ${atual} em itálico é a projeção</span>
+    <span class="mini"><i class="dx-leg"></i> maior mês entre os anos (mil t) · ${atual} em itálico é a projeção<span class="tm-so-cel"> · no celular aparecem os 3 últimos anos; vire a tela para ver os 5</span></span>
     ${info('Como ler', `<b>Recorde</b> é o maior valor daquele mês entre os anos da tabela. <b>Até ${ate}</b> soma os mesmos meses de cada ano, para comparar igual com igual. <b>Projeção sazonal</b> usa o peso que jan–${ate} teve nos anos fechados; a linear (média × 12) subestima quando o pico de embarque é no segundo semestre. <b>Total em grão</b> converte o óleo em amendoim equivalente (1 t de óleo ≈ ${OLEO_EM_GRAO} t de grão, rendimento de 40%). Fonte: Comex Stat/MDIC, publicado com cerca de um mês de atraso.`)}
   </section>`;
 }
@@ -145,11 +146,17 @@ export function telaTerminal(h) {
   if (!est.dados && !est.comex && !est.carregando && !est.erro) setTimeout(carregar);
   if (!est.dados && !est.comex) return `${topo}<section class="cartao dx-trava">${est.erro ? `<b style="font-size:18px">Não foi possível abrir agora</b><span class="mini" style="color:#B3261E;font-weight:700">${h.esc(est.erro)}</span><button class="btn btn-verde" type="button" data-tm-tentar>Tentar de novo</button>` : '<b style="font-size:18px">Abrindo o terminal…</b><span class="mini">Buscando Comex Stat e o levantamento de preços.</span>'}</section>`;
   const d = est.dados;
-  return `${topo}<div class="tm-grade">
-    ${blocoLeitura(d, h)}
-    ${est.comex ? blocoExportacao(est.comex, h) : ''}
-    ${d ? blocoDestinos(d, h) : ''}
-    ${d?.tipos ? blocoTipos(d.tipos, h) : ''}
+  const abas = [['exportacao', 'Exportação'], ['destinos', 'Destinos'], ['tipos', 'Por tipo'], ['mundo', 'Mundo']];
+  let corpo = '';
+  if (est.aba === 'exportacao') corpo = est.comex ? blocoExportacao(est.comex, h) : '<div class="vazio">Comex Stat indisponível agora.</div>';
+  if (est.aba === 'destinos') corpo = d ? blocoDestinos(d, h) : '<div class="vazio">Levantamento indisponível agora.</div>';
+  if (est.aba === 'tipos') corpo = d?.tipos ? blocoTipos(d.tipos, h) : '<div class="vazio">Levantamento por tipo indisponível agora.</div>';
+  if (est.aba === 'mundo') corpo = est.mundo ? `<div class="tm-mundo">${telaMundo(est.mundo, est.comex)}</div>` : '<div class="vazio">USDA indisponível agora.</div>';
+  return `${topo}
+  <div class="segmento tm-abas">${abas.map(([k, t]) => `<button data-tm-aba="${k}" aria-pressed="${est.aba === k}">${t}</button>`).join('')}</div>
+  <div class="tm-grade tm-aba-${est.aba}">
+    ${est.aba === 'exportacao' ? blocoLeitura(d, h) : ''}
+    ${corpo}
   </div>
   <p class="mini dx-nota">Fontes: Comex Stat/MDIC e levantamento Amendoim Brasil${d?.atualizado ? ` · conferido em ${new Date(d.atualizado + 'T12:00:00').toLocaleDateString('pt-BR')}` : ''}. Os dados oficiais saem com cerca de um mês de atraso. Uso exclusivo do assinante; não repasse as tabelas.</p>`;
 }
@@ -158,6 +165,7 @@ export function ligarTerminal(render, evento) {
   ctx = { render, evento };
   document.addEventListener('click', (e) => {
     let x;
+    if ((x = e.target.closest('[data-tm-aba]'))) { est.aba = x.dataset.tmAba; evento('terminal-' + est.aba); render(false); return; }
     if ((x = e.target.closest('[data-tm-prod]'))) { est.prod = x.dataset.tmProd; render(false); return; }
     if ((x = e.target.closest('[data-tm-tipo]'))) { est.tipoVisao = x.dataset.tmTipo; render(false); return; }
     if (e.target.closest('[data-tm-tentar]')) { est.erro = ''; render(false); }
