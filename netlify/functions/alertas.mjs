@@ -6,7 +6,7 @@ import { endpointValido, enviarPush } from '../lib/push.mjs';
 import { rodarAlertas } from '../lib/rotina.mjs';
 
 // Segredo do servidor de login (Supabase): só ele pode mandar o aviso "alguém pediu o código" para os celulares do painel.
-const AVISO_SHA256 = '34c5b43803ab5af098ed100f5102902d7c5f4e7d7013aa4743ed0e2c84b6ff17';
+const AVISO_SHA256 = '7a6c07d08b98b68b491b3ac043c633cd04103d2f0c5c0c5f6de294e63fd77f9d';
 const PREFS_VAZIAS = { mudanca: false, acima: null, abaixo: null, chuva: false, local: null, boletim: false, balcao: false };
 const numero = (v) => { const n = Number(v); return isFinite(n) && n > 0 && n < 1000 ? Math.round(n * 100) / 100 : null; };
 const coord = (v, lim) => { const n = Number(v); return isFinite(n) && Math.abs(n) <= lim ? +n.toFixed(2) : null; };
