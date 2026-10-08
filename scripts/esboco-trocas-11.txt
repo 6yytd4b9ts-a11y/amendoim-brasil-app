@@ -1,0 +1,63 @@
+<<<<<<< public/app.js
+import { chuva7Unificada } from '/esboco-clima.js';
+
+=======
+import { chuva7Unificada } from '/esboco-clima.js';
+import { telaTerminal, ligarTerminal } from '/terminal.js';
+
+>>>>>>>
+<<<<<<< public/app.js
+  destinos: () => telaDestinos(H()),
+  biblioteca: () => telaBiblioteca(H())
+=======
+  destinos: () => telaDestinos(H()),
+  terminal: () => telaTerminal(H()),
+  biblioteca: () => telaBiblioteca(H())
+>>>>>>>
+<<<<<<< public/app.js
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado' };
+=======
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado', terminal: 'mercado' };
+>>>>>>>
+<<<<<<< public/app.js
+ligarEsboco3({ render, evento });
+document.addEventListener('click', (e) => {
+=======
+ligarEsboco3({ render, evento });
+ligarTerminal(render, evento);
+document.addEventListener('click', (e) => {
+>>>>>>>
+<<<<<<< public/index.html
+  <link rel="stylesheet" href="/esboco3.css">
+</head>
+=======
+  <link rel="stylesheet" href="/esboco3.css">
+  <link rel="stylesheet" href="/terminal.css">
+</head>
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
+=======
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+  ${card(empresa ? '#/terminal' : '#/conta/planos', navio, 'Terminal Amendoim Brasil', empresa ? 'Exportação, preço por destino e por tipo, para decidir' : 'Plano Empresa', !empresa)}
+  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <span class="mini">Amendoim em grão sem casca · US$ por tonelada, FOB</span>
+    </section>
+=======
+      <span class="mini">Amendoim em grão sem casca · US$ por tonelada, FOB</span>
+      <a class="btn btn-escuro btn-pequeno" href="#/terminal" style="align-self:flex-start">Abrir o Terminal: mês a mês, por tipo e ranking</a>
+    </section>
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v20';
+=======
+const VERSAO = 'ab-v21';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
