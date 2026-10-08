@@ -1,0 +1,60 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v28';
+=======
+const VERSAO = 'ab-v29';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/boasvindas.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/boasvindas.js', '/mapa-chuva.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+import { UFS, MAPA_W, MAPA_H, projetar } from '/esboco-mapa.js';
+=======
+import { UFS, MAPA_W, MAPA_H, projetar } from '/esboco-mapa.js';
+import { mapaChuva2 } from '/mapa-chuva.js';
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    ${regs.length ? mapaChuva(regs, esc, numBr) : ''}
+=======
+    ${regs.length ? mapaChuva2(regs, esc, numBr) : ''}
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do amendoim', 'Eventos, feiras e relatórios, com lembrete')}
+  ${empresa ? card('#/terminal', navio, 'Terminal Amendoim Brasil', 'Exportação, preço por destino e por tipo, mundo') : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+  ${card('#/mercado/historico', grafico, 'Histórico de preço', '1 ano liberado · 5 anos em breve')}
+=======
+  ${empresa ? card('#/terminal', navio, 'Central de Mercado', 'Análise do mercado: exportação, preço por destino e por tipo, mundo') : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+  ${card('#/mercado/historico', grafico, 'Histórico de preço', '1 ano liberado · 5 anos em breve')}
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do amendoim', 'Eventos, feiras e relatórios, com lembrete')}
+>>>>>>>
+<<<<<<< public/terminal.js
+    <div><h1>Terminal Amendoim Brasil</h1><div class="sub">Exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+=======
+    <div><h1>Central de Mercado</h1><div class="sub">Análise do mercado: exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <a class="btn btn-escuro btn-pequeno" href="#/terminal" style="align-self:flex-start">Abrir o Terminal: mês a mês, por tipo e ranking</a>
+=======
+      <a class="btn btn-escuro btn-pequeno" href="#/terminal" style="align-self:flex-start">Abrir a Central de Mercado: mês a mês, por tipo e ranking</a>
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    <div class="fh-outras">${ORDEM.filter((id) => id !== k).map((id) => `<a class="fh-mini" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span>${esc(FERR[id].nome)}</a>`).join('')}</div>
+=======
+    <div class="fh-outras">${ORDEM.filter((id) => id !== k && id !== 'barter').map((id) => `<a class="fh-mini" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span>${esc(FERR[id].nome)}</a>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/auth.js
+  const txt = s.plano === 'empresa' ? 'Estimativas, Terminal de exportação, agenda e histórico' : 'Estimativas, exportação, agenda e histórico';
+=======
+  const txt = s.plano === 'empresa' ? 'Estimativas, Central de Mercado, histórico e agenda' : 'Estimativas, exportação, histórico e agenda';
+  const selo = s.status === 'cortesia' ? 'Cortesia' : 'Assinante';
+>>>>>>>
+<<<<<<< public/auth.js
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area">
+    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--verde-claro)">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#007731"')}</span>
+    <span class="cresce"><b style="font-size:15px;display:block">Sua área exclusiva · ${esc((s.nome || '').split(' ')[0] || 'Olá')}</b><span class="mini">${txt}</span></span>
+=======
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" style="border:2px solid #D9A93B;background:#FFFBF0">
+    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:#FBEBC2">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#7A4A08"')}</span>
+    <span class="cresce"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px"><span class="mini" style="font-weight:800;letter-spacing:.04em;color:#7A4A08">USO EXCLUSIVO DE ASSINANTE</span><span class="pilula pilula-amendoim" style="font-size:11px">${selo}</span></span><b style="font-size:16px;display:block">Abrir minha área, ${esc((s.nome || '').split(' ')[0] || 'bem-vindo')}</b><span class="mini">${txt}</span></span>
+>>>>>>>
