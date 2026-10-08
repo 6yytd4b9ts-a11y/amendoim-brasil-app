@@ -1,0 +1,43 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v46-previa';
+=======
+const VERSAO = 'ab-v47-previa';
+>>>>>>>
+<<<<<<< public/dolar.js
+      const r = await fetch('https://economia.awesomeapi.com.br/json/USD-BRL/360');
+      if (!r.ok) throw new Error('http');
+      const hoje = hojeSP();
+      let lista = (await r.json()).map((x) => ({ ts: +x.timestamp, bid: +x.bid, high: +x.high, low: +x.low })).filter((x) => x.bid > 0 && diaDe(x.ts) === hoje).sort((a, b) => a.ts - b.ts);
+      // um ponto a cada ~5 min, para o gráfico não ficar serrilhado
+      const porFaixa = new Map(); lista.forEach((x) => porFaixa.set(Math.floor(x.ts / 300), x));
+      lista = [...porFaixa.values()];
+      if (lista.length < 2) throw new Error('sem-hoje');
+      est.dados.HOJE = lista; est.hojeEm = Date.now();
+=======
+      // a API devolve só os últimos ~100 registros (cerca de 1 h); o app guarda o que já viu no dia para o gráfico ir crescendo
+      const r = await fetch('https://economia.awesomeapi.com.br/json/USD-BRL/100');
+      if (!r.ok) throw new Error('http');
+      const hoje = hojeSP();
+      let lista = (await r.json()).map((x) => ({ ts: +x.timestamp, bid: +x.bid, high: +x.high, low: +x.low })).filter((x) => x.bid > 0 && diaDe(x.ts) === hoje);
+      let guardado = []; try { const g = JSON.parse(localStorage.getItem('ab-dolar-hoje') || 'null'); if (g && g.dia === hoje) guardado = g.pts || []; } catch (e) { /* ignora */ }
+      // um ponto a cada ~5 min, para o gráfico não ficar serrilhado
+      const porFaixa = new Map(); [...guardado, ...lista].sort((a, b) => a.ts - b.ts).forEach((x) => porFaixa.set(Math.floor(x.ts / 300), x));
+      lista = [...porFaixa.values()];
+      if (lista.length < 2) throw new Error('sem-hoje');
+      try { localStorage.setItem('ab-dolar-hoje', JSON.stringify({ dia: hoje, pts: lista.slice(-200) })); } catch (e) { /* ignora */ }
+      est.dados.HOJE = lista; est.hojeEm = Date.now(); est.diaMax = Math.max(...lista.map((x) => x.high || x.bid)); est.diaMin = Math.min(...lista.map((x) => x.low || x.bid));
+>>>>>>>
+<<<<<<< public/dolar.js
+    <span class="mini" style="text-align:center">${p === 'HOJE' ? `Hoje, das ${horaDe(ini.ts)} às ${horaDe(ult.ts)} · atualiza a cada 15 min · toque e arraste para ver cada horário` : 'Toque e arraste no gráfico para ver o valor de cada dia.'}</span>
+=======
+    <span class="mini" style="text-align:center">${p === 'HOJE' ? `Hoje, das ${horaDe(ini.ts)} às ${horaDe(ult.ts)} · atualiza a cada 15 min enquanto a tela está aberta · toque e arraste para ver o horário` : 'Toque e arraste no gráfico para ver o valor de cada dia.'}</span>
+>>>>>>>
+<<<<<<< public/dolar.js
+      <div class="dx-tile"><span>${p === 'HOJE' ? 'Abertura' : 'No período'}</span><b class="num">${p === 'HOJE' ? brl(ini.bid) : pc(vPer)}</b><small>${p === 'HOJE' ? pc(vPer) + ' até agora' : 'de ' + brl(ini.bid)}</small></div>
+      <div class="dx-tile"><span>Máxima</span><b class="num">${brl(max)}</b></div>
+      <div class="dx-tile"><span>Mínima</span><b class="num">${brl(min)}</b></div>
+=======
+      <div class="dx-tile"><span>${p === 'HOJE' ? 'Desde ' + horaDe(ini.ts) : 'No período'}</span><b class="num">${pc(vPer)}</b><small>de ${brl(ini.bid)}</small></div>
+      <div class="dx-tile"><span>${p === 'HOJE' ? 'Máxima do dia' : 'Máxima'}</span><b class="num">${brl(p === 'HOJE' ? est.diaMax || max : max)}</b></div>
+      <div class="dx-tile"><span>${p === 'HOJE' ? 'Mínima do dia' : 'Mínima'}</span><b class="num">${brl(p === 'HOJE' ? est.diaMin || min : min)}</b></div>
+>>>>>>>
