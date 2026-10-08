@@ -1,0 +1,33 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v35';
+=======
+const VERSAO = 'ab-v36';
+>>>>>>>
+<<<<<<< public/auth.js
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="380"><text x="260" y="200" text-anchor="middle" transform="rotate(-20 260 190)" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#2B2B26" fill-opacity=".06">${esc(txt)}</text></svg>`;
+=======
+  // mosaico denso e bem claro: duas fileiras alternadas, uma marca a cada ~95 px de altura, para aparecer atrás de qualquer tabela
+  const larg = Math.max(300, Math.round(txt.length * 8.3 + 70)), alt = 190, tt = esc(txt);
+  const um = (x, y) => `<text x="${x}" y="${y}" transform="rotate(-20 ${x} ${y - 5})">${tt}</text>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larg}" height="${alt}"><g font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#2B2B26" fill-opacity=".055" text-anchor="middle">${um(larg / 2, 57)}${um(0, 152)}${um(larg, 152)}</g></svg>`;
+>>>>>>>
+<<<<<<< public/auth.js
+  el.style.background = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 0 0 / 520px 380px repeat`;
+=======
+  el.style.background = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}") 0 0 / ${larg}px ${alt}px repeat`;
+>>>>>>>
+<<<<<<< public/auth.js
+  const selo = s.status === 'cortesia' ? 'CORTESIA' : 'ASSINANTE';
+=======
+  const selo = s.papel === 'admin' ? 'ADMINISTRADOR' : s.status === 'cortesia' ? 'CORTESIA' : 'ASSINANTE';
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="cartao-cab"><span class="rotulo">Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}</span><span class="pilula pilula-verde">${s.status === 'cortesia' ? 'Cortesia' : 'Plano ' + (empresa ? 'Empresa' : 'Produtor')}</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}</span><span class="pilula ${s.papel === 'admin' ? '' : 'pilula-verde'}"${s.papel === 'admin' ? ' style="background:linear-gradient(180deg,#F7EDCB,#EBDAA6);color:#6F5214;box-shadow:inset 0 0 0 1px #C2A04C;font-weight:800"' : ''}>${s.papel === 'admin' ? 'Administrador' : s.status === 'cortesia' ? 'Cortesia' : 'Plano ' + (empresa ? 'Empresa' : 'Produtor')}</span></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="cartao-cab" style="padding:12px 0 6px"><b style="font-size:18px">${h.esc(s.nome || 'Assinante')}</b><span class="pilula ${st[1]}">${st[0]}</span></div>
+=======
+    <div class="cartao-cab" style="padding:12px 0 6px"><b style="font-size:18px">${h.esc(s.nome || 'Assinante')}</b><span class="pilula ${s.papel === 'admin' ? '' : st[1]}"${s.papel === 'admin' ? ' style="background:linear-gradient(180deg,#F7EDCB,#EBDAA6);color:#6F5214;box-shadow:inset 0 0 0 1px #C2A04C;font-weight:800"' : ''}>${s.papel === 'admin' ? 'Administrador' : st[0]}</span></div>
+>>>>>>>
