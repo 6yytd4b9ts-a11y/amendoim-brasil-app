@@ -1,0 +1,115 @@
+<<<<<<< public/esboco.js
+import { telaConvidados } from '/convidados.js';
+=======
+
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (sub === 'convidados') return telaConvidados(hh);
+=======
+
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (sub === 'criar') return telaCriar();
+=======
+  if ((sub === 'planos' || sub === 'pagar') && sessao()?.remoto) return `${voltar('#/mercado/consultoria', 'Assinantes')}<div class="vazio">Você está com acesso de cortesia na fase de teste.<br>Não há nada para pagar por enquanto.</div>`;
+  if (sub === 'criar') return telaCriar();
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${s.remoto && s.papel === 'admin' ? `<a class="cartao es-cartao" href="#/conta/convidados"><span class="cresce"><b style="font-size:16px;display:block">Convidados do piloto</b><span class="mini">Liberar acesso, ver códigos e quem entrou</span></span>${h.ic(h.I.seta)}</a>` : ''}
+=======
+
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha('Plano', s.status === 'cortesia' ? 'Consultoria (cortesia)' : `${h.esc(p.nome)} · ${h.esc(s.periodo || 'mensal')}`)}
+=======
+    ${linha('Plano', s.remoto ? 'Cortesia · fase de teste' : s.status === 'cortesia' ? 'Consultoria (cortesia)' : `${h.esc(p.nome)} · ${h.esc(s.periodo || 'mensal')}`)}
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha(s.teste ? 'Teste grátis até' : 'Próxima cobrança', s.teste ? h.esc(s.vence || '—') : s.status === 'ativo' ? `${h.esc(s.vence || '—')} · ${preco(p[s.periodo || 'mensal'])}` : '—')}
+=======
+    ${s.remoto ? linha('Acesso até', h.esc(s.vence || 'sem prazo')) : linha(s.teste ? 'Teste grátis até' : 'Próxima cobrança', s.teste ? h.esc(s.vence || '—') : s.status === 'ativo' ? `${h.esc(s.vence || '—')} · ${preco(p[s.periodo || 'mensal'])}` : '—')}
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha('Pagamento', h.esc(s.forma === 'cartao' ? 'Cartão de crédito' : s.forma === 'pix' ? 'Pix' : '—'))}
+=======
+    ${s.remoto ? '' : linha('Pagamento', h.esc(s.forma === 'cartao' ? 'Cartão de crédito' : s.forma === 'pix' ? 'Pix' : '—'))}
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha('E-mail', h.esc(s.email || '—'))}
+=======
+    ${s.remoto ? '' : linha('E-mail', h.esc(s.email || '—'))}
+>>>>>>>
+<<<<<<< public/esboco.js
+    <a class="btn btn-escuro btn-pequeno" href="#/conta/planos">Trocar de plano</a>
+=======
+    ${s.remoto ? '' : `<a class="btn btn-escuro btn-pequeno" href="#/conta/planos">Trocar de plano</a>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${cartaoExportar(h)}
+=======
+  ${s.remoto && s.piloto && s.papel !== 'admin' ? '' : cartaoExportar(h)}
+>>>>>>>
+<<<<<<< public/app.js
+import { iniciarAuth } from '/auth.js';
+=======
+import { iniciarAuth, atalhoArea } from '/auth.js';
+>>>>>>>
+<<<<<<< public/app.js
+import { ligarConvidados } from '/convidados.js';
+=======
+
+>>>>>>>
+<<<<<<< public/app.js
+ligarConvidados(render, evento);
+=======
+
+>>>>>>>
+<<<<<<< public/app.js
+  ${heroConab(D, H())}
+=======
+  ${atalhoArea(H())}
+
+  ${heroConab(D, H())}
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v23';
+=======
+const VERSAO = 'ab-v24';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/convidados.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
+<<<<<<< public/painel-admin.js
+import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from '/painel-esboco2.js';
+=======
+import { telaHoje, telaProdutores, telaConteudoExtra, ligarPainelEsboco2 } from '/painel-esboco2.js';
+import { telaConvidadosP, telaUsoP, abrirAbaPiloto, ligarPainelPiloto } from '/painel-piloto.js';
+>>>>>>>
+<<<<<<< public/painel-admin.js
+  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo']];
+=======
+  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo'], ['convidados', 'Convidados'], ['piloto', 'Uso do piloto']];
+>>>>>>>
+<<<<<<< public/painel-admin.js
+    ${!['balcao', 'hoje', 'assin', 'prod', 'conteudo'].includes(est.aba) ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+=======
+    ${!['balcao', 'hoje', 'assin', 'prod', 'conteudo', 'convidados', 'piloto'].includes(est.aba) ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+>>>>>>>
+<<<<<<< public/painel-admin.js
+    ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
+=======
+    ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'convidados' ? telaConvidadosP() : est.aba === 'piloto' ? telaUsoP() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
+>>>>>>>
+<<<<<<< public/painel-admin.js
+  if (aba) { e.preventDefault(); est.aba = aba.dataset.pnAba; desenhar(); if (est.aba === 'balcao') carregarBalcao(); return; }
+=======
+  if (aba) { e.preventDefault(); est.aba = aba.dataset.pnAba; desenhar(); if (est.aba === 'balcao') carregarBalcao(); if (est.aba === 'convidados' || est.aba === 'piloto') abrirAbaPiloto(est.aba); return; }
+>>>>>>>
+<<<<<<< public/painel-admin.js
+ligarPainelEsboco2(desenhar);
+=======
+ligarPainelEsboco2(desenhar);
+ligarPainelPiloto(desenhar);
+>>>>>>>
