@@ -19,7 +19,7 @@ const quando = (iso, vazio = 'nunca entrou') => {
   return m < 2 ? 'agora' : m < 60 ? `há ${m} min` : m < 1440 ? `há ${Math.round(m / 60)} h` : `há ${Math.round(m / 1440)} d`;
 };
 const msgCodigo = (cod) => `Amendoim Brasil\nSeu código de acesso: ${cod}\nVale por 10 minutos. Não compartilhe com ninguém.`;
-const NOMES = { '/inicio': 'Início', '/mercado': 'Mercado', '/mercado/consultoria': 'Área do assinante', '/mercado/hoje': 'Mercado hoje', '/mercado/dados': 'Exportação do Brasil', '/mercado/historico': 'Histórico de preço', '/mercado/termometro': 'Termômetro', '/estimativas': 'Estimativas', '/agenda': 'Agenda', '/terminal': 'Terminal (exportação)', '/destinos': 'Preço por destino', '/dolar': 'Dólar', '/clima': 'Clima', '/ferramentas': 'Ferramentas', '/negociar': 'Negociar', '/alertas': 'Alertas', '/conta': 'Minha conta', '/perfil': 'Perfil' };
+const NOMES = { '/inicio': 'Início', '/mercado': 'Mercado', '/mercado/consultoria': 'Área do assinante', '/mercado/hoje': 'Mercado hoje', '/mercado/dados': 'Exportação do Brasil', '/mercado/historico': 'Histórico de preço', '/mercado/termometro': 'Termômetro', '/estimativas': 'Estimativas', '/agenda': 'Agenda', '/terminal': 'Central de Mercado', '/destinos': 'Preço por destino', '/dolar': 'Dólar', '/clima': 'Clima', '/ferramentas': 'Ferramentas', '/negociar': 'Negociar', '/alertas': 'Alertas', '/conta': 'Minha conta', '/perfil': 'Perfil' };
 const nomeTela = (r) => NOMES[r] || r;
 const TAGS = { confuso: ['Achei confuso', 'pilula-amendoim'], faltou: ['Faltou algo', 'pilula-azul'], ideia: ['Tenho uma ideia', 'pilula-verde'], gostei: ['Gostei', 'pilula-verde'] };
 const mmss = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, '0')}`;
@@ -43,6 +43,19 @@ async function carregar() {
 }
 
 export function abrirTeste() { est.erro = ''; est.msg = ''; carregar(); }
+
+// Atualiza só o bloco de códigos (sem mexer no resto da tela) e mostra a hora da última atualização.
+async function atualizarCodigos() {
+  const el = document.getElementById('pp-codigos');
+  if (!el) return false;
+  const r = await chamar('admin_listar');
+  if (r.ok) {
+    est.dados = r; el.innerHTML = blocoCodigos();
+    const q = document.getElementById('pp-quando');
+    if (q) q.textContent = 'atualizado ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  return r.ok;
+}
 
 // ---------- peças ----------
 const tile = (rot, val, sub = '') => `<div class="pn-tile"><span>${rot}</span><b class="num">${val}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
@@ -94,13 +107,10 @@ function todosJuntos(convs) {
 export function telaTeste() {
   if (!est.dados) return `<section class="cartao"><div class="vazio">${est.erro ? `${esc(est.erro)} <button class="link-mini" type="button" data-pp-recarregar>Tentar de novo</button>` : 'Carregando…'}</div></section>`;
   clearInterval(timer);
-  timer = setInterval(async () => {
-    const el = document.getElementById('pp-codigos');
-    if (!el) { clearInterval(timer); return; }
-    if (document.visibilityState !== 'visible') return;
-    const r = await chamar('admin_listar');
-    if (r.ok) { est.dados = r; el.innerHTML = blocoCodigos(); }
-  }, 8000);
+  timer = setInterval(() => {
+    if (!document.getElementById('pp-codigos')) { clearInterval(timer); return; }
+    if (document.visibilityState === 'visible') atualizarCodigos();
+  }, 4000);
   const d = est.dados, e = est.editando;
   const ligado = !!d.piloto;
   const convs = d.convidados.filter((c) => c.papel !== 'admin');
@@ -120,7 +130,7 @@ export function telaTeste() {
     <span class="mini">${ligado ? 'Ao encerrar, o app volta ao normal: tira o bloqueio, a marca d\'água e o registro de uso. Os convidados continuam com a conta.' : 'Antes de começar, vale zerar os números na aba Uso para a contagem partir do zero.'}</span>
   </section>
   <section class="cartao" style="gap:8px">
-    <div class="cartao-cab"><span class="rotulo">Códigos para repassar</span><span class="mini">atualiza sozinho</span></div>
+    <div class="cartao-cab"><span class="rotulo">Códigos para repassar</span><span style="display:flex;align-items:center;gap:8px"><span class="mini" id="pp-quando">atualiza sozinho</span><button class="chip" type="button" data-pp-cod>↻ Atualizar</button></span></div>
     <div id="pp-codigos" style="display:flex;flex-direction:column;gap:10px">${blocoCodigos()}</div>
     <span class="mini">Envio automático pelo WhatsApp: <b>${d.whatsapp.provedor === 'manual' ? 'desligado (você repassa o código)' : 'ligado (' + esc(d.whatsapp.provedor) + ')'}</b>.</span>
   </section>
@@ -136,7 +146,7 @@ export function telaTeste() {
     <form id="pp-form" class="es-campos" style="margin-top:10px">
       <div class="campo"><label for="pp-nome">Nome</label><input id="pp-nome" required maxlength="80" value="${esc(e?.nome || '')}"></div>
       <div class="campo"><label for="pp-cel2">Celular com WhatsApp</label><input id="pp-cel2" type="tel" inputmode="tel" required placeholder="(18) 90000-0000" value="${esc(e ? fmtCel(e.celular) : '')}" ${e ? 'readonly' : ''}></div>
-      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano"><option value="empresa" ${e?.plano !== 'produtor' ? 'selected' : ''}>Empresa (tudo, inclusive Terminal)</option><option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option></select></div>
+      <div class="campo"><label for="pp-plano">Plano</label><select id="pp-plano"><option value="empresa" ${e?.plano !== 'produtor' ? 'selected' : ''}>Empresa (tudo, inclusive a Central de Mercado)</option><option value="produtor" ${e?.plano === 'produtor' ? 'selected' : ''}>Produtor</option></select></div>
       <div class="campo"><label for="pp-ate">Acesso até (opcional)</label><input id="pp-ate" type="date" value="${esc(e?.expira_em ? String(e.expira_em).slice(0, 10) : '')}"></div>
       <div class="campo"><label for="pp-obs">Observação (opcional)</label><input id="pp-obs" maxlength="200" placeholder="ex.: amigo da Dreyfus" value="${esc(e?.observacao || '')}"></div>
       ${e ? `<label class="es-check"><input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''}><span>Acesso ativo (desmarque para encerrar na hora)</span></label>` : ''}
@@ -168,6 +178,41 @@ export function telaTeste() {
 export function ligarPainelPiloto(desenhar, getChave) {
   redesenhar = desenhar;
   pegarChave = getChave || (() => '');
+  // voltou para o painel (aba, app em segundo plano, internet): atualiza na hora, sem esperar o relógio
+  const voltou = () => { if (document.visibilityState === 'visible') atualizarCodigos(); };
+  document.addEventListener('visibilitychange', voltou);
+  window.addEventListener('focus', voltou);
+  window.addEventListener('pageshow', voltou);
+  window.addEventListener('online', voltou);
+  // puxar para baixo no topo da página atualiza os códigos e a aba inteira
+  let puxa = null;
+  const topo = () => (document.scrollingElement || document.documentElement).scrollTop <= 0;
+  const aviso = () => {
+    let d = document.getElementById('pp-puxar');
+    if (!d) {
+      d = document.createElement('div'); d.id = 'pp-puxar';
+      d.style.cssText = 'position:fixed;top:0;left:50%;transform:translate(-50%,-70px);z-index:99999;background:#fff;border:1px solid #E6E1D6;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;color:#1B1B17;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .15s';
+      document.body.appendChild(d);
+    }
+    return d;
+  };
+  document.addEventListener('touchstart', (e) => { puxa = document.getElementById('pp-codigos') && topo() && e.touches.length === 1 ? { y: e.touches[0].clientY, dy: 0 } : null; }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (!puxa) return;
+    const dy = e.touches[0].clientY - puxa.y; puxa.dy = Math.max(0, dy);
+    if (dy <= 0) return;
+    const d = aviso(); d.textContent = dy > 70 ? '↻ Solte para atualizar' : '↓ Puxe para atualizar'; d.style.transform = `translate(-50%,${Math.min(dy * 0.5, 54) - 8}px)`;
+  }, { passive: true });
+  document.addEventListener('touchend', async () => {
+    if (!puxa) return;
+    const feito = puxa.dy > 70; puxa = null;
+    const d = document.getElementById('pp-puxar');
+    if (!d) return;
+    if (!feito) { d.style.transform = 'translate(-50%,-70px)'; return; }
+    d.textContent = '↻ Atualizando…'; d.style.transform = 'translate(-50%,12px)';
+    await Promise.all([atualizarCodigos(), carregar()]);
+    d.style.transform = 'translate(-50%,-70px)';
+  });
   document.addEventListener('toggle', (e) => {
     if (e.target.id === 'pp-det-novo' && !est.editando) est.novo = e.target.open;
     if (e.target.id === 'pp-det-zap') est.ver = e.target.open;
@@ -176,6 +221,7 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const t = e.target;
     let x;
     if (t.closest('[data-pp-recarregar]')) { est.erro = ''; carregar(); return; }
+    if ((x = t.closest('[data-pp-cod]'))) { x.disabled = true; x.textContent = 'Atualizando…'; await atualizarCodigos(); x.disabled = false; x.textContent = '↻ Atualizar'; return; }
     if ((x = t.closest('[data-pp-ouvir]'))) {
       const id = x.dataset.ppOuvir, caixa = x.parentElement;
       x.disabled = true; x.textContent = 'Abrindo…';
