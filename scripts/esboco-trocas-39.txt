@@ -1,0 +1,67 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v48';
+=======
+const VERSAO = 'ab-v49';
+>>>>>>>
+<<<<<<< public/terminal.js
+    <div><h1>Painel de Mercado</h1><div class="sub">Análise do mercado: exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+  const s = sessao(), ok = assinante() && s?.plano === 'empresa';
+  if (!ok && s?.remoto) return topo + cartaoExclusivo(h, 'Fechado no seu plano', 'O Painel de Mercado faz parte do plano Empresa. No seu acesso de teste (plano Produtor) esta área fica fechada. Se o seu plano for ampliado, ela abre aqui, sem precisar entrar de novo.', ['Exportação mês a mês, com recorde e projeção', 'Preço por destino e por tipo de grão', 'Ranking de compradores e leitura de mercado'], '#/mercado/consultoria', 'Voltar à minha área');
+  if (!ok) return topo + cartaoExclusivo(h, 'A mesa de decisão de quem exporta', 'Exportação mês a mês com recorde e projeção, preço FOB por destino e por tipo de grão (cru, blancheado, banda, calibre), ranking de compradores e a leitura da Amendoim Brasil. Atualizado todo mês.', ['Tabela de 5 anos, estilo mesa de exportação', 'Preço por destino, mês a mês', 'Preço por tipo e calibre', 'Leitura de mercado da Amendoim Brasil'], '#/conta/planos', 'Conhecer o plano Empresa');
+=======
+    <div><h1>Painel de Mercado</h1><div class="sub">Análise do mercado: exportação, preço por destino e por tipo · para decidir</div></div></header>`;
+  const s = sessao(), ok = assinante() && s?.plano === 'empresa';
+  // Plano Produtor: abre só a aba Exportação (toneladas, sem preço). Destinos, Por tipo, Mundo e a leitura (que cita preços) ficam no Empresa.
+  const soExp = !ok && assinante() && s?.plano === 'produtor';
+  if (soExp) est.aba = 'exportacao';
+  if (!ok && !soExp && s?.remoto) return topo + cartaoExclusivo(h, 'Fechado no seu plano', 'O Painel de Mercado faz parte do plano Empresa. No seu acesso de teste (plano Produtor) esta área fica fechada. Se o seu plano for ampliado, ela abre aqui, sem precisar entrar de novo.', ['Exportação mês a mês, com recorde e projeção', 'Preço por destino e por tipo de grão', 'Ranking de compradores e leitura de mercado'], '#/mercado/consultoria', 'Voltar à minha área');
+  if (!ok && !soExp) return topo + cartaoExclusivo(h, 'A mesa de decisão de quem exporta', 'Exportação mês a mês com recorde e projeção, preço FOB por destino e por tipo de grão (cru, blancheado, banda, calibre), ranking de compradores e a leitura da Amendoim Brasil. Atualizado todo mês.', ['Tabela de 5 anos, estilo mesa de exportação', 'Preço por destino, mês a mês', 'Preço por tipo e calibre', 'Leitura de mercado da Amendoim Brasil'], '#/conta/planos', 'Conhecer o plano Empresa');
+>>>>>>>
+<<<<<<< public/terminal.js
+  const abas = [['exportacao', 'Exportação'], ['destinos', 'Destinos'], ['tipos', 'Por tipo'], ['mundo', 'Mundo']];
+=======
+  const abas = soExp ? [['exportacao', 'Exportação']] : [['exportacao', 'Exportação'], ['destinos', 'Destinos'], ['tipos', 'Por tipo'], ['mundo', 'Mundo']];
+>>>>>>>
+<<<<<<< public/terminal.js
+  return `${topo}
+  <div class="segmento tm-abas">${abas.map(([k, t]) => `<button data-tm-aba="${k}" aria-pressed="${est.aba === k}">${t}</button>`).join('')}</div>
+  <div class="tm-grade tm-aba-${est.aba}">
+    ${est.aba === 'exportacao' ? blocoLeitura(d, h) : ''}
+=======
+  return `${soExp ? topo.replace(/<div class="sub">[^<]*<\/div>/, '<div class="sub">Exportação do Brasil mês a mês, com recorde e projeção</div>') : topo}
+  ${soExp ? '' : `<div class="segmento tm-abas">${abas.map(([k, t]) => `<button data-tm-aba="${k}" aria-pressed="${est.aba === k}">${t}</button>`).join('')}</div>`}
+  <div class="tm-grade tm-aba-${est.aba}">
+    ${est.aba === 'exportacao' && !soExp ? blocoLeitura(d, h) : ''}
+>>>>>>>
+<<<<<<< public/terminal.js
+    if ((x = e.target.closest('[data-tm-aba]'))) { est.aba = x.dataset.tmAba; evento('terminal-' + est.aba); render(false); return; }
+=======
+    if ((x = e.target.closest('[data-tm-aba]'))) { const s = sessao(); if (x.dataset.tmAba !== 'exportacao' && !(assinante() && s?.plano === 'empresa')) return; est.aba = x.dataset.tmAba; evento('terminal-' + est.aba); render(false); return; }
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/terminal', navio, 'Painel de Mercado', empresa ? 'Análise do mercado: exportação, preço por destino e por tipo, mundo' : 'Fechado no seu plano · exclusivo do plano Empresa', !empresa)}
+  ${empresa ? '' : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+=======
+  ${card('#/terminal', navio, 'Painel de Mercado', empresa ? 'Análise do mercado: exportação, preço por destino e por tipo, mundo' : s.plano === 'produtor' ? 'Exportação do Brasil mês a mês, com recorde e projeção' : 'Fechado no seu plano · exclusivo do plano Empresa', !empresa && s.plano !== 'produtor')}
+  ${empresa || s.plano === 'produtor' ? '' : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+>>>>>>>
+<<<<<<< public/app.js
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'noticias' ? topoMercado('noticias') + telaNoticias(D, H()) : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? telaDadosAssinante(D, H(), telaDados) : telaCotacoes(),
+=======
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'noticias' ? topoMercado('noticias') + telaNoticias(D, H()) : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? (assinante() && sessao()?.plano === 'produtor' ? telaTerminal(H()) : telaDadosAssinante(D, H(), telaDados)) : telaCotacoes(),
+>>>>>>>
+<<<<<<< public/app.js
+import { assinante } from '/esboco-dados.js';
+=======
+import { assinante, sessao } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+      <span class="mini">${i.plano === 'produtor' ? 'Produtor: estimativas, exportação e histórico.' : i.plano === 'empresa' ? 'Empresa: tudo, inclusive o Painel de Mercado.' : 'Nenhum plano escolhido ainda. Sem escolher, o acesso não é liberado.'}</span></div>
+=======
+      <span class="mini">${i.plano === 'produtor' ? 'Produtor: estimativas, exportação (só toneladas) e histórico.' : i.plano === 'empresa' ? 'Empresa: tudo, inclusive preço por destino, por tipo e Mundo.' : 'Nenhum plano escolhido ainda. Sem escolher, o acesso não é liberado.'}</span></div>
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+      ? `<span class="es-txt">Passar <b>${esc(c.nome)}</b> para o plano <b>${rotPlano(tp.plano)}</b>? ${tp.plano === 'empresa' ? 'A pessoa passa a ver também o Painel de Mercado.' : 'A pessoa deixa de ver o Painel de Mercado.'} Vale na próxima vez que abrir o app, sem sair e sem pedir código novo.</span>
+=======
+      ? `<span class="es-txt">Passar <b>${esc(c.nome)}</b> para o plano <b>${rotPlano(tp.plano)}</b>? ${tp.plano === 'empresa' ? 'A pessoa passa a ver também Destinos, Por tipo e Mundo no Painel de Mercado.' : 'A pessoa deixa de ver Destinos, Por tipo e Mundo (continua com a Exportação).'} Vale na próxima vez que abrir o app, sem sair e sem pedir código novo.</span>
+>>>>>>>
