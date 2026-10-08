@@ -1,0 +1,15 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v37';
+=======
+const VERSAO = 'ab-v38';
+>>>>>>>
+<<<<<<< public/auth.js
+    else if (Date.now() - ultima > 15 * 60e3) validar();
+=======
+    else if (Date.now() - ultima > 3 * 60e3) validar();
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${linha('Plano', s.remoto ? 'Cortesia · fase de teste' : s.status === 'cortesia' ? 'Consultoria (cortesia)' : `${h.esc(p.nome)} · ${h.esc(s.periodo || 'mensal')}`)}
+=======
+    ${linha('Plano', s.remoto ? 'Teste · plano ' + (s.plano === 'empresa' ? 'Empresa' : 'Produtor') : s.status === 'cortesia' ? 'Consultoria (cortesia)' : `${h.esc(p.nome)} · ${h.esc(s.periodo || 'mensal')}`)}
+>>>>>>>
