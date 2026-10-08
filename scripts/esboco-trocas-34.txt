@@ -1,0 +1,52 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v43';
+=======
+const VERSAO = 'ab-v44';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  inv: { nome: '', cel: '', plano: '', ate: null, msg: '', editou: false, aviso: '' }, trocandoPlano: null, usoPlano: 'todos',
+=======
+  inv: { nome: '', cel: '', plano: '', ate: null, msg: '', editou: false, aviso: '', modelo: 'liguei' }, trocandoPlano: null, usoPlano: 'todos',
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+const dataMsg = (d) => (!d ? '' : /^\d{4}-\d\d-\d\d$/.test(d) ? d.split('-').reverse().join('/') : new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }));
+const msgConvite = (nome, ate) => `${primeiroNome(nome) || 'Olá'}, aqui está o acesso ao teste do app Amendoim Brasil:\n${SITE}\n\nComo entrar:\n\n1. Abra o link e digite o seu celular.\n2. Peça o código e eu te envio na hora.\n3. Coloque o app na tela inicial, que ele fica igual a um aplicativo. Ele mesmo te ensina a fazer isso assim que você abrir.\n\nSua opinião é muito importante. Estou trazendo clientes e amigos que vão dar opinião sincera, criticar o que não estiver legal e me ajudar a melhorar antes do lançamento. Manda tudo pelo botão Opinar, até o que parecer bobeira.\n${ate ? `O teste vai até ${dataMsg(ate)}. ` : 'O teste '}${ate ? 'É' : 'é'} fechado: sem prints, sem gravar a tela e sem comentar com ninguém.\nObrigado por fazer parte.`;
+=======
+const dataMsg = (d) => (!d ? '' : /^\d{4}-\d\d-\d\d$/.test(d) ? d.slice(8, 10) + '/' + d.slice(5, 7) : new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }));
+// Modelos do convite: [Nome] = primeiro nome, [link] = endereço do app, [data] = "Acesso até" em dd/mm.
+const MODELOS = {
+  liguei: { nome: 'Já liguei', texto: `[Nome], aqui está o acesso ao teste do app Amendoim Brasil: [link]\nComo entrar:\n\n1. Abra o link e digite o seu celular.\n2. Peça o código e eu te envio na hora.\n3. Coloque o app na tela inicial, que ele fica igual a um aplicativo. Ele mesmo te ensina a fazer isso assim que você abrir.\n\nSua opinião é muito importante. Estou trazendo clientes e amigos que vão dar opinião sincera, criticar o que não estiver legal e me ajudar a melhorar antes do lançamento. Manda tudo pelo botão Opinar, até o que parecer bobeira.\nO teste vai até [data]. É fechado: sem prints, sem gravar a tela e sem comentar com ninguém.\nObrigado por fazer parte.` },
+  sem: { nome: 'Sem ligação', texto: `Fala, [Nome], tudo bem?\nEstou desenvolvendo o aplicativo da Amendoim Brasil, um app do mercado de amendoim com preço do mercado, notícias, clima da sua região e ferramentas, tudo num lugar só, para o produtor e para a indústria. Hoje não existe nada assim no nosso mercado.\nAntes de lançar, estou escolhendo poucos amigos e clientes para usar e me trazer a opinião. Gostaria que você usasse o app no dia a dia para analisar o mercado, ver os preços e as notícias e tomar suas decisões, e me falasse com sinceridade o que pode melhorar. Dentro do app tem o botão Opinar, para escrever ou mandar áudio. A ideia é fazer algo legal de verdade para o nosso setor.\nAqui está o seu acesso: [link]\nComo entrar:\n\n1. Abra o link e digite o seu celular.\n2. Peça o código e eu te envio na hora.\n3. Coloque o app na tela inicial, que ele fica igual a um aplicativo. Ele mesmo te ensina a fazer isso assim que você abrir.\n\nNinguém conhece o app ainda, então peço sigilo: não comente com ninguém, não tire print e não grave a tela.\nO teste vai até [data]. Valeu demais!` }
+};
+const msgConvite = (nome, ate, modelo = 'liguei') => {
+  const m = MODELOS[modelo] || MODELOS.liguei, pn = primeiroNome(nome);
+  let t = m.texto.replace(/\[link\]/g, SITE);
+  if (pn) t = t.replace(/\[Nome\]/g, pn); // sem nome, o [Nome] fica à vista para lembrar de preencher
+  t = ate ? t.replace(/\[data\]/g, dataMsg(ate)) : t.replace(/O teste vai até \[data\]\.\s?/g, ''); // sem prazo, a frase do prazo sai
+  return t;
+};
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome, ateConvite()));
+=======
+const textoConvite = () => (est.inv.editou && est.inv.msg ? est.inv.msg : msgConvite(est.inv.nome, ateConvite(), est.inv.modelo));
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    <div class="campo"><label for="pp-inv-ate">Acesso até</label><input id="pp-inv-ate" type="date" value="${esc(ateConvite())}"><span class="mini">Já vem com 21 dias a partir de hoje. Pode mudar a data. Se apagar, fica sem prazo.</span></div>
+=======
+    <div class="campo"><label for="pp-inv-ate">Acesso até</label><input id="pp-inv-ate" type="date" value="${esc(ateConvite())}"><span class="mini">Já vem com 21 dias a partir de hoje. Pode mudar a data. Se apagar, fica sem prazo.</span></div>
+    <div class="campo"><label>Modelo da mensagem</label><div class="segmento pn-abas" role="group" aria-label="Modelo do convite">${Object.entries(MODELOS).map(([k, m]) => `<button type="button" data-pp-inv-modelo="${k}" aria-pressed="${i.modelo === k}">${m.nome}</button>`).join('')}</div><span class="mini" id="pp-inv-modelo-dica">${i.modelo === 'liguei' ? 'Para quem você já explicou por telefone.' : 'Para quem recebe o convite direto, sem ligação.'}${i.editou ? ' · Você editou o texto: vale só para este envio.' : ''}</span></div>
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    else if (id === 'pp-inv-msg') { i.msg = e.target.value; i.editou = true; }
+    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome, ateConvite()); }
+=======
+    else if (id === 'pp-inv-msg') { i.msg = e.target.value; if (!i.editou) { i.editou = true; const d = document.getElementById('pp-inv-modelo-dica'); if (d && !d.textContent.includes('vale só')) d.textContent += ' · Você editou o texto: vale só para este envio.'; } }
+    if (id !== 'pp-inv-msg' && !i.editou) { const m = document.getElementById('pp-inv-msg'); if (m) m.value = msgConvite(i.nome, ateConvite(), i.modelo); }
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    if ((x = t.closest('[data-pp-inv-plano]'))) { est.inv.plano = x.dataset.ppInvPlano; est.inv.aviso = ''; redesenhar(); return; }
+=======
+    if ((x = t.closest('[data-pp-inv-plano]'))) { est.inv.plano = x.dataset.ppInvPlano; est.inv.aviso = ''; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-inv-modelo]'))) { est.inv.modelo = x.dataset.ppInvModelo; est.inv.msg = ''; est.inv.editou = false; est.inv.aviso = ''; redesenhar(); return; }
+>>>>>>>
