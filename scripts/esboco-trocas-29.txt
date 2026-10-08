@@ -1,0 +1,22 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v38';
+=======
+const VERSAO = 'ab-v39';
+>>>>>>>
+<<<<<<< public/auth.js
+  const s = sessao(), el0 = document.getElementById('ab-marca');
+=======
+  const s = sessao(), el0 = document.getElementById('ab-marca');
+  document.body.classList.toggle('ab-teste', restrito()); // na fase de teste os convidados não veem patrocínio nem preços de anúncio
+>>>>>>>
+<<<<<<< public/auth.js
+  st.id = 'ab-auth-css';
+=======
+  st.id = 'ab-auth-css';
+  document.head.insertAdjacentHTML('beforeend', '<style id="ab-teste-css">.ab-teste .parceiros, .ab-teste a[href="#/anuncie"] { display: none !important; }</style>');
+>>>>>>>
+<<<<<<< public/app.js
+  anuncie: () => telaPatrocinio(D, H()),
+=======
+  anuncie: () => (document.body.classList.contains('ab-teste') ? '<div class="vazio">Esta área não está disponível na fase de teste.</div>' : telaPatrocinio(D, H())),
+>>>>>>>
