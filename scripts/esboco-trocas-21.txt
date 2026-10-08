@@ -1,0 +1,33 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v30';
+=======
+const VERSAO = 'ab-v31';
+>>>>>>>
+<<<<<<< public/auth.js
+  if (!location.hash || location.hash === '#/') location.hash = '#/inicio';
+=======
+  location.hash = '#/inicio'; // quem acabou de entrar começa sempre pelo Início
+>>>>>>>
+<<<<<<< public/auth.js
+  const txt = s.plano === 'empresa' ? 'Estimativas, Central de Mercado, histórico e agenda' : 'Estimativas, exportação, histórico e agenda';
+  const selo = s.status === 'cortesia' ? 'Cortesia' : 'Assinante';
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" style="border:2px solid #D9A93B;background:#FFFBF0">
+    <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:#FBEBC2">${h.ic('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', 'style="stroke:#7A4A08"')}</span>
+    <span class="cresce"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px"><span class="mini" style="font-weight:800;letter-spacing:.04em;color:#7A4A08">USO EXCLUSIVO DE ASSINANTE</span><span class="pilula pilula-amendoim" style="font-size:11px">${selo}</span></span><b style="font-size:16px;display:block">Abrir minha área, ${esc((s.nome || '').split(' ')[0] || 'bem-vindo')}</b><span class="mini">${txt}</span></span>
+    ${h.ic(h.I.seta, 'style="width:18px;height:18px;stroke:#5F5B52"')}
+  </a>`;
+=======
+  const txt = s.plano === 'empresa' ? 'Central de Mercado, estimativas, histórico e agenda' : 'Estimativas, exportação, histórico e agenda';
+  const selo = s.status === 'cortesia' ? 'CORTESIA' : 'ASSINANTE';
+  const nome = esc((s.nome || '').split(' ')[0] || '');
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" style="flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:10px 14px;border:1.5px solid #C2A04C;background:linear-gradient(180deg,#FFFEFA,#FBF4E1)">
+    <span style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#8A6A1E">ÁREA EXCLUSIVA</span><span style="font-size:10px;font-weight:800;letter-spacing:.05em;color:#8A6A1E;border:1px solid #C2A04C;border-radius:999px;padding:1px 8px">${selo}</span></span>
+    <b style="font-size:15px">Abrir minha área${nome ? ', ' + nome : ''} ›</b>
+    <span style="font-size:12px;color:var(--texto-3)">${txt}</span>
+  </a>`;
+>>>>>>>
+<<<<<<< public/app.js
+  return `<div class="segmento">${it.map(([k, t]) => `<a href="#/mercado/${k}" ${k === atual ? 'aria-current="page"' : ''}>${t}</a>`).join('')}</div>`;
+=======
+  return `<div class="segmento">${it.map(([k, t]) => `<a href="#/mercado/${k}" ${k === atual ? 'aria-current="page"' : ''}${k === 'consultoria' ? ' style="box-shadow:inset 0 0 0 1.5px #C2A04C;color:#8A6A1E;font-weight:800" data-ev="aba-assinante"' : ''}>${t}</a>`).join('')}</div>`;
+>>>>>>>
