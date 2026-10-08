@@ -1,0 +1,27 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v45';
+=======
+const VERSAO = 'ab-v46';
+>>>>>>>
+<<<<<<< public/index.html
+  <meta name="description" content="Radar de preços do amendoim: IEA e Conab, mercado físico, clima e ferramentas para quem produz e negocia amendoim.">
+=======
+  <meta name="description" content="Sua central de informação do amendoim: preços, notícias, clima e ferramentas num lugar só.">
+>>>>>>>
+<<<<<<< public/index.html
+  <meta property="og:title" content="Amendoim Brasil · Radar de preços">
+  <meta property="og:description" content="Preço do amendoim em casca (IEA e Conab), mercado físico, clima e ferramentas para o produtor.">
+=======
+  <meta property="og:title" content="App Amendoim Brasil">
+  <meta property="og:description" content="Sua central de informação do amendoim: preços, notícias, clima e ferramentas num lugar só.">
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+const msgCodigo = (cod) => `Amendoim Brasil\nSeu código de acesso: ${cod}\nVale por 10 minutos. Não compartilhe com ninguém.`;
+=======
+const msgCodigo = (cod, nome) => { const pn = String(nome || '').trim().split(/\s+/)[0]; return `${pn ? pn + ', aqui' : 'Aqui'} está o seu código de acesso: ${cod}\nVale por 10 minutos. Acesse e aproveite!\nConto com a sua colaboração. Obrigado!`; };
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    <a class="btn btn-verde btn-pequeno" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgCodigo(c.codigo))}">WhatsApp</a>
+=======
+    <a class="btn btn-verde btn-pequeno" target="_blank" rel="noopener" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgCodigo(c.codigo, c.nome))}">WhatsApp</a>
+>>>>>>>
