@@ -1,0 +1,94 @@
+<<<<<<< public/painel-admin.js
+import { telaConvidadosP, telaUsoP, abrirAbaPiloto, ligarPainelPiloto } from '/painel-piloto.js';
+=======
+import { telaTeste, abrirTeste, ligarPainelPiloto } from '/painel-piloto.js';
+>>>>>>>
+<<<<<<< public/painel-admin.js
+const est = { k: '', dados: null, extras: null, periodo: 30, aba: 'geral', patros: [], relatorio: null, balcao: null, zerar: false };
+=======
+const est = { k: '', dados: null, extras: null, periodo: 30, aba: 'teste', patros: [], relatorio: null, balcao: null, zerar: false };
+>>>>>>>
+<<<<<<< public/painel-admin.js
+// ---------- montagem ----------
+=======
+const GRUPOS = [['teste', 'Teste', ['teste']], ['uso', 'Uso', ['geral', 'uso']], ['hoje', 'Hoje', ['hoje']], ['negocios', 'Negócios', ['patro', 'balcao']], ['pessoas', 'Pessoas', ['assin', 'prod']], ['conteudo', 'Conteúdo', ['conteudo']]];
+const grupoDe = (aba) => GRUPOS.find((g) => g[2].includes(aba)) || GRUPOS[0];
+const pendBalcao = () => est.extras?.balcao?.pendentes || 0;
+const SUB = { geral: () => 'Resumo', uso: () => 'Detalhes', patro: () => 'Patrocínio', balcao: () => `Balcão${pendBalcao() ? ` (${pendBalcao()})` : ''}`, assin: () => 'Assinantes', prod: () => 'Produtores' };
+// O aparelho do administrador não entra na contagem de uso (marcado ao abrir o painel; dá para desfazer aqui).
+const semMedir = () => { try { return localStorage.getItem('ab-sem-medir') === '1'; } catch (e) { return false; } };
+const cartaoMedir = () => `<section class="cartao" style="gap:8px"><span class="es-txt">${semMedir() ? '<b>Este aparelho não entra na contagem.</b> Ele foi marcado como seu, então o seu uso fica de fora dos números desta aba.' : 'Este aparelho está entrando na contagem de uso.'}</span><button class="btn btn-pequeno es-btn-claro" type="button" data-pn-medir>${semMedir() ? 'Contar este aparelho de novo' : 'Não contar este aparelho'}</button><span class="mini">Em outro aparelho seu (computador, outro celular), abra o painel uma vez para ele também ficar de fora. Durante o teste, quem não tem convite não passa da tela de entrada e também não é contado.</span></section>`;
+
+// ---------- montagem ----------
+>>>>>>>
+<<<<<<< public/painel-admin.js
+  const abas = [['geral', 'Visão geral'], ['hoje', 'Hoje'], ['uso', 'Uso do app'], ['patro', 'Patrocínio'], ['balcao', `Balcão${est.extras?.balcao?.pendentes ? ` (${est.extras.balcao.pendentes})` : ''}`], ['assin', 'Assinantes'], ['prod', 'Produtores'], ['conteudo', 'Conteúdo'], ['convidados', 'Convidados'], ['piloto', 'Uso do piloto']];
+  corpo.innerHTML = `<div class="segmento pn-abas">${abas.map(([k, t]) => `<button data-pn-aba="${k}" aria-pressed="${est.aba === k}">${t}</button>`).join('')}</div>
+    ${!['balcao', 'hoje', 'assin', 'prod', 'conteudo', 'convidados', 'piloto'].includes(est.aba) ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+    ${est.aba === 'geral' ? telaGeral() : est.aba === 'uso' ? telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'convidados' ? telaConvidadosP() : est.aba === 'piloto' ? telaUsoP() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
+=======
+  const [gk, , subs] = grupoDe(est.aba);
+  const principais = GRUPOS.map(([k, t, s]) => `<button data-pn-aba="${s[0]}" aria-pressed="${gk === k}">${t}${k === 'negocios' && pendBalcao() ? '<i class="pn-dot" aria-label="anúncios esperando"></i>' : ''}</button>`).join('');
+  const sub = subs.length > 1 ? `<div class="chips pn-sub">${subs.map((k) => `<button class="chip" data-pn-aba="${k}" aria-pressed="${est.aba === k}">${SUB[k]()}</button>`).join('')}</div>` : '';
+  corpo.innerHTML = `<div class="segmento pn-abas">${principais}</div>${sub}
+    ${['geral', 'uso'].includes(est.aba) ? `<div class="chips pn-periodo">${[7, 30, 90].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${est.periodo === p}">${p} dias</button>`).join('')}<button class="chip" data-recarregar>Atualizar</button></div>` : ''}
+    ${est.aba === 'teste' ? telaTeste() : est.aba === 'geral' ? cartaoMedir() + telaGeral() : est.aba === 'uso' ? cartaoMedir() + telaUso() : est.aba === 'patro' ? telaPatro() : est.aba === 'hoje' ? telaHoje() : est.aba === 'assin' ? telaAssinantesAdm() : est.aba === 'prod' ? telaProdutores() : est.aba === 'conteudo' ? telaConteudo() + telaConteudoExtra() : telaBalcao()}`;
+>>>>>>>
+<<<<<<< public/painel-admin.js
+    try { localStorage.setItem(CHAVE_LS, est.k); } catch (e) { /* ignora */ }
+=======
+    try { localStorage.setItem(CHAVE_LS, est.k); } catch (e) { /* ignora */ }
+    try { if (localStorage.getItem('ab-sem-medir') === null) localStorage.setItem('ab-sem-medir', '1'); } catch (e) { /* ignora */ }
+>>>>>>>
+<<<<<<< public/painel-admin.js
+    if (est.aba === 'balcao') carregarBalcao();
+=======
+    if (est.aba === 'balcao') carregarBalcao();
+    if (est.aba === 'teste') abrirTeste();
+>>>>>>>
+<<<<<<< public/painel-admin.js
+  if (aba) { e.preventDefault(); est.aba = aba.dataset.pnAba; desenhar(); if (est.aba === 'balcao') carregarBalcao(); if (est.aba === 'convidados' || est.aba === 'piloto') abrirAbaPiloto(est.aba); return; }
+=======
+  const med = t.closest('[data-pn-medir]');
+  if (med) { try { localStorage.setItem('ab-sem-medir', semMedir() ? '0' : '1'); } catch (er) { /* ignora */ } desenhar(); return; }
+  if (aba) { e.preventDefault(); est.aba = aba.dataset.pnAba; desenhar(); if (est.aba === 'balcao') carregarBalcao(); if (est.aba === 'teste') abrirTeste(); return; }
+>>>>>>>
+<<<<<<< public/painel-admin.js
+ligarPainelPiloto(desenhar);
+=======
+ligarPainelPiloto(desenhar, () => est.k);
+>>>>>>>
+<<<<<<< public/painel.html
+    .pn-abas button { white-space: nowrap; padding: 0 10px; flex: 1 0 auto; font-size: 13px; }
+=======
+    .pn-abas button { white-space: nowrap; padding: 0 7px; flex: 1 0 auto; font-size: 12.5px; }
+    .pn-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #C0392B; margin-left: 5px; }
+    .pn-sub { margin-top: -4px; }
+>>>>>>>
+<<<<<<< public/auth.js
+  if (typeof c.piloto === 'boolean') gravarCache(c.piloto);
+=======
+  if (typeof c.piloto === 'boolean') gravarCache(c.piloto);
+  if (c.papel === 'admin') { try { if (localStorage.getItem('ab-sem-medir') === null) localStorage.setItem('ab-sem-medir', '1'); } catch (e) { /* sem armazenamento */ } } // o uso do administrador não entra nos números
+>>>>>>>
+<<<<<<< public/medicao.js
+export function evento(nome) {
+  if (!MEDIR || !NOME.test(nome)) return;
+=======
+// Fora da contagem: o aparelho do administrador e, na fase de teste, quem ainda não entrou com convite.
+function foraDaContagem() {
+  try {
+    if (localStorage.getItem('ab-sem-medir') === '1') return true;
+    if (localStorage.getItem('ab-piloto') === 'on' && !localStorage.getItem('ab-auth')) return true;
+  } catch (e) { /* sem armazenamento: conta normal */ }
+  return false;
+}
+
+export function evento(nome) {
+  if (!MEDIR || !NOME.test(nome) || foraDaContagem()) return;
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v24';
+=======
+const VERSAO = 'ab-v25';
+>>>>>>>
