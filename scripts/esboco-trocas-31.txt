@@ -1,0 +1,141 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v40';
+=======
+const VERSAO = 'ab-v41-previa';
+>>>>>>>
+<<<<<<< public/auth.js
+const piloto = () => lerCache() === 'on';
+=======
+const PREVIA = /^(deploy-preview-\d+|preview-[a-z0-9-]+)--/.test(location.hostname);
+const piloto = () => !PREVIA && lerCache() === 'on';
+>>>>>>>
+<<<<<<< public/auth.js
+const restrito = () => { const s = sessao(); return !!(s && s.remoto && s.papel !== 'admin' && s.piloto); };
+=======
+const restrito = () => { const s = sessao(); return !PREVIA && !!(s && s.remoto && s.papel !== 'admin' && s.piloto); };
+>>>>>>>
+<<<<<<< public/app.js
+  ${atalhoArea(H())}
+
+  ${heroConab(D, H())}
+
+  ${blocoNovidades(D, H())}
+
+  ${blocoMercadoHoje(D, H())}
+
+  <div class="grade-2">
+=======
+  ${atalhoArea(H())}
+
+  ${heroPreco(D, H())}
+
+  ${blocoMercadoHoje(D, H())}
+
+  ${blocoPrecoRelatado(D, H())}
+
+  <div class="grade-2">
+>>>>>>>
+<<<<<<< public/app.js
+const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+function varChip(v) {
+=======
+const ddmm = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+// ---------- Prévia: preço com contexto ("o que mudou desde a última vez") ----------
+const brlCurto = (n) => 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const difTxt = (d) => (Math.abs(d) < 0.005 ? 'igual' : (d > 0 ? '+' : '−') + brlCurto(Math.abs(d)));
+function contextoConab(c) {
+  const p = (c.historico?.pontos || []).filter((x) => x && x.data && isFinite(x.preco)).sort((a, b) => (a.data < b.data ? -1 : 1));
+  if (p.length < 5) return null;
+  const ult = p[p.length - 1], d30 = p.find((x) => x.data >= new Date(new Date(ult.data).getTime() - 30 * 864e5).toISOString().slice(0, 10)) || p[0];
+  const ano = p.filter((x) => x.data >= new Date(new Date(ult.data).getTime() - 365 * 864e5).toISOString().slice(0, 10));
+  const max = ano.reduce((m, x) => (x.preco > m.preco ? x : m), ano[0]), min = ano.reduce((m, x) => (x.preco < m.preco ? x : m), ano[0]);
+  const base = ano[0];
+  return { ult, d30: ult.preco - d30.preco, pctAno: base.preco ? (ult.preco / base.preco - 1) * 100 : null, max, min, noMax: ult.preco >= max.preco - 0.005, noMin: ult.preco <= min.preco + 0.005 };
+}
+function heroPreco(D, h) {
+  const c = D.cotacoes, dest = c.destaque || {}, v = variacaoIEA(c), k = contextoConab(c);
+  if (dest.preco == null) return '';
+  const sobe = v && v.dif > 0, cai = v && v.dif < 0;
+  const linhaDia = v ? (v.dif === 0 ? `igual desde ${ddmm(v.desde)}` : `${difTxt(v.dif)} em relação a ${ddmm(v.desde)}`) : '';
+  const chips = [];
+  if (k) {
+    chips.push(`<span class="ctx-chip ${k.d30 > 0 ? 'sobe' : k.d30 < 0 ? 'cai' : ''}">${k.d30 === 0 ? 'igual' : difTxt(k.d30)} em 30 dias</span>`);
+    if (k.pctAno != null) chips.push(`<span class="ctx-chip ${k.pctAno > 0 ? 'sobe' : k.pctAno < 0 ? 'cai' : ''}">${k.pctAno > 0 ? '+' : ''}${k.pctAno.toFixed(0)}% em 1 ano</span>`);
+    chips.push(k.noMax ? '<span class="ctx-chip sobe">maior do ano</span>' : k.noMin ? '<span class="ctx-chip cai">menor do ano</span>' : `<span class="ctx-chip">${brlCurto(k.max.preco - k.ult.preco)} abaixo do maior do ano</span>`);
+  }
+  return `<section class="destaque hero-preco">
+    <div class="cartao-cab"><span class="rotulo">Preço da casca · ${esc(dest.regiao || 'Tupã')}</span><span class="pilula pilula-verde-escuro">${esc(dest.fonte || 'IEA')} · ${esc(String(dest.data || '').slice(0, 5))}</span></div>
+    <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brlCurto(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
+    ${linhaDia ? `<div class="hero-var ${sobe ? 'sobe' : cai ? 'cai' : ''}">${v.dif === 0 ? '<span aria-hidden="true">=</span>' : ic(sobe ? I.sobe : I.cai, 'style="width:16px;height:16px"')}<span>${linhaDia}</span></div>` : ''}
+    ${k ? `<div class="ctx-linha"><span class="ctx-fonte">Conab · média SP · ${brlCurto(k.ult.preco)} na semana</span>${chips.join('')}</div>` : ''}
+    <div class="hero-acoes">
+      <a class="btn-branco" href="#/mercado">Ver todas as cotações</a>
+      <button class="btn-enviar" data-compartilhar="preco" aria-label="Enviar o preço no WhatsApp">${ic(I.enviar)}<span>Enviar</span></button>
+    </div>
+  </section>`;
+}
+// Preço relatado por quem está no mercado (prévia com dados de exemplo, para avaliar o layout).
+const RELATOS_EXEMPLO = { praca: 'Oeste Paulista', semana: 'esta semana', produtores: { n: 5, de: 74, a: 78, mediana: 76 }, compradores: { n: 2, valor: 75 }, var: 1 };
+function blocoPrecoRelatado(D, h) {
+  const r = RELATOS_EXEMPLO;
+  const barra = (de, a, med, min = 70, max = 82) => {
+    const p = (x) => Math.max(0, Math.min(100, ((x - min) / (max - min)) * 100));
+    return `<div class="rel-barra" aria-hidden="true"><span class="rel-faixa" style="left:${p(de)}%;width:${p(a) - p(de)}%"></span><span class="rel-med" style="left:${p(med)}%"></span></div>`;
+  };
+  return `<section class="cartao relatado">
+    <div class="cartao-cab"><span class="rotulo">Preço relatado · ${esc(r.praca)}</span><span class="mini">${r.produtores.n + r.compradores.n} relatos ${esc(r.semana)}</span></div>
+    <div class="rel-linha"><span class="rel-quem">Produtores receberam</span><b class="num">R$ ${r.produtores.de} a ${r.produtores.a}</b><span class="mini">mediana R$ ${r.produtores.mediana} · ${r.produtores.n} relatos</span></div>
+    ${barra(r.produtores.de, r.produtores.a, r.produtores.mediana)}
+    <div class="rel-linha"><span class="rel-quem">Compradores pagando</span><b class="num">R$ ${r.compradores.valor}</b><span class="mini">${r.compradores.n} relatos</span></div>
+    <div class="rel-rodape"><span class="mini">${r.var > 0 ? '+' : ''}R$ ${r.var} em relação à semana passada · só quem relata vê a faixa</span><a class="btn btn-verde btn-pequeno" href="#/mercado/termometro" data-ev="relatar">Relatar oferta</a></div>
+    <span class="mini rel-aviso">Prévia com números de exemplo. Relatos são anônimos; o nome e o celular ficam só com a Amendoim Brasil.</span>
+  </section>`;
+}
+// Puxar para baixo no topo da tela recarrega os dados (prévia).
+function ligarPuxar() {
+  let y0 = null, dy = 0, pill = null;
+  const topo = () => (document.scrollingElement || document.documentElement).scrollTop <= 0;
+  const faz = () => { if (!pill) { pill = document.createElement('div'); pill.className = 'puxar-pill'; document.body.appendChild(pill); } return pill; };
+  document.addEventListener('touchstart', (e) => { y0 = topo() && e.touches.length === 1 ? e.touches[0].clientY : null; dy = 0; }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (y0 == null) return;
+    dy = Math.max(0, e.touches[0].clientY - y0);
+    if (!dy) return;
+    const p = faz(); p.textContent = dy > 70 ? '↻ Solte para atualizar' : '↓ Puxe para atualizar'; p.style.transform = `translate(-50%,${Math.min(dy * 0.5, 54) - 8}px)`;
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (y0 == null) return;
+    const ok = dy > 70; y0 = null;
+    if (!pill) return;
+    if (!ok) { pill.style.transform = 'translate(-50%,-70px)'; return; }
+    pill.textContent = '↻ Atualizando…'; pill.style.transform = 'translate(-50%,12px)';
+    setTimeout(() => location.reload(), 250);
+  });
+}
+ligarPuxar();
+
+function varChip(v) {
+>>>>>>>
+<<<<<<< public/extra.css
+.formato span { font-size: 13px; line-height: 1.45; color: var(--texto-2); }
+=======
+.formato span { font-size: 13px; line-height: 1.45; color: var(--texto-2); }
+/* prévia: preço com contexto, preço relatado, puxar para atualizar */
+.hero-preco .ctx-linha { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 2px; }
+.hero-preco .ctx-fonte { font-size: 13px; font-weight: 600; color: #E6F4EA; flex-basis: 100%; }
+.ctx-chip { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; }
+.ctx-chip.sobe { background: rgba(255,255,255,.92); color: var(--verde-escuro); }
+.ctx-chip.cai { background: #FBE3E0; color: #B3261E; }
+.relatado { gap: 8px; border-left: 4px solid var(--amendoim); }
+.rel-linha { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline; }
+.rel-linha .rel-quem { font-size: 13px; font-weight: 600; color: var(--texto-2); }
+.rel-linha b { font-size: 20px; grid-row: span 2; align-self: center; }
+.rel-barra { position: relative; height: 8px; border-radius: 4px; background: #EFEBE0; margin: 2px 0 4px; }
+.rel-faixa { position: absolute; top: 0; height: 100%; border-radius: 4px; background: var(--amendoim-claro); border: 1px solid var(--amendoim-borda); box-sizing: border-box; }
+.rel-med { position: absolute; top: -3px; width: 3px; height: 14px; margin-left: -1px; border-radius: 2px; background: var(--marrom); }
+.rel-rodape { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.rel-aviso { color: var(--texto-3); }
+.puxar-pill { position: fixed; top: 0; left: 50%; transform: translate(-50%,-70px); z-index: 99999; background: #fff; border: 1px solid #E6E1D6; border-radius: 999px; padding: 9px 16px; font-size: 14px; font-weight: 700; color: #1B1B17; box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: transform .15s; }
+>>>>>>>
