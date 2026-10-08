@@ -1,0 +1,303 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v41';
+=======
+const VERSAO = 'ab-v42';
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+    { safra: '26/27', areaMin: 180, areaMax: 180, prodMin: 380, prodMax: 380, situacao: 'Preliminar' }
+=======
+    { safra: '26/27', areaMin: 184, areaMax: 184, prodMin: 380, prodMax: 380, situacao: 'Preliminar' }
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  comentario: 'Minha estimativa é de uma queda de área na faixa de 28% em 26/27, para cerca de 180 mil ha. Eu esperava 30%, mas alguns produtores aumentaram a área, outros buscaram parcerias para conseguir plantar e a queda na venda de semente e de grão foi bem menor do que o esperado. Com a produtividade média brasileira de 380 sc/alq, a oferta fica apertada.',
+=======
+  comentario: 'Área 28% menor em 26/27, para cerca de 184 mil ha: esperava 30%, mas parcerias e a venda de semente seguraram parte da queda. Com 380 sc/alq, a oferta fica apertada.',
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  noticias: [
+    { id: 'n1', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Argentina confirma área 8% menor para a safra 26/27', fonte: 'Bolsa de Cereales de Córdoba', resumo: 'Menos amendoim argentino na Europa em 2027', link: '', exemplo: true },
+    { id: 'n2', dia: new Date().toISOString().slice(0, 10), titulo: 'Exemplo: Conab publica o 1º levantamento da safra 26/27 no dia 15', fonte: 'Conab', resumo: 'Primeira estimativa oficial de área e produção', link: '', exemplo: true }
+  ],
+=======
+  noticias: [],
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function noticiasDoDia() {
+  const lim = new Date(); lim.setDate(lim.getDate() - 2);
+  const corte = lim.toISOString().slice(0, 10);
+  return (conteudo().noticias || []).filter((n) => n.titulo && n.dia >= corte).sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0)).slice(0, 5);
+}
+=======
+// As notícias publicadas vêm de data/mercado.json (atualizado com o app); as do painel local entram por cima.
+let NOTICIAS_APP = [];
+export function definirNoticias(l) { NOTICIAS_APP = Array.isArray(l) ? l : []; }
+export const todasNoticias = () => [...NOTICIAS_APP, ...(conteudo().noticias || [])].filter((n) => n && n.titulo && !n.exemplo);
+export function noticiasDoDia() {
+  const lim = new Date(); lim.setDate(lim.getDate() - 4);
+  const corte = lim.toISOString().slice(0, 10);
+  return todasNoticias().filter((n) => n.dia >= corte).sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0)).slice(0, 5);
+}
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const todas = (conteudo().noticias || []).filter((n) => n.titulo).sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0));
+=======
+  const todas = todasNoticias().sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0));
+>>>>>>>
+<<<<<<< public/app.js
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3, telaNoticias } from '/esboco3.js';
+=======
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3, telaNoticias, definirNoticias } from '/esboco3.js';
+>>>>>>>
+<<<<<<< public/app.js
+  const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
+=======
+  const res = await Promise.all(ARQUIVOS.map((a) => fetch(`/data/${a}.json`, { cache: 'no-cache' }).then((r) => r.json())));
+  ARQUIVOS.forEach((a, i) => { if (a === 'mercado') definirNoticias(res[i]?.noticias); });
+>>>>>>>
+<<<<<<< public/app.js
+function telaCotacoes() {
+  const c = D.cotacoes, cfg = D.config, h = c.historico || {};
+  const chips = `<div class="chips"><button class="chip" aria-pressed="true">Casca</button>${(cfg.produtosEmBreve || []).map((p) => `<button class="chip" disabled>${esc(p)} <span class="breve">EM BREVE</span></button>`).join('')}</div>`;
+  const temProprias = (c.regioes || []).some((r) => r.preco != null);
+  const ult = D.boletins[0];
+  return `${topoMercado('cotacoes', chips)}
+  ${c.referencias?.length ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 4px"><span class="rotulo">Cotações oficiais · casca</span><span class="mini">${esc(c.unidade)}</span></div>
+    ${ordenarRefs(c.referencias).map((r) => {
+      const href = linkSeguro(r.link);
+      return `<${href ? 'a' : 'div'} class="lista-linha ref" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+        <span class="cresce"><b style="font-size:15px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}${r.detalhe ? '<br>' + esc(r.detalhe) : ''}</span></span>
+        <span style="text-align:right"><b class="num" style="font-size:17px;display:block">${brl(r.preco)}</b>${r.variacao != null ? varChip(r.variacao) : ''}</span>
+        ${href ? ic(I.fora, 'style="width:16px;height:16px;stroke:var(--verde);flex-shrink:0" aria-label="Ver na fonte"') : ''}
+      </${href ? 'a' : 'div'}>`;
+    }).join('')}
+    <p class="mini" style="margin:0;padding:10px 0 12px">Toque na linha para conferir na fonte. Conab: preço em R$/kg convertido para saca de 25 kg.</p>
+  </section>` : ''}
+
+  ${cartaoFisico(D, H())}
+
+  ${cartaoFato(D, H())}
+
+  ${temProprias ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Cotação Amendoim Brasil · ${esc(c.unidade)}</span><span class="mini">${c.semana ? 'Semana ' + esc(c.semana) : ''}</span></div>
+    ${c.regioes.filter((r) => r.preco != null).map((r) => `<div class="lista-linha"><span class="cresce"><b style="font-size:15px;display:block">${esc(r.nome)}</b><span class="mini">Levantamento Amendoim Brasil${r.data ? ' · ' + esc(r.data) : ''}</span></span><b class="num" style="font-size:17px">${brl(r.preco)}</b>${varChip(r.variacao)}</div>`).join('')}
+  </section>` : ''}
+
+  <section class="cartao" id="sec-historico">
+    <div class="cartao-cab"><span class="rotulo">Histórico de preço · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
+    <div class="chips" role="group" aria-label="Período">
+      ${[['3M', '3M'], ['6M', '6M'], ...(assinante() ? [['1A', '1 ano']] : [])].map(([p, t]) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${t}</button>`).join('')}
+      ${(assinante() ? [['5 anos', '#/conta/em-breve', 'em breve']] : [['1 ano', '#/conta/planos', ''], ['5 anos', '#/conta/planos', '']]).map(([p, href, extra]) => `<a class="chip" href="${href}" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}${extra ? ' · ' + extra : ''}</a>`).join('')}
+    </div>
+    ${graficoNovo(D, estado.periodo)}
+    ${h.fonte ? `<span class="mini">Fonte: ${linkSeguro(h.link) ? `<a class="link-mini" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
+  </section>
+
+  ${cartaoTermometroDetalhe(D, H(), medidor)}
+
+  ${blocoExportacao(D, H())}
+
+  ${blocoMundo(D, H())}
+
+  ${ult ? `<section class="boletim">
+    <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}Análise · ${esc(ult.tipo)}</span><span class="mini" style="color:#5C3A06">${esc(ult.data)}</span></div>
+    <h2>${esc(ult.titulo)}</h2>
+    <div class="cartao-cab" style="margin-top:4px"><a class="link-mini" href="#/mercado/analises" style="color:#5C3A06">Ver todas as análises</a><a class="btn btn-escuro btn-pequeno" style="min-height:40px" href="${hrefBoletim(ult)}">Ler</a></div>
+  </section>` : ''}
+
+  <a class="chamada es-consult" href="#/mercado/consultoria" data-ev="consultoria"><span class="cresce"><b style="font-size:15px;display:block">Consultoria Amendoim Brasil</b><span style="font-size:13px;color:#5C3A06">Recomendação de venda, histórico completo e paridade de exportação</span></span>${ic(I.seta, 'style="stroke:#5C3A06"')}</a>`;
+}
+=======
+function telaCotacoes() {
+  const c = D.cotacoes, cfg = D.config, h = c.historico || {};
+  const chips = `<div class="chips chips-discretos"><button class="chip" aria-pressed="true">Casca</button>${(cfg.produtosEmBreve || []).map((p) => `<button class="chip" disabled>${esc(p)} <span class="breve">em breve</span></button>`).join('')}</div>`;
+  const temProprias = (c.regioes || []).some((r) => r.preco != null);
+  const refs = ordenarRefs(c.referencias || []);
+  const conab = refs.find((r) => r.fonte === 'Conab');
+  const dest = c.destaque || {};
+  const v = variacaoIEA(c);
+  const outras = refs.filter((r) => r !== conab && r.praca !== dest.regiao);
+  const linhaRef = (r) => { const href = linkSeguro(r.link); return `<${href ? 'a' : 'div'} class="lista-linha ref" style="padding:9px 0" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="cresce"><b style="font-size:15px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}</span></span>
+      <span style="text-align:right"><b class="num" style="font-size:16px;display:block">${brl(r.preco)}</b>${r.variacao != null ? varChip(r.variacao) : ''}</span>
+      ${href ? ic(I.fora, 'style="width:14px;height:14px;stroke:var(--texto-3);flex-shrink:0" aria-label="Ver na fonte"') : ''}
+    </${href ? 'a' : 'div'}>`; };
+  return `${topoMercado('cotacoes', chips)}
+  ${dest.preco != null ? `<section class="destaque hero-preco">
+    <div class="cartao-cab"><span class="rotulo">Quanto está pagando hoje · ${esc(dest.regiao || 'Tupã')}</span><span class="pilula pilula-verde-escuro">${esc(dest.fonte || 'IEA')} · ${esc(String(dest.data || '').slice(0, 5))}</span></div>
+    <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brl(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
+    ${v ? `<div class="hero-var ${v.dif > 0 ? 'sobe' : v.dif < 0 ? 'cai' : ''}">${v.dif === 0 ? '<span aria-hidden="true">=</span>' : ic(v.dif > 0 ? I.sobe : I.cai, 'style="width:16px;height:16px"')}<span>${v.dif === 0 ? `igual desde ${ddmm(v.desde)}` : `${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif)).replace('R$ ', 'R$ ')} em relação a ${ddmm(v.desde)}`}</span></div>` : ''}
+    ${conab ? `<div style="font-size:13.5px;font-weight:600;opacity:.95">Conab · média do estado de SP · ${brl(conab.preco)} na semana ${esc(conab.data)}</div>` : ''}
+    <div class="hero-acoes">
+      <a class="btn-branco" href="#/mercado/hoje">Ver o Mercado hoje</a>
+      <button class="btn-enviar" data-compartilhar="preco" aria-label="Enviar o preço no WhatsApp">${ic(I.enviar)}<span>Enviar</span></button>
+    </div>
+  </section>` : ''}
+
+  ${outras.length ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 2px"><span class="rotulo">Por praça</span><span class="mini">${esc(c.unidade)}</span></div>
+    ${outras.map(linhaRef).join('')}
+    <p class="mini" style="margin:0;padding:10px 0 12px;color:var(--texto-3)">IEA-SP: preço médio diário recebido pelo produtor · Conab: média semanal do estado, R$/kg convertido para saca de 25 kg · toque na praça para conferir na fonte</p>
+  </section>` : ''}
+
+  ${temProprias ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 8px"><span class="rotulo">Cotação Amendoim Brasil · ${esc(c.unidade)}</span><span class="mini">${c.semana ? 'Semana ' + esc(c.semana) : ''}</span></div>
+    ${c.regioes.filter((r) => r.preco != null).map((r) => `<div class="lista-linha"><span class="cresce"><b style="font-size:15px;display:block">${esc(r.nome)}</b><span class="mini">Levantamento Amendoim Brasil${r.data ? ' · ' + esc(r.data) : ''}</span></span><b class="num" style="font-size:17px">${brl(r.preco)}</b>${varChip(r.variacao)}</div>`).join('')}
+  </section>` : ''}
+
+  <section class="cartao" id="sec-historico">
+    <div class="cartao-cab"><span class="rotulo">Como o preço andou · R$/saca</span>${h.exemplo ? '<span class="aviso-exemplo">Dados de exemplo</span>' : ''}</div>
+    <div class="chips" role="group" aria-label="Período">
+      ${[['3M', '3M'], ['6M', '6M'], ...(assinante() ? [['1A', '1 ano']] : [])].map(([p, t]) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${t}</button>`).join('')}
+      ${(assinante() ? [['5 anos', '#/conta/em-breve', 'em breve']] : [['1 ano', '#/conta/planos', ''], ['5 anos', '#/conta/planos', '']]).map(([p, href, extra]) => `<a class="chip" href="${href}" data-ev="assinar" style="text-decoration:none;box-shadow:none">${ic(I.cadeado, 'style="width:14px;height:14px;margin-right:4px"')}${p}${extra ? ` <span class="breve">${extra}</span>` : ''}</a>`).join('')}
+    </div>
+    ${graficoNovo(D, estado.periodo)}
+    ${h.fonte ? `<span class="mini fonte-nota">Fonte: ${linkSeguro(h.link) ? `<a class="fonte-link" href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.fonte)}</a>` : esc(h.fonte)}</span>` : ''}
+  </section>
+
+  ${cartaoFisico(D, H())}
+
+  ${blocoExportacao(D, H())}
+
+  <a class="chamada" href="#/mercado/analises" data-ev="ver-analises" style="text-decoration:none"><span class="cresce"><b style="font-size:15px;display:block">Para onde vai o preço?</b><span style="font-size:13px;color:var(--texto-3)">Termômetro, Brasil e mundo e o boletim do mês, em Análises</span></span>${ic(I.seta, 'style="width:18px;height:18px"')}</a>`;
+}
+>>>>>>>
+<<<<<<< public/app.js
+function telaAnalises() {
+  const tipos = ['Todos', ...new Set(D.boletins.map((b) => b.tipo))];
+  const lista = estado.filtroBoletim === 'Todos' ? D.boletins : D.boletins.filter((b) => b.tipo === estado.filtroBoletim);
+  const ult = D.boletins[0];
+  return `${topoMercado('analises')}
+  ${ult ? `<a class="boletim" href="${hrefBoletim(ult)}">
+    <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}${esc(ult.tipo)}</span><span class="mini" style="color:#5C3A06">${esc(ult.data)}</span></div>
+    <h2>${esc(ult.titulo)}</h2>
+    ${ult.resumo ? `<p>${esc(ult.resumo)}</p>` : ''}
+    <div class="cartao-cab" style="margin-top:4px"><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti</span><span class="btn btn-escuro btn-pequeno" style="min-height:40px">Ler boletim</span></div>
+  </a>` : ''}
+
+  ${cartaoNoticiasDia(H(), false)}
+
+  <div class="secao-titulo"><h2>Panorama global</h2><span class="mini">${ult ? 'Atualizado em ' + esc(ult.data) : ''}</span></div>
+  <div class="paises">${D.panorama.map((p) => {
+    const [tt, tc] = textoTendencia[p.tendencia] || ['', ''];
+    return `<article class="cartao pais">
+      <div class="cartao-cab"><span style="display:flex;align-items:center;gap:10px">${bandeira(p.sigla, 34)}<b style="font-size:16px">${esc(p.pais)}</b></span><span class="pilula">${esc(p.fase)}</span></div>
+      ${p.indicador ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b class="num" style="font-size:18px">${esc(p.indicador)}</b>${tt ? `<span class="pilula ${tc}" style="font-size:11px">${tt}</span>` : ''}</div>` : ''}
+      <p style="margin:0;font-size:14px;line-height:1.45;color:var(--texto-2)">${esc(p.resumo)}</p>
+    </article>`;
+  }).join('')}</div>
+
+  <section class="destaque" style="gap:12px">
+    <b style="font-size:20px;line-height:1.25;letter-spacing:-0.01em">Decida a venda com informação de quem está no mercado</b>
+    ${['Relatórios e boletins completos', 'Histórico de preços completo', 'Paridade de exportação em R$/saca', 'Recomendação de venda semana a semana'].map((t) => `<div style="display:flex;align-items:center;gap:10px;font-size:14px">${ic('<path d="M5 12l5 5 9-10"/>', 'style="width:18px;height:18px;stroke:#F4AD46;stroke-width:2.6"')}${t}</div>`).join('')}
+    <a class="btn btn-amendoim" href="#/mercado/consultoria" data-ev="consultoria">Quero assinar</a>
+  </section>
+
+  <div class="secao-titulo"><h2>Boletins e relatórios</h2></div>
+  <div class="chips">${tipos.map((t) => `<button class="chip" data-boletim="${esc(t)}" aria-pressed="${estado.filtroBoletim === t}">${esc(t)}</button>`).join('')}</div>
+  ${lista.map((r) => {
+    const href = hrefBoletim(r);
+    const fora = !r.exclusivo && !r.secoes?.length && linkSeguro(r.link);
+    return `<a class="cartao" style="flex-direction:row;align-items:center;padding:14px" href="${href}" ${fora ? 'target="_blank" rel="noopener"' : ''}>
+      <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--amendoim-claro)">${ic(I.doc, 'style="stroke:#7A4A08"')}</span>
+      <span class="cresce"><span style="font-size:12px;font-weight:700;color:var(--marrom);display:block">${esc(r.tipo)}</span><b style="font-size:15px;display:block">${esc(r.titulo)}</b><span class="mini">${esc(r.data)}</span></span>
+      ${r.exclusivo ? ic(I.cadeado, 'style="width:18px;height:18px;stroke:#5F5B52" aria-label="Exclusivo"') : ic(I.seta, 'style="width:18px;height:18px"')}
+    </a>`;
+  }).join('')}`;
+}
+=======
+function telaAnalises() {
+  const tipos = ['Todos', ...new Set(D.boletins.map((b) => b.tipo))];
+  const lista = estado.filtroBoletim === 'Todos' ? D.boletins : D.boletins.filter((b) => b.tipo === estado.filtroBoletim);
+  const ult = D.boletins[0];
+  return `${topoMercado('analises')}
+  ${cartaoTermometroDetalhe(D, H(), medidor)}
+
+  ${blocoMundo(D, H())}
+
+  ${ult ? `<a class="boletim" href="${hrefBoletim(ult)}">
+    <div class="cartao-cab"><span class="tag">${ic(I.doc, 'style="width:18px;height:18px"')}${esc(ult.tipo)}</span><span class="mini" style="color:#5C3A06">${esc(ult.data)}</span></div>
+    <h2>${esc(ult.titulo)}</h2>
+    ${ult.resumo ? `<p>${esc(ult.resumo)}</p>` : ''}
+    <div class="cartao-cab" style="margin-top:4px"><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti</span><span class="btn btn-escuro btn-pequeno" style="min-height:40px">Ler boletim</span></div>
+  </a>` : ''}
+
+  ${lista.length > 1 ? `<div class="secao-titulo"><h2>Boletins e relatórios</h2></div>
+  <div class="chips">${tipos.map((t) => `<button class="chip" data-boletim="${esc(t)}" aria-pressed="${estado.filtroBoletim === t}">${esc(t)}</button>`).join('')}</div>
+  ${lista.map((r) => {
+    const href = hrefBoletim(r);
+    const fora = !r.exclusivo && !r.secoes?.length && linkSeguro(r.link);
+    return `<a class="cartao" style="flex-direction:row;align-items:center;padding:14px" href="${href}" ${fora ? 'target="_blank" rel="noopener"' : ''}>
+      <span class="sigla" style="width:44px;height:44px;border-radius:12px;background:var(--amendoim-claro)">${ic(I.doc, 'style="stroke:#7A4A08"')}</span>
+      <span class="cresce"><span style="font-size:12px;font-weight:700;color:var(--marrom);display:block">${esc(r.tipo)}</span><b style="font-size:15px;display:block">${esc(r.titulo)}</b><span class="mini">${esc(r.data)}</span></span>
+      ${r.exclusivo ? ic(I.cadeado, 'style="width:18px;height:18px;stroke:#5F5B52" aria-label="Exclusivo"') : ic(I.seta, 'style="width:18px;height:18px"')}
+    </a>`;
+  }).join('')}` : ''}
+
+  <a class="link-mini" href="#/mercado/consultoria" data-ev="consultoria" style="display:block;text-align:center;padding:6px 0 2px;color:var(--texto-3);font-weight:600">Relatórios completos e recomendação de venda são para assinantes ›</a>`;
+}
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `<section class="cartao es-fisico3" id="sec-fisico">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Mercado físico</span><span class="pilula pilula-verde">direto com o Helder</span></div>
+    <b class="es-fis3-tit">Quanto o comprador está pagando hoje na sua região?</b>
+    <span class="es-fis3-txt">Conab e IEA são médias oficiais, publicadas com alguns dias de atraso. O preço do negócio de hoje é outro: muda com o comprador, a qualidade e o volume. A Amendoim Brasil acompanha esse preço todo dia.</span>
+    <a class="btn btn-verde" href="${zap}" target="_blank" rel="noopener" data-ev="fisico">${h.ic(h.I.zap, 'style="width:20px;height:20px;stroke:#fff"')}Perguntar o preço de hoje no WhatsApp</a>
+    <span class="mini" style="text-align:center">Resposta pessoal, sem compromisso</span>
+  </section>`;
+=======
+  return `<section class="cartao es-fisico3" id="sec-fisico">
+    <span class="rotulo" style="color:var(--verde-escuro)">Preço do negócio de hoje</span>
+    <b class="es-fis3-tit">Quanto estão pagando na sua região hoje?</b>
+    <span class="es-fis3-txt">IEA e Conab são médias com alguns dias de atraso. O preço do dia muda com o comprador, a qualidade e o volume.</span>
+    <a class="btn btn-verde btn-pequeno" href="${zap}" target="_blank" rel="noopener" data-ev="fisico" style="align-self:flex-start">${h.ic(h.I.zap, 'style="width:18px;height:18px;stroke:#fff"')}Perguntar no WhatsApp</a>
+  </section>`;
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-fisico3 { gap: 10px; border: 2px solid var(--verde); background: var(--verde-fundo); }
+.es-fis3-tit { font-size: 18px; line-height: 1.25; letter-spacing: -0.01em; }
+.es-fis3-txt { font-size: 14px; line-height: 1.5; color: var(--texto-2); }
+=======
+.es-fisico3 { gap: 6px; border: 1px solid #BFD9C6; background: var(--verde-fundo); }
+.es-fis3-tit { font-size: 16px; line-height: 1.3; letter-spacing: -0.01em; }
+.es-fis3-txt { font-size: 13.5px; line-height: 1.45; color: var(--texto-2); }
+.fonte-nota { color: var(--texto-3); }
+.fonte-link { color: var(--texto-3); font-weight: 600; text-decoration: underline dotted; }
+.chips-discretos .chip[disabled] { opacity: .6; }
+.chips-discretos .chip .breve { background: transparent; color: var(--texto-3); padding: 0; font-weight: 600; text-transform: lowercase; }
+>>>>>>>
+<<<<<<< public/painel.js
+    ${e.fonte ? `<span class="mini">Fonte: ${h.linkSeguro(e.fonteLink) ? `<a class="link-mini" href="${esc(e.fonteLink)}" target="_blank" rel="noopener">${esc(e.fonte)}</a>` : esc(e.fonte)}</span>` : ''}
+=======
+    ${e.fonte ? `<span class="mini fonte-nota">Fonte: ${h.linkSeguro(e.fonteLink) ? `<a class="fonte-link" href="${esc(e.fonteLink)}" target="_blank" rel="noopener">${esc(e.fonte)}</a>` : esc(e.fonte)}</span>` : ''}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const nomeLocal = atual.gps ? (atual.perto ? 'Perto de ' + esc(atual.perto) : 'Sua localização') : `${esc(atual.nome)}/${esc(atual.uf)}`;
+=======
+  const nomeLocal = atual.gps ? (atual.perto ? esc(atual.perto) : 'Sua localização') : `${esc(atual.nome)}/${esc(atual.uf)}`;
+>>>>>>>
+<<<<<<< public/esboco2.css
+.es-clima-local { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+=======
+.es-clima-local { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; opacity: .92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  return `<header class="topo"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><div><h1>Ferramentas</h1><div class="sub">Veja se a sua conta fecha</div></div></div></header>
+=======
+  return `<header class="topo"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><h1>Ferramentas</h1></div></header>
+>>>>>>>
+<<<<<<< public/balcao.js
+    <div class="topo-linha"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><div><h1>Negociar</h1><div class="sub">Balcão de compra e venda de amendoim</div></div></div>
+=======
+    <div class="topo-linha"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><h1>Negociar</h1></div>
+>>>>>>>
+<<<<<<< public/balcao.js
+    <div class="segmento">${lados.map(([k, t]) => `<button data-lado-b="${k}" aria-pressed="${estado.lado === k}">${t}</button>`).join('')}</div>
+=======
+    <div class="sub" style="margin:-6px 0 0">Balcão de compra e venda de amendoim</div>
+    <div class="segmento">${lados.map(([k, t]) => `<button data-lado-b="${k}" aria-pressed="${estado.lado === k}">${t}</button>`).join('')}</div>
+>>>>>>>
