@@ -1,0 +1,195 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v41-previa';
+=======
+const VERSAO = 'ab-v42-previa';
+>>>>>>>
+<<<<<<< public/auth.js
+const lerCache = () => { try { return localStorage.getItem(CHAVE_PILOTO); } catch (e) { return null; } };
+=======
+const PREVIA = /^(deploy-preview-\d+|preview-[a-z0-9-]+)--/.test(location.hostname);
+const lerCache = () => { if (PREVIA) return 'off'; try { return localStorage.getItem(CHAVE_PILOTO); } catch (e) { return null; } };
+>>>>>>>
+<<<<<<< public/auth.js
+const PREVIA = /^(deploy-preview-\d+|preview-[a-z0-9-]+)--/.test(location.hostname);
+const piloto = () => !PREVIA && lerCache() === 'on';
+=======
+const piloto = () => !PREVIA && lerCache() === 'on';
+>>>>>>>
+<<<<<<< public/app.js
+    ${k ? `<div class="ctx-linha"><span class="ctx-fonte">Conab · média SP · ${brlCurto(k.ult.preco)} na semana</span>${chips.join('')}</div>` : ''}
+=======
+    ${k ? `<div class="ctx-linha"><span class="ctx-fonte">Conab · média SP · ${brlCurto(k.ult.preco)} na semana${k.noMax ? ' · maior do ano' : k.noMin ? ' · menor do ano' : ''}</span></div>` : ''}
+>>>>>>>
+<<<<<<< public/auth.js
+import { sessao, salvarSessao, emProducao } from '/esboco-dados.js';
+=======
+import { sessao, salvarSessao, emProducao, assinante } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/auth.js
+  const s = sessao();
+  if (!s?.remoto) return '';
+  const txt = s.plano === 'empresa' ? 'Painel de Mercado, estimativas e histórico' : 'Estimativas, exportação e histórico';
+=======
+  const s = sessao();
+  if (!s?.remoto || !(assinante() || s.papel === 'admin')) return '';
+  const txt = s.plano === 'empresa' ? 'Painel de Mercado, estimativas e histórico' : 'Estimativas, exportação e histórico';
+>>>>>>>
+<<<<<<< public/app.js
+  ${heroPreco(D, H())}
+
+  ${blocoMercadoHoje(D, H())}
+=======
+  ${heroPreco(D, H())}
+
+  ${blocoNovidades(D, H())}
+
+  ${blocoMercadoHoje(D, H())}
+>>>>>>>
+<<<<<<< public/app.js
+      <span class="rotulo">Chuva · 7 dias${auto?.municipio ? ` <span class="rotulo-local">— ${esc(nomeLocal(auto.municipio))}</span>` : ''}</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
+=======
+      <span class="rotulo">Chuva · 7 dias${auto?.municipio ? ` <span class="rotulo-local">— ${esc(nomeLocal(auto.municipio).replace(/^(perto de|em|na) /, ''))}</span>` : ''}</span>${ic(I.chuva, 'style="width:32px;height:32px;stroke:#2F6FA3"')}
+>>>>>>>
+<<<<<<< public/app.js
+      <span class="mini">${rec ? `<b style="color:var(--verde-escuro)">${esc(rec.titulo)}</b>` : auto ? 'Previsão ' + esc(nomeLocal(auto.municipio)) : 'Carregando previsão…'}</span>
+=======
+      <span class="mini">${rec ? `<b style="color:var(--verde-escuro)">${esc(rec.titulo)}</b>` : auto ? 'Previsão para 7 dias' : 'Carregando previsão…'}</span>
+>>>>>>>
+<<<<<<< public/esboco3.js
+  return `<section class="cartao es-noticias">
+    <div class="cartao-cab"><span class="rotulo">Notícias do dia</span><span class="mini">${quando(lista[0].dia)}</span></div>
+    ${lista.slice(0, compacto ? 3 : 5).map((n) => { const href = /^https?:\/\//.test(n.link || '') ? n.link : ''; const tag = href ? 'a' : 'div'; return `<${tag} class="es-not" ${href ? `href="${h.esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="es-not-ponto"></span>
+      <span class="cresce"><b>${h.esc(n.titulo)}</b>${n.fonte || n.resumo ? `<small>${n.resumo ? h.esc(n.resumo) + ' · ' : ''}${h.esc(n.fonte || '')}</small>` : ''}</span>
+      ${href ? h.ic(h.I.seta, 'style="width:16px;height:16px;stroke:#5F5B52;flex-shrink:0"') : ''}
+    </${tag}>`; }).join('')}
+    <button class="link-enviar" data-compartilhar="noticias" type="button">${h.ic(h.I.enviar)}Enviar no WhatsApp</button>
+  </section>`;
+}
+=======
+  return `<section class="cartao es-noticias">
+    <div class="cartao-cab"><span class="rotulo">Notícias</span><a class="link-mini" href="#/noticias" style="display:flex;align-items:center;gap:4px">Ver todas ${h.ic(h.I.seta, 'style="width:14px;height:14px"')}</a></div>
+    ${lista.slice(0, compacto ? 3 : 5).map((n) => `<a class="es-not" href="#/noticias" data-ev="noticia">
+      <span class="es-not-ponto"></span>
+      <span class="cresce"><b>${h.esc(n.titulo)}</b><small>${quando(n.dia)}${n.fonte ? ' · ' + h.esc(n.fonte) : ''}</small></span>
+      ${h.ic(h.I.seta, 'style="width:16px;height:16px;stroke:#5F5B52;flex-shrink:0"')}
+    </a>`).join('')}
+    <button class="link-enviar" data-compartilhar="noticias" type="button">${h.ic(h.I.enviar)}Enviar no WhatsApp</button>
+  </section>`;
+}
+// Página de notícias: o fato do dia com o texto inteiro e todas as notícias publicadas, cada uma abrindo o resumo e a fonte.
+export function telaNoticias(D, h) {
+  const todas = (conteudo().noticias || []).filter((n) => n.titulo).sort((a, b) => (b.dia > a.dia ? 1 : b.dia < a.dia ? -1 : 0));
+  const hoje = new Date().toISOString().slice(0, 10);
+  const dia = (d) => (!d ? '' : d === hoje ? 'Hoje' : `${d.slice(8, 10)}/${d.slice(5, 7)}/${d.slice(0, 4)}`);
+  const m = D.mercado;
+  const grupos = [];
+  todas.forEach((n) => { const g = grupos[grupos.length - 1]; if (g && g.dia === n.dia) g.itens.push(n); else grupos.push({ dia: n.dia, itens: [n] }); });
+  return `<header class="topo"><a class="link-mini" href="#/" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Início</a>
+    <div><h1>Notícias</h1><div class="sub">O que mexe com o amendoim, com a fonte de cada uma</div></div></header>
+  ${m?.fato ? `<section class="cartao es-fato"><div class="fato"><span class="fato-tag">Fato do dia</span><b>${h.esc(m.fato.titulo)}</b><span>${h.esc(m.fato.texto || '')}</span>${m.fato.fonte || m.fato.link ? `<small class="mini">Fonte: ${/^https?:/.test(m.fato.link || '') ? `<a href="${h.esc(m.fato.link)}" target="_blank" rel="noopener">${h.esc(m.fato.fonte || m.fato.link)}</a>` : h.esc(m.fato.fonte || '')}</small>` : ''}<button class="link-enviar" data-compartilhar="fato">${h.ic(h.I.enviar)}Enviar no WhatsApp</button></div></section>` : ''}
+  ${grupos.length ? grupos.map((g) => `<span class="rotulo" style="padding:4px 4px 0">${dia(g.dia)}</span>
+    ${g.itens.map((n) => { const href = /^https?:\/\//.test(n.link || '') ? n.link : ''; return `<details class="cartao nt-item" style="gap:6px">
+      <summary style="cursor:pointer;list-style:none;display:flex;gap:10px;align-items:flex-start"><span class="es-not-ponto" style="margin-top:7px"></span><span class="cresce"><b style="font-size:15px;line-height:1.3;display:block">${h.esc(n.titulo)}</b>${n.fonte ? `<small class="mini">${h.esc(n.fonte)}</small>` : ''}</span><span aria-hidden="true" style="font-size:18px;color:var(--texto-3)">⌄</span></summary>
+      <div class="es-txt" style="padding-left:18px">${n.resumo ? h.esc(n.resumo) : '<span class="mini">Sem resumo ainda.</span>'}</div>
+      ${href ? `<a class="btn btn-pequeno es-btn-claro" href="${h.esc(href)}" target="_blank" rel="noopener" style="margin-left:18px;align-self:flex-start">Ler na fonte ${n.fonte ? '· ' + h.esc(n.fonte) : ''}</a>` : ''}
+    </details>`; }).join('')}`).join('') : '<div class="vazio">Nenhuma notícia publicada ainda.</div>'}
+  <p class="mini dx-nota">As notícias são selecionadas e resumidas pela Amendoim Brasil a partir das fontes indicadas.</p>`;
+}
+>>>>>>>
+<<<<<<< public/app.js
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3 } from '/esboco3.js';
+=======
+import { botaoAssinanteTopo, heroConab, blocoNovidades, cartaoEnquete, ordenarRefs, cartaoFisico, medidor5, ajustarDados, graficoNovo, telaDestinos, telaBiblioteca, cartaoNoticiasDia, textoNoticias, cartaoFato, telaDadosAssinante, ligarEsboco3, telaNoticias } from '/esboco3.js';
+>>>>>>>
+<<<<<<< public/app.js
+  dolar: () => telaDolar(D, H()),
+=======
+  dolar: () => telaDolar(D, H()),
+  noticias: () => telaNoticias(D, H()),
+>>>>>>>
+<<<<<<< public/dolar.js
+const est = { periodo: '1M', dados: {}, carregando: false, erro: '' };
+=======
+const est = { periodo: 'HOJE', dados: {}, carregando: false, erro: '', hojeEm: 0 };
+>>>>>>>
+<<<<<<< public/dolar.js
+const DIAS = { '5D': 7, '1M': 31, '6M': 183, '1A': 366 };
+=======
+const DIAS = { HOJE: 0, '5D': 7, '1M': 31, '6M': 183, '1A': 366 };
+const horaDe = (ts) => new Date(ts * 1000).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+const hojeSP = () => new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+>>>>>>>
+<<<<<<< public/dolar.js
+async function carregar(p) {
+  if (est.dados[p] || est.carregando) return;
+  est.carregando = true; est.erro = ''; ctx.render(false);
+  try {
+    const r = await fetch(`https://economia.awesomeapi.com.br/json/daily/USD-BRL/${DIAS[p]}`);
+    if (!r.ok) throw new Error('http');
+    const lista = (await r.json()).map((x) => ({ ts: +x.timestamp, bid: +x.bid, high: +x.high, low: +x.low })).filter((x) => x.bid > 0).sort((a, b) => a.ts - b.ts);
+    // um ponto por dia (o primeiro item da API é a cotação de agora)
+    const porDia = new Map(); lista.forEach((x) => porDia.set(diaDe(x.ts), x));
+    est.dados[p] = [...porDia.values()];
+  } catch (e) { est.erro = 'Não foi possível buscar o dólar agora.'; }
+  finally { est.carregando = false; ctx.render(false); }
+}
+=======
+async function carregar(p) {
+  if (p === 'HOJE' && est.dados.HOJE && Date.now() - est.hojeEm > 15 * 60e3) delete est.dados.HOJE; // intradiário vence em 15 min
+  if (est.dados[p] || est.carregando) return;
+  est.carregando = true; est.erro = ''; ctx.render(false);
+  try {
+    if (p === 'HOJE') {
+      const r = await fetch('https://economia.awesomeapi.com.br/json/USD-BRL/360');
+      if (!r.ok) throw new Error('http');
+      const hoje = hojeSP();
+      let lista = (await r.json()).map((x) => ({ ts: +x.timestamp, bid: +x.bid, high: +x.high, low: +x.low })).filter((x) => x.bid > 0 && diaDe(x.ts) === hoje).sort((a, b) => a.ts - b.ts);
+      // um ponto a cada ~5 min, para o gráfico não ficar serrilhado
+      const porFaixa = new Map(); lista.forEach((x) => porFaixa.set(Math.floor(x.ts / 300), x));
+      lista = [...porFaixa.values()];
+      if (lista.length < 2) throw new Error('sem-hoje');
+      est.dados.HOJE = lista; est.hojeEm = Date.now();
+    } else {
+      const r = await fetch(`https://economia.awesomeapi.com.br/json/daily/USD-BRL/${DIAS[p]}`);
+      if (!r.ok) throw new Error('http');
+      const lista = (await r.json()).map((x) => ({ ts: +x.timestamp, bid: +x.bid, high: +x.high, low: +x.low })).filter((x) => x.bid > 0).sort((a, b) => a.ts - b.ts);
+      // um ponto por dia (o primeiro item da API é a cotação de agora)
+      const porDia = new Map(); lista.forEach((x) => porDia.set(diaDe(x.ts), x));
+      est.dados[p] = [...porDia.values()];
+    }
+  } catch (e) {
+    if (p === 'HOJE' && e.message === 'sem-hoje') { est.periodo = '5D'; est.carregando = false; return carregar('5D'); } // fim de semana / feriado: cai para 5 dias
+    est.erro = 'Não foi possível buscar o dólar agora.';
+  }
+  finally { est.carregando = false; ctx.render(false); }
+}
+// Enquanto a tela do dólar estiver aberta, o "Hoje" se renova sozinho a cada 15 min.
+setInterval(() => { if (location.hash.startsWith('#/dolar') && est.periodo === 'HOJE' && document.visibilityState === 'visible') { delete est.dados.HOJE; carregar('HOJE'); } }, 15 * 60e3);
+>>>>>>>
+<<<<<<< public/dolar.js
+  const rot = pts.map((p, i) => (i % passo === 0 || i === pts.length - 1) ? `<text class="eixo" x="${xs[i].toFixed(1)}" y="${H - 5}" text-anchor="${i === pts.length - 1 ? 'end' : i === 0 ? 'start' : 'middle'}">${diaDe(p.ts).slice(0, 5)}</text>` : '').join('');
+=======
+  const intra = est.periodo === 'HOJE';
+  const rot = pts.map((p, i) => (i % passo === 0 || i === pts.length - 1) ? `<text class="eixo" x="${xs[i].toFixed(1)}" y="${H - 5}" text-anchor="${i === pts.length - 1 ? 'end' : i === 0 ? 'start' : 'middle'}">${intra ? horaDe(p.ts) : diaDe(p.ts).slice(0, 5)}</text>` : '').join('');
+>>>>>>>
+<<<<<<< public/dolar.js
+  const chips = `<div class="chips" role="group" aria-label="Período">${Object.keys(DIAS).map((k) => `<button class="chip" data-dl-per="${k}" aria-pressed="${p === k}">${k === '5D' ? '5 dias' : k === '1M' ? '1 mês' : k === '6M' ? '6 meses' : '1 ano'}</button>`).join('')}</div>`;
+=======
+  const chips = `<div class="chips" role="group" aria-label="Período">${Object.keys(DIAS).map((k) => `<button class="chip" data-dl-per="${k}" aria-pressed="${p === k}">${k === 'HOJE' ? 'Hoje' : k === '5D' ? '5 dias' : k === '1M' ? '1 mês' : k === '6M' ? '6 meses' : '1 ano'}</button>`).join('')}</div>`;
+>>>>>>>
+<<<<<<< public/dolar.js
+    <span class="mini" style="text-align:center">Toque e arraste no gráfico para ver o valor de cada dia.</span>
+=======
+    <span class="mini" style="text-align:center">${p === 'HOJE' ? `Hoje, das ${horaDe(ini.ts)} às ${horaDe(ult.ts)} · atualiza a cada 15 min · toque e arraste para ver cada horário` : 'Toque e arraste no gráfico para ver o valor de cada dia.'}</span>
+>>>>>>>
+<<<<<<< public/dolar.js
+      <div class="dx-tile"><span>No período</span><b class="num">${pc(vPer)}</b><small>de ${brl(ini.bid)}</small></div>
+=======
+      <div class="dx-tile"><span>${p === 'HOJE' ? 'Abertura' : 'No período'}</span><b class="num">${p === 'HOJE' ? brl(ini.bid) : pc(vPer)}</b><small>${p === 'HOJE' ? pc(vPer) + ' até agora' : 'de ' + brl(ini.bid)}</small></div>
+>>>>>>>
+<<<<<<< public/dolar.js
+  d.textContent = `${diaDe(p.ts)} · ${brl(p.bid, 4)}${v == null ? '' : ' · ' + pc(v)}`;
+=======
+  d.textContent = `${est.periodo === 'HOJE' ? horaDe(p.ts) : diaDe(p.ts)} · ${brl(p.bid, 4)}${v == null || est.periodo === 'HOJE' ? '' : ' · ' + pc(v)}`;
+>>>>>>>
