@@ -1,0 +1,34 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v26';
+=======
+const VERSAO = 'ab-v27';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/boasvindas.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
+<<<<<<< public/auth.js
+import { sessao, salvarSessao, emProducao } from '/esboco-dados.js';
+=======
+import { sessao, salvarSessao, emProducao } from '/esboco-dados.js';
+import { boasVindas } from '/boasvindas.js';
+>>>>>>>
+<<<<<<< public/auth.js
+  document.body.appendChild(x);
+=======
+  document.body.appendChild(x);
+  boasVindas(); // uma vez por convidado, logo depois do primeiro acesso
+>>>>>>>
+<<<<<<< public/auth.js
+    <div class="pt-msg" id="ab-op-msg" role="status"></div>
+=======
+    <div class="pt-msg" id="ab-op-msg" role="status"></div>
+    <button class="pt-link" id="ab-op-ajuda" type="button" style="align-self:center;padding:2px 8px">Como funciona o teste</button>
+>>>>>>>
+<<<<<<< public/auth.js
+  el.querySelector('#ab-op-x').addEventListener('click', fechar);
+=======
+  el.querySelector('#ab-op-x').addEventListener('click', fechar);
+  el.querySelector('#ab-op-ajuda').addEventListener('click', () => { fechar(); boasVindas(true); });
+>>>>>>>
