@@ -124,7 +124,15 @@ function estilo() {
   #ab-opinar{position:fixed;right:14px;bottom:88px;z-index:2147482900;height:40px;padding:0 14px;border-radius:20px;border:1.5px solid #CFC9BB;background:#fff;color:#1B1B17;font:inherit;font-size:13px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.14);cursor:pointer}
   #ab-opiniao{position:fixed;inset:0;z-index:2147483250;background:rgba(0,0,0,.42);display:flex;align-items:flex-end;justify-content:center}
   #ab-opiniao .pt-folha{width:100%;max-width:480px;background:#fff;border-radius:20px 20px 0 0;padding:18px 18px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
-  #ab-opiniao textarea{min-height:110px;border:1.5px solid #CFC9BB;border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
+  #ab-opiniao textarea{min-height:84px;border:1.5px solid #CFC9BB;border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
+  #ab-opiniao .ab-tags{display:flex;flex-wrap:wrap;gap:6px}
+  #ab-opiniao .ab-tag{min-height:40px;padding:0 12px;border-radius:20px;border:1.5px solid #CFC9BB;background:#fff;color:#1B1B17;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+  #ab-opiniao .ab-tag[aria-pressed="true"]{background:#007731;border-color:#007731;color:#fff}
+  #ab-opiniao .ab-gravar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #ab-opiniao .ab-mic{min-height:44px;padding:0 16px;border-radius:22px;border:1.5px solid #007731;background:#fff;color:#007731;font:inherit;font-size:15px;font-weight:800;cursor:pointer}
+  #ab-opiniao .ab-mic.ab-rec{background:#B3261E;border-color:#B3261E;color:#fff}
+  #ab-opiniao audio{width:100%;max-width:100%}
+  #ab-opiniao .ab-tempo{font-variant-numeric:tabular-nums;font-weight:800;font-size:15px}
   .es-btn-perfil.ab-txt{width:auto;padding:0 12px 0 8px;gap:6px;border-radius:999px}`;
   document.head.appendChild(st);
 }
@@ -163,23 +171,78 @@ function atualizarOpinar() {
 }
 function abrirOpiniao() {
   if (document.getElementById('ab-opiniao')) return;
+  const MAX = 120;
+  const gravavel = !!(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
   const el = document.createElement('div');
   el.id = 'ab-opiniao';
   el.innerHTML = `<div class="pt-folha" role="dialog" aria-label="Sua opinião"><b style="font-size:18px">O que achou?</b>
-    <span style="font-size:14px;color:#5F5B52">Conte o que ficou confuso, o que faltou ou o que você mais usou. O Helder lê tudo.</span>
+    <span style="font-size:14px;color:#5F5B52">Conte o que ficou confuso, o que faltou ou o que você mais usou. Pode escrever ou gravar um áudio. O Helder lê e ouve tudo.</span>
+    <div class="ab-tags" role="group" aria-label="Tipo de opinião">${[['confuso', 'Achei confuso'], ['faltou', 'Faltou algo'], ['ideia', 'Tenho uma ideia'], ['gostei', 'Gostei']].map(([k, r]) => `<button type="button" class="ab-tag" data-tag="${k}" aria-pressed="false">${r}</button>`).join('')}</div>
     <textarea id="ab-op-txt" maxlength="1000" placeholder="Escreva aqui…"></textarea>
+    ${gravavel ? `<div class="ab-gravar"><button type="button" class="ab-mic" id="ab-op-mic">🎙 Gravar áudio</button><span class="ab-tempo" id="ab-op-tempo" aria-live="off"></span></div><div id="ab-op-prev"></div>` : ''}
     <div class="pt-msg" id="ab-op-msg" role="status"></div>
     <div style="display:flex;gap:8px"><button class="pt-btn" id="ab-op-env" type="button" style="flex:1">Enviar</button><button class="pt-link" id="ab-op-x" type="button">Cancelar</button></div></div>`;
   document.body.appendChild(el);
-  const fechar = () => el.remove();
+  const msg = el.querySelector('#ab-op-msg');
+  let tag = '', rec = null, fluxo = null, partes = [], gravado = null, seg = 0, relogio = null, t0 = 0, urlPrev = '';
+  const parar = (descartar) => {
+    clearInterval(relogio); relogio = null;
+    try { if (rec && rec.state !== 'inactive') { if (descartar) rec.onstop = null; rec.stop(); } } catch (e) { /* ignora */ }
+    fluxo?.getTracks().forEach((k) => k.stop()); fluxo = null;
+  };
+  const fechar = () => { parar(true); if (urlPrev) URL.revokeObjectURL(urlPrev); el.remove(); };
   el.addEventListener('click', (e) => { if (e.target === el) fechar(); });
   el.querySelector('#ab-op-x').addEventListener('click', fechar);
+  el.querySelectorAll('.ab-tag').forEach((b) => b.addEventListener('click', () => {
+    tag = tag === b.dataset.tag ? '' : b.dataset.tag;
+    el.querySelectorAll('.ab-tag').forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.tag === tag)));
+  }));
+  const mic = el.querySelector('#ab-op-mic'), tempo = el.querySelector('#ab-op-tempo'), prev = el.querySelector('#ab-op-prev');
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  if (mic) mic.addEventListener('click', async () => {
+    if (rec && rec.state === 'recording') { parar(false); return; }
+    msg.textContent = ''; msg.className = 'pt-msg';
+    try {
+      fluxo = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) { msg.textContent = 'Não consegui usar o microfone. Libere o microfone para este site ou escreva a opinião.'; return; }
+    const tipo = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'].find((m) => MediaRecorder.isTypeSupported?.(m));
+    try { rec = new MediaRecorder(fluxo, { ...(tipo ? { mimeType: tipo } : {}), audioBitsPerSecond: 24000 }); }
+    catch (e) { parar(true); msg.textContent = 'Este aparelho não consegue gravar áudio aqui. Escreva a opinião.'; return; }
+    partes = []; gravado = null; prev.replaceChildren(); if (urlPrev) { URL.revokeObjectURL(urlPrev); urlPrev = ''; }
+    rec.ondataavailable = (ev) => { if (ev.data?.size) partes.push(ev.data); };
+    rec.onstop = () => {
+      mic.classList.remove('ab-rec'); mic.textContent = '🎙 Gravar de novo';
+      if (msg.textContent.startsWith('Toque em Parar')) msg.textContent = '';
+      seg = Math.max(1, Math.round((Date.now() - t0) / 1000));
+      const mime = (rec.mimeType || tipo || 'audio/webm').split(';')[0];
+      const blob = new Blob(partes, { type: mime });
+      if (blob.size < 800) { tempo.textContent = ''; msg.textContent = 'Não captei som. Tente de novo.'; return; }
+      gravado = { blob, mime, seg };
+      urlPrev = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('audio'), { controls: true, src: urlPrev });
+      prev.replaceChildren(a); tempo.textContent = fmt(seg);
+    };
+    t0 = Date.now(); rec.start(1000);
+    mic.classList.add('ab-rec'); mic.textContent = '■ Parar'; tempo.textContent = '0:00';
+    relogio = setInterval(() => {
+      const s = Math.round((Date.now() - t0) / 1000);
+      tempo.textContent = fmt(s) + ' / ' + fmt(MAX);
+      if (s >= MAX) parar(false);
+    }, 500);
+  });
+  const paraBase64 = (blob) => new Promise((ok, erro) => { const f = new FileReader(); f.onload = () => ok(String(f.result).split(',')[1] || ''); f.onerror = erro; f.readAsDataURL(blob); });
   el.querySelector('#ab-op-env').addEventListener('click', async () => {
-    const txt = el.querySelector('#ab-op-txt').value.trim(), msg = el.querySelector('#ab-op-msg');
-    if (txt.length < 2) { msg.textContent = 'Escreva a sua opinião.'; return; }
-    msg.textContent = 'Enviando…'; msg.className = 'pt-msg pt-ok';
+    if (rec && rec.state === 'recording') { msg.textContent = 'Toque em Parar antes de enviar.'; return; }
+    const txt = el.querySelector('#ab-op-txt').value.trim();
+    if (txt.length < 2 && !gravado) { msg.textContent = 'Escreva ou grave a sua opinião.'; return; }
+    const env = el.querySelector('#ab-op-env'); env.disabled = true;
+    msg.textContent = gravado ? 'Enviando o áudio…' : 'Enviando…'; msg.className = 'pt-msg pt-ok';
+    const corpo = { texto: txt, tela: telaAtual(), ...(tag ? { tag } : {}) };
+    try { if (gravado) corpo.audio = { base64: await paraBase64(gravado.blob), mime: gravado.mime, seg: gravado.seg }; }
+    catch (e) { env.disabled = false; msg.className = 'pt-msg'; msg.textContent = 'Não foi possível preparar o áudio. Grave de novo.'; return; }
     const tk = await tokenValido();
-    const r = tk ? await chamar('feedback', { texto: txt, tela: telaAtual() }, tk) : SEM_REDE;
+    const r = tk ? await chamar('feedback', corpo, tk) : SEM_REDE;
+    env.disabled = false;
     if (r.ok) { fechar(); toast('Obrigado! Sua opinião chegou ao Helder.'); } else { msg.className = 'pt-msg'; msg.textContent = r.mensagem || 'Não foi possível enviar agora.'; }
   });
   setTimeout(() => el.querySelector('#ab-op-txt')?.focus(), 50);
