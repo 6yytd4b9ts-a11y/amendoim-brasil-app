@@ -1,0 +1,155 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v43-previa';
+=======
+const VERSAO = 'ab-v44-previa';
+>>>>>>>
+<<<<<<< public/esboco3.js
+const TEMAS = [['todos', 'Tudo'], ['aflatoxina', 'Aflatoxina'], ['armazenagem', 'Armazenagem'], ['colheita', 'Arranquio e colheita'], ['doencas', 'Doenças']];
+=======
+const TEMAS = [['todos', 'Tudo'], ['aflatoxina', 'Aflatoxina'], ['armazenagem', 'Armazenagem'], ['colheita', 'Arranquio e cura'], ['nutricao', 'Nutrição (boro, cálcio, gesso)'], ['doencas', 'Doenças e pragas']];
+const BIB_SECAO = { tema: 'todos', busca: '' };
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function telaBiblioteca(h) {
+  const { tema, busca } = est.bib;
+  const q = semAcento(busca);
+  const lista = BIBLIOTECA.filter((x) => (tema === 'todos' || x.tema === tema) && (!q || semAcento(x.titulo + ' ' + x.resumo + ' ' + x.fonte).includes(q)));
+  const termo = encodeURIComponent('amendoim ' + (busca || (tema !== 'todos' ? TEMAS.find((t) => t[0] === tema)[1] : '')));
+  return `<header class="topo">
+    <a class="link-mini" href="#/mercado/analises" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Análises</a>
+    <div><h1>Biblioteca do amendoim</h1><div class="sub">Pesquisas e manuais gratuitos, com resumo prático</div></div>
+    <div class="campo"><input id="bib-busca" type="search" placeholder="Buscar: aflatoxina, secagem, arranquio…" value="${h.esc(busca)}" style="font-size:16px;font-weight:600"></div>
+    <div class="chips">${TEMAS.map(([k, t]) => `<button class="chip" data-bib-tema="${k}" aria-pressed="${tema === k}">${t}</button>`).join('')}</div>
+  </header>
+  ${lista.length ? lista.map((x) => `<article class="cartao es-bib-item">
+    <span class="es-tipo es-t-evento">${h.esc(TEMAS.find((t) => t[0] === x.tema)[1])}</span>
+    <b style="font-size:15px;line-height:1.35">${h.esc(x.titulo)}</b>
+    <span class="mini">${h.esc(x.fonte)}${x.ano ? ' · ' + x.ano : ''}</span>
+    <span class="es-txt">${h.esc(x.resumo)}</span>
+    <a class="btn btn-pequeno es-btn-claro" href="${h.esc(x.link)}" target="_blank" rel="noopener" style="align-self:flex-start">${h.ic(h.I.pdf, 'style="width:16px;height:16px"')}Abrir / baixar</a>
+  </article>`).join('') : '<div class="vazio">Nada encontrado aqui. Tente as buscas abaixo.</div>'}
+  <section class="cartao" style="gap:8px">
+    <span class="rotulo">Procurar mais em</span>
+    <div class="es-botoes">
+      <a class="btn btn-pequeno es-btn-claro" href="https://search.scielo.org/?q=${termo}&lang=pt" target="_blank" rel="noopener">SciELO</a>
+      <a class="btn btn-pequeno es-btn-claro" href="https://scholar.google.com/scholar?q=${termo}" target="_blank" rel="noopener">Google Acadêmico</a>
+    </div>
+  </section>
+  <p class="mini es-legal">Só material de acesso livre. O arquivo abre no site oficial de quem publicou.</p>`;
+}
+=======
+export function telaBiblioteca(h) {
+  const { tema, busca } = est.bib;
+  const q = semAcento(busca);
+  const lista = BIBLIOTECA.filter((x) => (tema === 'todos' || x.tema === tema) && (!q || semAcento(x.titulo + ' ' + x.resumo + ' ' + x.fonte).includes(q)));
+  const nomeTema = (k) => (TEMAS.find((t) => t[0] === k) || ['', k])[1];
+  const termo = encodeURIComponent('amendoim ' + (busca || (tema !== 'todos' ? nomeTema(tema) : '')));
+  const sec = (id, titulo, sub, corpo, aberto = false) => `<details class="cartao bib-sec" id="bib-${id}" ${aberto ? 'open' : ''}><summary class="cartao-cab" style="cursor:pointer;list-style:none"><span><b style="font-size:15px;display:block">${titulo}</b><span class="mini">${sub}</span></span><span class="mini bib-seta">abrir</span></summary>${corpo}</details>`;
+  const item = (x) => `<article class="cartao es-bib-item">
+    <div class="cartao-cab"><span class="es-tipo es-t-evento">${h.esc(nomeTema(x.tema))}</span><span class="mini">${x.ano ? x.ano : 'data a confirmar'}</span></div>
+    <b style="font-size:15px;line-height:1.35">${h.esc(x.titulo)}</b>
+    <span class="mini">${x.autor ? h.esc(x.autor) + ' · ' : '<i>autor a confirmar</i> · '}${h.esc(x.fonte)}</span>
+    <div class="bib-bloco"><span class="rotulo">Resumo de 1 minuto</span><span class="es-txt">${h.esc(x.resumo)}</span></div>
+    <details class="abre"><summary>O que fazer na prática</summary><p class="es-txt" style="margin:0 0 10px">${x.pratica ? h.esc(x.pratica) : '<span class="mini">Em preparação: a Amendoim Brasil escreve este passo a passo a partir do material original.</span>'}</p></details>
+    <a class="btn btn-pequeno es-btn-claro" href="${h.esc(x.link)}" target="_blank" rel="noopener" style="align-self:flex-start">${h.ic(h.I.pdf, 'style="width:16px;height:16px"')}PDF original</a>
+  </article>`;
+  const cultivar = (n) => `<div class="cartao bib-cult"><div class="cartao-cab"><b>Cultivar ${n}</b><span class="pilula pilula-amendoim">EXEMPLO</span></div>
+    <div class="bib-cult-grade"><span>Ciclo</span><b>— dias</b><span>Tipo</span><b>runner / alto oleico</b><span>Produtividade média</span><b>— sc/ha</b><span>Obtentor</span><b>IAC · Embrapa · …</b></div>
+    <span class="mini">Cartão de exemplo: os dados entram só com a fonte oficial (ficha do obtentor).</span></div>`;
+  return `<header class="topo">
+    <a class="link-mini" href="#/ferramentas" style="display:flex;align-items:center;gap:4px">${h.ic(h.I.seta, 'style="width:16px;height:16px;transform:rotate(180deg)"')}Ferramentas</a>
+    <div><h1>Biblioteca do Amendoim</h1><div class="sub">Conteúdo técnico de instituições, com resumo prático · sem propaganda</div></div>
+    <div class="campo"><input id="bib-busca" type="search" placeholder="Buscar: aflatoxina, gesso, arranquio…" value="${h.esc(busca)}" style="font-size:16px;font-weight:600"></div>
+    <div class="chips">${TEMAS.map(([k, t]) => `<button class="chip" data-bib-tema="${k}" aria-pressed="${tema === k}">${t}</button>`).join('')}</div>
+  </header>
+  ${lista.length ? lista.map(item).join('') : '<div class="vazio">Nada publicado neste tema ainda.</div>'}
+
+  ${sec('cultivares', 'Banco de cultivares', 'nome, ciclo, tipo, produtividade e obtentor', `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${cultivar('A')}${cultivar('B')}<span class="mini">Fontes previstas: IAC, Embrapa e obtentores privados. Nada é publicado sem a ficha oficial.</span></div>`)}
+
+  ${sec('camara', 'Câmara Setorial do Amendoim', 'comunicados e atas, no espaço próprio', `<div class="vazio" style="margin-top:8px">Nenhum comunicado publicado ainda. Quando a Câmara divulgar, entra aqui com data e link para o documento original.</div>`)}
+
+  ${sec('defensivos', 'Comparativo de defensivos', 'só ensaios de instituição · espaço reservado', `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+    <span class="es-txt">Aqui vão entrar resultados de ensaios de instituições de pesquisa (herbicidas, inseticidas, fungicidas), sempre com <b>local, safra e metodologia</b>, e o <b>nome do agrônomo responsável</b>. Sem ranking de “melhor produto”.</span>
+    <div class="cartao" style="background:var(--fundo);gap:4px"><span class="rotulo">Como vai aparecer</span><span class="mini">Produto × tratamento · instituição · local · safra · metodologia · resultado medido · responsável técnico</span></div>
+    <span class="mini" style="font-weight:700">Este conteúdo não substitui o receituário agronômico.</span>
+    <span class="pilula pilula-amendoim" style="align-self:flex-start">Em preparação</span></div>`)}
+
+  ${sec('enviar', 'Enviar conteúdo técnico', 'pesquisador ou agrônomo · passa pela aprovação da Amendoim Brasil', `<form id="bib-envio" class="es-campos" style="margin-top:8px">
+    <div class="campo"><label for="be-tit">Título do material</label><input id="be-tit" maxlength="140" required></div>
+    <div class="campo"><label for="be-autor">Autor(es)</label><input id="be-autor" maxlength="120" required></div>
+    <div class="campo"><label for="be-inst">Instituição</label><input id="be-inst" maxlength="80" required placeholder="IAC, Embrapa, Unesp, APTA…"></div>
+    <div class="campo"><label for="be-tema">Tema</label><select id="be-tema">${TEMAS.slice(1).map(([k, t]) => `<option value="${k}">${t}</option>`).join('')}</select></div>
+    <div class="campo"><label for="be-link">Link do PDF ou da publicação</label><input id="be-link" type="url" placeholder="https://…" required></div>
+    <div class="campo"><label for="be-resumo">Resumo em até 5 linhas</label><textarea id="be-resumo" rows="4" maxlength="600" style="width:100%;font:inherit;padding:10px;border:1px solid var(--linha);border-radius:12px;background:#fff"></textarea></div>
+    <div class="campo"><label for="be-contato">Seu nome e WhatsApp (não aparece no app)</label><input id="be-contato" maxlength="120" required></div>
+    <label class="es-check"><input type="checkbox" required><span>É material técnico de instituição, sem propaganda de produto.</span></label>
+    <button class="btn btn-verde" type="submit">Enviar para aprovação</button>
+    <span class="mini">Nada é publicado sem a aprovação da Amendoim Brasil. Você recebe um retorno pelo WhatsApp.</span>
+    <div class="mini" role="status" id="be-msg" style="font-weight:700;color:var(--verde-escuro)"></div>
+  </form>`)}
+
+  <section class="cartao" style="gap:8px">
+    <span class="rotulo">Procurar mais em</span>
+    <div class="es-botoes">
+      <a class="btn btn-pequeno es-btn-claro" href="https://search.scielo.org/?q=${termo}&lang=pt" target="_blank" rel="noopener">SciELO</a>
+      <a class="btn btn-pequeno es-btn-claro" href="https://scholar.google.com/scholar?q=${termo}" target="_blank" rel="noopener">Google Acadêmico</a>
+    </div>
+  </section>
+  <p class="mini es-legal">Só material de acesso livre, de instituições. O arquivo abre no site oficial de quem publicou. Conteúdo informativo: não substitui o receituário agronômico.</p>`;
+}
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function ligarEsboco3(opcoes) {
+  ctx = { ...ctx, ...opcoes };
+=======
+export function ligarEsboco3(opcoes) {
+  ctx = { ...ctx, ...opcoes };
+  document.addEventListener('submit', (e) => {
+    if (e.target.id !== 'bib-envio') return;
+    e.preventDefault();
+    const m = document.getElementById('be-msg'); if (m) m.textContent = 'Prévia: na versão final este envio cai no painel da Amendoim Brasil para aprovação.';
+  });
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  <p class="mini" style="text-align:center;margin:0 8px">Seus números ficam salvos só neste aparelho.</p>`;
+=======
+  <p class="mini" style="text-align:center;margin:0 8px">Seus números ficam salvos só neste aparelho.</p>
+  <section class="fh-ler"><span class="rotulo fh-rot" style="color:#7A4A08">Para ler · não é conta, é conteúdo</span>
+    <a class="cartao fh-ler-card" href="#/biblioteca" data-ev="hub-biblioteca">
+      <span class="sigla" style="width:46px;height:46px;border-radius:12px;background:var(--amendoim-claro);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#7A4A08" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h7"/></svg></span>
+      <span class="cresce"><b style="font-size:16px;display:block">Biblioteca do Amendoim</b><span class="mini">Aflatoxina, armazenagem, arranquio e cura, nutrição, doenças e pragas · cultivares · Câmara Setorial</span></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#7A4A08" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
+    <span class="mini" style="margin:0 8px;text-align:center"><b>Opção A (recomendada):</b> a Biblioteca mora aqui, em seção separada das calculadoras.</span>
+  </section>`;
+>>>>>>>
+<<<<<<< public/app.js
+  ${blocoPanoramaCompacto(D, H())}
+
+  ${cartaoAlertas()}
+=======
+  ${blocoPanoramaCompacto(D, H())}
+
+  <a class="cartao fh-ler-card" href="#/biblioteca" data-ev="home-biblioteca" style="border-left:4px solid var(--amendoim)">
+    <span class="sigla" style="width:46px;height:46px;border-radius:12px;background:var(--amendoim-claro);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#7A4A08" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h7"/></svg></span>
+    <span class="cresce"><b style="font-size:16px;display:block">Biblioteca do Amendoim</b><span class="mini">Conteúdo técnico confiável para a lavoura · <b>Opção B (esboço): card na Home</b></span></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#7A4A08" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0"><path d="M9 6l6 6-6 6"/></svg>
+  </a>
+
+  ${cartaoAlertas()}
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-bib-item { gap: 6px; }
+=======
+.es-bib-item { gap: 6px; }
+.bib-bloco { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; border-radius: 12px; background: var(--fundo); }
+.bib-sec { gap: 0; }
+.bib-sec > summary::-webkit-details-marker { display: none; }
+.bib-sec .bib-seta::after { content: ' ⌄'; }
+.bib-sec[open] .bib-seta::after { content: ' ⌃'; }
+.bib-cult { gap: 6px; background: var(--amendoim-fundo); border-color: var(--amendoim-borda); }
+.bib-cult-grade { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 13px; }
+.bib-cult-grade span { color: var(--texto-3); font-weight: 600; }
+.fh-ler { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.fh-ler-card { flex-direction: row; align-items: center; gap: 12px; padding: 14px; text-decoration: none; color: inherit; background: #fff; }
+>>>>>>>

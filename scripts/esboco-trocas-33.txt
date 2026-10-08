@@ -1,0 +1,161 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v42-previa';
+=======
+const VERSAO = 'ab-v43-previa';
+>>>>>>>
+<<<<<<< public/clima.js
+    out.chuva7passados = somaJanela(d, somaDias(hoje, -7), ontem);
+=======
+    out.chuva7passados = somaJanela(d, somaDias(hoje, -7), ontem);
+    out.chuvaOntem = iHoje > 0 ? (d.precipitation_sum[iHoje - 1] ?? null) : null;
+    out.chuva15passados = somaJanela(d, somaDias(hoje, -15), ontem);
+    // janela seca na previsão: dias seguidos com menos de 1 mm e chance baixa, a partir de hoje (ou depois da chuva de hoje)
+    (() => {
+      const ds = out.dias, secoDia = (x) => (x.mm || 0) < 1 && (x.prob == null || x.prob < 35);
+      let i = 0; while (i < ds.length && !secoDia(ds[i])) i++;
+      let j = i; while (j < ds.length && secoDia(ds[j])) j++;
+      out.janelaSeca = j > i ? { inicio: ds[i].data, fim: ds[j - 1].data, dias: j - i, comecaHoje: i === 0, aberta: j >= ds.length, depois: ds[j] || null, antes: i > 0 ? ds[i - 1] : null } : null;
+    })();
+>>>>>>>
+<<<<<<< public/clima.js
+      if (totais.length) { out.mediaSafra = totais.reduce((a, b) => a + b, 0) / totais.length; out.anosMedia = totais.length; }
+=======
+      if (totais.length) { out.mediaSafra = totais.reduce((a, b) => a + b, 0) / totais.length; out.anosMedia = totais.length; }
+      // normal (média de 10 anos) das mesmas janelas de 7, 15 e 30 dias que terminam ontem
+      out.normal = {};
+      [7, 15, 30].forEach((n) => {
+        const vals = [];
+        for (let k = 1; k <= 10; k++) {
+          const fim = somaDias(ontem, 0).replace(/^\d{4}/, String(Number(ontem.slice(0, 4)) - k)), ini = somaDias(fim, -n);
+          let soma = 0, c = 0;
+          h.time.forEach((t, i) => { if (t >= ini && t <= fim && h.precipitation_sum[i] != null) { soma += h.precipitation_sum[i]; c++; } });
+          if (c >= n * 0.9) vals.push(soma);
+        }
+        if (vals.length >= 5) out.normal[n] = { mm: vals.reduce((a, b) => a + b, 0) / vals.length, anos: vals.length };
+      });
+>>>>>>>
+<<<<<<< public/esboco2.css
+.es-clima-local { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+=======
+.es-clima-local { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; opacity: .92; }
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
+      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
+      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
+    </a>
+  </section>
+=======
+    <a class="es-radar2" href="${esc(c.radarLink || 'https://www.ipmetradar.com.br/2mobileGis.php')}" target="_blank" rel="noopener" data-ev="radar">
+      <span class="es-radar2-ic">${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1"/>', 'style="width:22px;height:22px;stroke:#1F4E78"')}</span>
+      <span class="cresce"><b>Ver radar de chuva ao vivo</b><small>IPMet/Unesp · onde está chovendo agora</small></span>
+      ${ic(I.seta, 'style="width:18px;height:18px;stroke:#1F4E78"')}
+    </a>
+  </section>
+
+  ${a && a.chuva7passados != null ? `<section class="cartao cl-choveu" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Choveu de verdade</span><span class="mini">medido · até ontem</span></div>
+    <div class="cl-tiles"><div><span>Ontem</span><b class="num">${a.chuvaOntem == null ? '—' : numBr(Math.round(a.chuvaOntem * 10) / 10)}<small>mm</small></b></div><div><span>5 dias</span><b class="num">${numBr(Math.round(a.chuva5passados || 0))}<small>mm</small></b></div><div><span>7 dias</span><b class="num">${numBr(Math.round(a.chuva7passados || 0))}<small>mm</small></b></div><div><span>30 dias</span><b class="num">${numBr(Math.round(a.chuva30passados || 0))}<small>mm</small></b></div></div>
+    ${(() => { const n = a.normal || {}; const fr = (dias, v) => { const nm = n[dias]; if (!nm || !nm.mm) return ''; const p = Math.round((v / nm.mm - 1) * 100); return `<span class="cl-normal ${p <= -30 ? 'cai' : p >= 30 ? 'sobe' : ''}">${dias === 30 ? 'No mês' : `Em ${dias} dias`}: ${Math.abs(p) < 10 ? 'dentro do normal' : `${Math.abs(p)}% ${p < 0 ? 'abaixo' : 'acima'} do normal`} <small>(normal ${numBr(Math.round(nm.mm))} mm)</small></span>`; }; const l = [fr(30, a.chuva30passados || 0), fr(15, a.chuva15passados || 0), fr(7, a.chuva7passados || 0)].filter(Boolean); return l.length ? `<div class="cl-normais">${l.join('')}</div>` : ''; })()}
+    <span class="mini">Chuva estimada para o ponto da lavoura (Open-Meteo). Normal = média dos últimos 10 anos no mesmo período.</span>
+  </section>` : ''}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  ${rec ? `<section class="cartao fase-cartao">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Para a lavoura esta semana</span><span class="pilula pilula-verde">${esc(fase)}</span></div>
+    <b style="font-size:17px;line-height:1.3">${esc(rec.titulo)}</b>
+    ${rec.dica ? `<details class="abre"><summary>Ver orientação</summary><p class="es-txt" style="margin:0 0 10px">${esc(rec.dica)}</p></details>` : ''}
+    <span class="mini">Automática, pela previsão · confirme com seu agrônomo</span>
+  </section>` : ''}
+=======
+  ${(() => { const js = a?.janelaSeca; if (!a?.dias?.length) return ''; const dd = (iso) => `${SEMANA[new Date(iso + 'T12:00:00Z').getUTCDay()]} ${dataCurta(iso)}`;
+    let titulo, txt, cor;
+    if (!js) { titulo = 'Sem janela seca à vista'; txt = `Chuva prevista em quase todos os próximos ${diasTodos.length} dias. Para arranquio e cura, espere uma sequência de 3 dias ou mais sem chuva.`; cor = 'cai'; }
+    else if (js.dias >= 3) { titulo = js.comecaHoje ? `${js.dias}${js.aberta ? '+' : ''} dias secos a partir de hoje` : `${js.dias}${js.aberta ? '+' : ''} dias secos de ${dd(js.inicio)} a ${dd(js.fim)}`; txt = `${js.aberta ? 'Sem chuva prevista até o fim da previsão.' : `Volta a chover ${dd(js.depois.data)} (${numBr(js.depois.mm)} mm).`} ${js.dias >= 5 ? 'Janela boa para arranquio e cura na leira.' : 'Serve para arranquio curto; cura de 3 a 5 dias fica no limite.'}`; cor = 'sobe'; }
+    else { titulo = `Só ${js.dias} ${js.dias === 1 ? 'dia seco' : 'dias secos'} (${dd(js.inicio)}${js.dias > 1 ? ' a ' + dd(js.fim) : ''})`; txt = `Pouco para arranquio e cura. ${js.depois ? `Chuva de ${numBr(js.depois.mm)} mm ${dd(js.depois.data)}.` : ''}`; cor = ''; }
+    return `<section class="cartao cl-seco ${cor}" style="gap:6px"><div class="cartao-cab"><span class="rotulo">Próximos dias secos?</span><span class="mini">arranquio e cura</span></div><b style="font-size:17px;line-height:1.3">${titulo}</b><span class="es-txt">${txt}</span></section>`; })()}
+
+  ${rec ? `<section class="cartao fase-cartao" style="gap:6px">
+    <div class="cartao-cab"><span class="rotulo" style="color:var(--verde-escuro)">Dica da fase</span><span class="pilula pilula-verde">${esc(fase)}</span></div>
+    <b style="font-size:15px;line-height:1.3">${esc(rec.titulo)}</b>
+    ${rec.dica || rec.itens?.length ? `<details class="abre"><summary>Ver a orientação completa</summary>${(rec.itens || []).map((t) => `<p class="es-txt" style="margin:0 0 8px">${esc(t)}</p>`).join('')}${rec.dica ? `<p class="es-txt" style="margin:0 0 10px">${esc(rec.dica)}</p>` : ''}<a class="link-mini" href="#/biblioteca" data-ev="dica-biblioteca">Ler mais na Biblioteca do Amendoim ›</a></details>` : ''}
+    <span class="mini">Automática, pela previsão · confirme com seu agrônomo</span>
+  </section>` : ''}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  <section class="cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias</span></div>
+=======
+  <details class="cartao abre-cartao" style="gap:8px">
+    <summary class="cartao-cab" style="cursor:pointer;list-style:none"><span class="rotulo">Chuva nas regiões produtoras</span><span class="mini">últimos 7 dias · toque para abrir</span></summary>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <span class="mini">Barra: chuva dos últimos 7 dias (Open-Meteo) · em verde: o que os produtores mediram no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (exemplo)' : ''}</span>
+  </section>
+=======
+    <span class="mini">Barra: chuva dos últimos 7 dias (Open-Meteo) · em verde: o que os produtores mediram no pluviômetro${(conteudo().chuvaExemplo || []).length ? ' (exemplo)' : ''}</span>
+  </details>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div class="cartao-cab"><b style="font-size:15px">Choveu na sua propriedade?</b><span class="mini">pluviômetro</span></div>
+=======
+    <div class="cartao-cab"><b style="font-size:15px">Quanto choveu aí?</b><span class="mini">seu pluviômetro</span></div>
+    <span class="mini">Anote a chuva da sua lavoura. Por enquanto fica só neste celular; em breve, com login, entra no mapa como “relatado por produtores”.</span>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  <section class="cartao" style="gap:12px">
+    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · ${nomeLocal}</span>${dif != null ? `<span class="mini" style="font-weight:700">${Math.abs(dif) < 5 ? 'Igual à safra passada' : `${dif > 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm`}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? `
+    <div class="comp-linha"><div class="cartao-cab"><b>Esta safra</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
+    <div class="comp-linha"><div class="cartao-cab"><span>Safra passada</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
+    ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}` : '<span class="mini">carregando…</span>'}
+=======
+  <section class="cartao" style="gap:10px">
+    <div class="cartao-cab"><span class="rotulo">Chuva desde 01/09 · ${nomeLocal}</span>${dif != null ? `<span class="mini" style="font-weight:700">${Math.abs(dif) < 5 ? 'Igual à safra passada' : `${dif > 0 ? '+' : '−'}${numBr(Math.abs(dif))} mm`}</span>` : ''}</div>
+    ${a && a.chuvaSafra != null ? `<b style="font-size:15px;line-height:1.35">Desde 1º de setembro: <span class="num">${numBr(Math.round(a.chuvaSafra))} mm</span> este ano${a.chuvaSafraPassada != null ? `, <span class="num">${numBr(Math.round(a.chuvaSafraPassada))} mm</span> no ano passado` : ''}${a.mediaSafra != null ? ` <span class="mini" style="font-weight:600">(média de ${a.anosMedia} safras: ${numBr(Math.round(a.mediaSafra))} mm)</span>` : ''}.</b>` : ''}
+    ${a && a.chuvaSafra != null ? `
+    <div class="comp-linha"><div class="cartao-cab"><b>Esta safra</b><b class="num">${mm(a.chuvaSafra)}</b></div>${barra(a.chuvaSafra, 'var(--azul)')}</div>
+    <div class="comp-linha"><div class="cartao-cab"><span>Safra passada</span><b class="num">${mm(a.chuvaSafraPassada)}</b></div>${barra(a.chuvaSafraPassada, '#9CC3E3')}</div>
+    ${a.mediaSafra != null ? `<div class="comp-linha"><div class="cartao-cab"><span>Média de ${a.anosMedia} safras</span><b class="num">${mm(a.mediaSafra)}</b></div>${barra(a.mediaSafra, '#CFC8B8')}</div>` : ''}` : '<span class="mini">carregando…</span>'}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  ${(() => { const e = conteudo().enso || {}; const regioes = e.regioes || []; return `<section class="cartao es-enso2">
+    <div class="cartao-cab"><span class="rotulo" style="color:#2F5F8A">El Niño agora</span>${e.selo ? `<span class="pilula" style="background:#FCE4E0;color:#9A2F1E">${esc(e.selo)}</span>` : ''}</div>
+    <b style="font-size:16px;line-height:1.3">${esc(e.titulo || 'El Niño em andamento')}</b>
+    <p class="es-txt" style="margin:0">${esc(c.enso || e.resumo || '')}</p>
+    ${regioes.length ? `<div class="es-enso-reg">${regioes.map((r) => `<div><b>${esc(r.nome)}</b><span>${esc(r.texto)}</span></div>`).join('')}</div>` : ''}
+=======
+  ${(() => { const e = conteudo().enso || {}; const regioes = e.regioes || []; return `<details class="cartao es-enso2 abre-cartao">
+    <summary class="cartao-cab" style="cursor:pointer;list-style:none"><span class="rotulo" style="color:#2F5F8A">El Niño agora</span><span style="display:flex;gap:6px;align-items:center">${e.selo ? `<span class="pilula" style="background:#FCE4E0;color:#9A2F1E">${esc(e.selo)}</span>` : ''}<span class="mini">abrir</span></span></summary>
+    <b style="font-size:15px;line-height:1.3">${esc(e.titulo || 'El Niño em andamento')}</b>
+    <p class="es-txt" style="margin:0">${esc(c.enso || e.resumo || '')}</p>
+    ${regioes.length ? regioes.map((r) => `<details class="abre"><summary>${esc(r.nome)}</summary><p class="es-txt" style="margin:0 0 10px">${esc(r.texto)}</p></details>`).join('') : ''}
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  </section>`; })()}
+=======
+  </details>`; })()}
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-enso2 { gap: 10px; border-color: #D5E3F0; }
+=======
+.es-enso2 { gap: 10px; border-color: #D5E3F0; }
+/* clima reorganizado (prévia) */
+.cl-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.cl-tiles > div { display: flex; flex-direction: column; gap: 2px; padding: 8px 6px; border-radius: 12px; background: var(--fundo); align-items: center; text-align: center; }
+.cl-tiles span { font-size: 11px; font-weight: 700; color: var(--texto-3); text-transform: uppercase; letter-spacing: .04em; }
+.cl-tiles b { font-size: 20px; line-height: 1.1; }
+.cl-tiles b small { font-size: 11px; margin-left: 2px; color: var(--texto-3); }
+.cl-normais { display: flex; flex-direction: column; gap: 4px; }
+.cl-normal { font-size: 13.5px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: var(--fundo); }
+.cl-normal small { font-weight: 600; color: var(--texto-3); }
+.cl-normal.cai { background: #FBE3E0; color: #8E1F15; }
+.cl-normal.sobe { background: #DCEFE2; color: #0B5E2B; }
+.cl-seco.sobe { border-color: #BFD9C6; background: var(--verde-fundo); }
+.cl-seco.cai { border-color: #E3B5B0; background: #FDF3F1; }
+details.abre-cartao > summary::-webkit-details-marker { display: none; }
+details.abre-cartao:not([open]) > summary { margin: 0; }
+details.abre-cartao > summary .mini::after { content: ' ⌄'; }
+details.abre-cartao[open] > summary .mini::after { content: ' ⌃'; }
+>>>>>>>
