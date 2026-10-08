@@ -1,0 +1,42 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v42';
+=======
+const VERSAO = 'ab-v43';
+>>>>>>>
+<<<<<<< public/app.js
+  const refs = ordenarRefs(c.referencias || []);
+  const conab = refs.find((r) => r.fonte === 'Conab');
+  const dest = c.destaque || {};
+  const v = variacaoIEA(c);
+  const outras = refs.filter((r) => r !== conab && r.praca !== dest.regiao);
+  const linhaRef = (r) => { const href = linkSeguro(r.link); return `<${href ? 'a' : 'div'} class="lista-linha ref" style="padding:9px 0" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="cresce"><b style="font-size:15px;display:block">${esc(r.praca)}</b><span class="mini">${esc(r.fonte)} · ${esc(r.data)}</span></span>
+=======
+  const refs = ordenarRefs(c.referencias || []);
+  const linhaRef = (r) => { const href = linkSeguro(r.link), conab = r.fonte === 'Conab'; return `<${href ? 'a' : 'div'} class="lista-linha ref" style="padding:9px 0" ${href ? `href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="cresce"><b style="font-size:15px;display:block">${conab ? 'Conab' : esc(r.praca)}</b><span class="mini">${conab ? 'média do estado de SP' : esc(r.fonte)} · ${esc(r.data)}</span></span>
+>>>>>>>
+<<<<<<< public/app.js
+  return `${topoMercado('cotacoes', chips)}
+  ${dest.preco != null ? `<section class="destaque hero-preco">
+    <div class="cartao-cab"><span class="rotulo">Quanto está pagando hoje · ${esc(dest.regiao || 'Tupã')}</span><span class="pilula pilula-verde-escuro">${esc(dest.fonte || 'IEA')} · ${esc(String(dest.data || '').slice(0, 5))}</span></div>
+    <div style="display:flex;align-items:baseline;gap:8px" class="num"><span class="preco">${brl(dest.preco)}</span><span class="unid">/ saca 25 kg</span></div>
+    ${v ? `<div class="hero-var ${v.dif > 0 ? 'sobe' : v.dif < 0 ? 'cai' : ''}">${v.dif === 0 ? '<span aria-hidden="true">=</span>' : ic(v.dif > 0 ? I.sobe : I.cai, 'style="width:16px;height:16px"')}<span>${v.dif === 0 ? `igual desde ${ddmm(v.desde)}` : `${v.dif > 0 ? '+' : '−'}${brl(Math.abs(v.dif)).replace('R$ ', 'R$ ')} em relação a ${ddmm(v.desde)}`}</span></div>` : ''}
+    ${conab ? `<div style="font-size:13.5px;font-weight:600;opacity:.95">Conab · média do estado de SP · ${brl(conab.preco)} na semana ${esc(conab.data)}</div>` : ''}
+    <div class="hero-acoes">
+      <a class="btn-branco" href="#/mercado/hoje">Ver o Mercado hoje</a>
+      <button class="btn-enviar" data-compartilhar="preco" aria-label="Enviar o preço no WhatsApp">${ic(I.enviar)}<span>Enviar</span></button>
+    </div>
+  </section>` : ''}
+
+  ${outras.length ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 2px"><span class="rotulo">Por praça</span><span class="mini">${esc(c.unidade)}</span></div>
+    ${outras.map(linhaRef).join('')}
+=======
+  return `${topoMercado('cotacoes', chips)}
+  ${refs.length ? `
+  <section class="cartao" style="gap:0;padding:4px 16px">
+    <div class="cartao-cab" style="padding:12px 0 2px"><span class="rotulo">Cotações oficiais · casca</span><span class="mini">${esc(c.unidade)}</span></div>
+    ${refs.map(linhaRef).join('')}
+>>>>>>>
