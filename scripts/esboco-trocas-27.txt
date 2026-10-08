@@ -1,0 +1,60 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v36';
+=======
+const VERSAO = 'ab-v37';
+>>>>>>>
+<<<<<<< public/auth.js
+  const larg = Math.max(300, Math.round(txt.length * 8.3 + 70)), alt = 190, tt = esc(txt);
+=======
+  const larg = Math.max(340, Math.round(txt.length * 7.8 + 80)), alt = 250, tt = esc(txt);
+>>>>>>>
+<<<<<<< public/auth.js
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larg}" height="${alt}"><g font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#2B2B26" fill-opacity=".055" text-anchor="middle">${um(larg / 2, 57)}${um(0, 152)}${um(larg, 152)}</g></svg>`;
+=======
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${larg}" height="${alt}"><g font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#2B2B26" fill-opacity=".045" text-anchor="middle">${um(larg / 2, 75)}${um(0, 200)}${um(larg, 200)}</g></svg>`;
+>>>>>>>
+<<<<<<< public/auth.js
+  // mosaico denso e bem claro: duas fileiras alternadas, uma marca a cada ~95 px de altura, para aparecer atrás de qualquer tabela
+=======
+  // mosaico leve: duas fileiras alternadas, uma marca a cada ~125 px de altura; aparece em qualquer recorte de tela sem atrapalhar a leitura
+>>>>>>>
+<<<<<<< public/terminal.css
+.tm-vire { display: block; margin: 2px 0 8px; }
+=======
+.tm-vire { display: block; margin: 2px 0 8px; }
+/* celular deitado: a Central de Mercado abre afastada (como se o usuário tivesse feito o gesto de pinça), com a barra de baixo menor, e a tabela cabe na tela */
+@media (orientation: landscape) and (max-height: 520px) {
+  body:has(.tm-grade) .app { zoom: .66; max-width: 1120px; }
+}
+>>>>>>>
+<<<<<<< public/esboco.js
+  const expGraoCasca = (b.exportGrao || 0) / rend; // mil t casca
+=======
+  const tagEst = (t) => `<em style="display:inline-block;margin-top:5px;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.01em;color:#6F5214;background:#F7EDCB;box-shadow:inset 0 0 0 1px #E3CF93;border-radius:999px;padding:1px 8px;white-space:nowrap">${t}</em>`;
+  const expGraoCasca = (b.exportGrao || 0) / rend; // mil t casca
+>>>>>>>
+<<<<<<< public/esboco.js
+        <div><small>Área</small><b>${faixa(e.areaMin, e.areaMax)}</b><span>mil ha</span>${ant ? vcSinal(var_(areaMeio(e), areaMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}</div>
+=======
+        <div><small>Área</small><b>${faixa(e.areaMin, e.areaMax)}</b><span>mil ha</span>${ant ? vcSinal(var_(areaMeio(e), areaMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}${i === lista.length - 1 ? tagEst('estimativa') : ''}</div>
+>>>>>>>
+<<<<<<< public/esboco.js
+        <div><small>Produtividade</small><b>${faixa(e.prodMin, e.prodMax)}</b><span>sc/alq</span>${ant ? vcSinal(var_(prodMeio(e), prodMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}</div>
+=======
+        <div><small>Produtividade</small><b>${faixa(e.prodMin, e.prodMax)}</b><span>sc/alq</span>${ant ? vcSinal(var_(prodMeio(e), prodMeio(ant))) : '<span class="es-var es-var-neutro">base</span>'}${i === lista.length - 1 ? tagEst('média brasileira') : ''}</div>
+>>>>>>>
+<<<<<<< public/esboco.js
+        <div><small>Produção</small><b>${nf(p.scMeio / 1e6, 1)}</b><span>mi sacas</span>${pAnt ? vcSinal(var_(p.scMeio, pAnt.scMeio)) : '<span class="es-var es-var-neutro">base</span>'}</div>
+=======
+        <div><small>Produção</small><b>${nf(p.scMeio / 1e6, 1)}</b><span>mi sacas</span>${pAnt ? vcSinal(var_(p.scMeio, pAnt.scMeio)) : '<span class="es-var es-var-neutro">base</span>'}${i === lista.length - 1 ? tagEst('estimativa') : ''}</div>
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${c.comentario ? `<section class="es-leitura-destaque"><span class="tag">${h.ic(h.I.doc, 'style="width:18px;height:18px"')}Leitura do Helder</span><p>${h.esc(c.comentario)}</p><span class="mini" style="color:#5C3A06;font-weight:600">Helder Lamberti · ${h.esc(c.atualizado)}</span></section>` : ''}
+=======
+  ${c.comentario ? `<section class="es-leitura-destaque"><span class="tag">${h.ic(h.I.doc, 'style="width:18px;height:18px"')}Leitura Amendoim Brasil – Helder Lamberti</span><p>${h.esc(c.comentario)}</p><span class="mini" style="color:#5C3A06;font-weight:600">Atualizado em ${h.esc(c.atualizado)}</span></section>` : ''}
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  comentario: 'A área segue em queda pelo terceiro ano. Com 180 mil ha em 26/27, mesmo com produtividade média de 380 sc/alq, a oferta fica perto da metade de 24/25.',
+=======
+  comentario: 'Minha estimativa é de uma queda de área na faixa de 28% em 26/27, para cerca de 180 mil ha. Eu esperava 30%, mas alguns produtores aumentaram a área, outros buscaram parcerias para conseguir plantar e a queda na venda de semente e de grão foi bem menor do que o esperado. Com a produtividade média brasileira de 380 sc/alq, a oferta fica apertada.',
+>>>>>>>
