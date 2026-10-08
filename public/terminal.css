@@ -1,0 +1,22 @@
+/* Terminal Amendoim Brasil (plano Empresa): no computador a página alarga; no celular as tabelas rolam de lado. */
+.tm-bloco { gap: 10px; }
+.tm-tabela { font-size: 12px; }
+.tm-tabela th, .tm-tabela td { padding: 7px 6px; white-space: nowrap; }
+.tm-tabela tbody th, .tm-tabela thead th:first-child { text-align: left; }
+.tm-tabela td { text-align: right; font-variant-numeric: tabular-nums; }
+.tm-dest td { min-width: 52px; }
+.tm-rank td:nth-child(4) { text-align: left; white-space: nowrap; }
+.tm-barra { display: inline-block; height: 8px; border-radius: 4px; background: var(--amendoim); vertical-align: middle; margin-right: 6px; }
+.tm-recorde { font-style: normal; background: var(--amendoim-claro); color: var(--marrom); border-radius: 6px; padding: 1px 6px; margin-left: 4px; font-size: 10px; }
+.tm-info summary { font-size: 13px; color: var(--texto-2); }
+.tm-leitura { background: var(--verde-fundo); border-color: var(--verde-claro); }
+.tm-lista { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; }
+.tm-grade { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 900px) {
+  body:has(.tm-grade) .app, body:has(.tm-grade) .app > main, body:has(.tm-grade) #tela { max-width: 1120px; }
+  .tm-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  .tm-grade > .tm-leitura { grid-column: 1 / -1; }
+  .tm-grade > .tm-bloco:nth-child(2) { grid-column: 1 / -1; }
+  .tm-tabela { font-size: 13px; }
+  .tm-tiles { grid-template-columns: repeat(3, 1fr); }
+}
