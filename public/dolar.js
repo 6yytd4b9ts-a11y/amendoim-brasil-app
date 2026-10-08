@@ -1,5 +1,6 @@
 // Dólar: gráfico e histórico (AwesomeAPI, cotação comercial PTAX/intradiária), aberto ao tocar no dólar do "Mercado hoje".
 const est = { periodo: '1M', dados: {}, carregando: false, erro: '' };
+let graf = null; // pontos do gráfico na tela (para o cursor que se arrasta)
 let ctx = { render: () => {}, evento: () => {} };
 const DIAS = { '5D': 7, '1M': 31, '6M': 183, '1A': 366 };
 const brl = (n, d = 2) => (n == null || !isFinite(n) ? '—' : 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -29,18 +30,21 @@ function grafico(pts) {
   const ys = pts.map((p) => pt + (H - pt - pb) * (1 - (p.bid - min) / (max - min)));
   const d = xs.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${ys[i].toFixed(1)}`).join(' ');
   const area = `${d} L${xs[xs.length - 1].toFixed(1)} ${H - pb} L${pl} ${H - pb} Z`;
+  graf = { pts, xs, ys, W, H, pb, pl, cor: '' };
   const sobe = vals[vals.length - 1] >= vals[0];
   const cor = sobe ? '#B3261E' : '#007731'; // dólar subindo pesa contra o comprador em R$: vermelho; caindo: verde
   const ticks = [min + folga, (min + max) / 2, max - folga];
   const passo = Math.max(1, Math.ceil(pts.length / 5));
   const rot = pts.map((p, i) => (i % passo === 0 || i === pts.length - 1) ? `<text class="eixo" x="${xs[i].toFixed(1)}" y="${H - 5}" text-anchor="${i === pts.length - 1 ? 'end' : i === 0 ? 'start' : 'middle'}">${diaDe(p.ts).slice(0, 5)}</text>` : '').join('');
-  return `<svg class="gn-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dólar">
+  graf.cor = cor;
+  return `<div class="dl-graf" id="dl-graf" style="position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none"><svg class="gn-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dólar: toque e arraste para ver o valor de cada dia">
     <defs><linearGradient id="dl-g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${cor}" stop-opacity=".22"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></linearGradient></defs>
     ${ticks.map((t) => { const y = pt + (H - pt - pb) * (1 - (t - min) / (max - min)); return `<line x1="${pl}" x2="${W - 8}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#E6E1D6"/><text class="eixo" x="${pl - 4}" y="${(y + 3).toFixed(1)}" text-anchor="end">${t.toFixed(2).replace('.', ',')}</text>`; }).join('')}
     <path d="${area}" fill="url(#dl-g)"/><path d="${d}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round"/>
     <circle cx="${xs[xs.length - 1].toFixed(1)}" cy="${ys[ys.length - 1].toFixed(1)}" r="4.5" fill="${cor}" stroke="#fff" stroke-width="2"/>
     ${rot}
-  </svg>`;
+    <g id="dl-cur" style="display:none;pointer-events:none"><line id="dl-cur-l" x1="0" x2="0" y1="${pt}" y2="${H - pb}" stroke="#5F5B52" stroke-width="1" stroke-dasharray="3 3"/><circle id="dl-cur-c" cx="0" cy="0" r="6" fill="${cor}" stroke="#fff" stroke-width="2.5"/></g>
+  </svg><div id="dl-dica" role="status" style="display:none;position:absolute;top:0;pointer-events:none;background:#1B1B17;color:#fff;border-radius:10px;padding:5px 9px;font-size:12.5px;font-weight:700;line-height:1.3;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.2)"></div></div>`;
 }
 
 export function telaDolar(D, h) {
@@ -62,6 +66,7 @@ export function telaDolar(D, h) {
     <div><b class="num" style="font-size:34px">${brl(agora)}</b> <span class="${vAgora > 0 ? 'dx-cai' : vAgora < 0 ? 'dx-sobe' : ''}" style="font-weight:800">${pc(vAgora)} hoje</span></div>
     ${chips}
     ${grafico(pts)}
+    <span class="mini" style="text-align:center">Toque e arraste no gráfico para ver o valor de cada dia.</span>
     <div class="dx-tiles" style="grid-template-columns:repeat(3,1fr)">
       <div class="dx-tile"><span>No período</span><b class="num">${pc(vPer)}</b><small>de ${brl(ini.bid)}</small></div>
       <div class="dx-tile"><span>Máxima</span><b class="num">${brl(max)}</b></div>
@@ -81,8 +86,56 @@ export function telaDolar(D, h) {
   <p class="mini dx-nota">Fonte: AwesomeAPI (cotação comercial). O "agora" acompanha o mercado; o histórico é o fechamento de cada dia.</p>`;
 }
 
+// Cursor que acompanha o dedo (ou o mouse) e mostra a data e o valor do dia mais próximo.
+function mover(e) {
+  const box = document.getElementById('dl-graf');
+  if (!box || !graf || !box.contains(e.target) && !box.__arrasta) return;
+  const svg = box.querySelector('svg'), r = svg.getBoundingClientRect();
+  if (!r.width) return;
+  const x = ((e.clientX - r.left) / r.width) * graf.W;
+  let k = 0, melhor = Infinity;
+  graf.xs.forEach((px, i) => { const d = Math.abs(px - x); if (d < melhor) { melhor = d; k = i; } });
+  const px = graf.xs[k], py = graf.ys[k], p = graf.pts[k], a = graf.pts[k - 1];
+  const cur = box.querySelector('#dl-cur');
+  cur.style.display = '';
+  const l = cur.querySelector('#dl-cur-l'), c = cur.querySelector('#dl-cur-c');
+  l.setAttribute('x1', px); l.setAttribute('x2', px); c.setAttribute('cx', px); c.setAttribute('cy', py);
+  const v = a ? ((p.bid - a.bid) / a.bid) * 100 : null;
+  const d = box.querySelector('#dl-dica');
+  d.textContent = `${diaDe(p.ts)} · ${brl(p.bid, 4)}${v == null ? '' : ' · ' + pc(v)}`;
+  d.style.display = 'block';
+  const esc2 = r.width / graf.W, w = d.offsetWidth;
+  d.style.left = Math.max(0, Math.min(r.width - w, px * esc2 - w / 2)) + 'px';
+  d.style.top = Math.max(0, py * esc2 - 40) + 'px';
+}
+function ligarArrasto() {
+  document.addEventListener('pointerdown', (e) => {
+    const box = e.target.closest?.('#dl-graf');
+    if (!box) return;
+    box.__arrasta = true;
+    try { box.setPointerCapture(e.pointerId); } catch (er) { /* ignora */ }
+    mover(e);
+  });
+  document.addEventListener('pointermove', (e) => {
+    const box = document.getElementById('dl-graf');
+    if (!box) return;
+    if (e.pointerType === 'mouse' || box.__arrasta) mover(e);
+  });
+  const soltar = (e) => {
+    const box = document.getElementById('dl-graf');
+    if (box) box.__arrasta = false;
+  };
+  document.addEventListener('pointerup', soltar);
+  document.addEventListener('pointercancel', soltar);
+  document.addEventListener('pointerout', (e) => {
+    const box = document.getElementById('dl-graf');
+    if (box && e.pointerType === 'mouse' && !box.contains(e.relatedTarget)) { box.querySelector('#dl-cur').style.display = 'none'; box.querySelector('#dl-dica').style.display = 'none'; }
+  });
+}
+
 export function ligarDolar(render, evento) {
   ctx = { render, evento };
+  ligarArrasto();
   document.addEventListener('click', (e) => {
     let x;
     if ((x = e.target.closest('[data-dl-per]'))) { est.periodo = x.dataset.dlPer; evento('dolar-' + est.periodo); render(false); return; }

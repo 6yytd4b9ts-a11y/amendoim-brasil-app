@@ -1,0 +1,5 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v25';
+=======
+const VERSAO = 'ab-v26';
+>>>>>>>

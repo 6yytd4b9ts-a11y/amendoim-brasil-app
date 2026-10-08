@@ -21,6 +21,8 @@ const quando = (iso, vazio = 'nunca entrou') => {
 const msgCodigo = (cod) => `Amendoim Brasil\nSeu código de acesso: ${cod}\nVale por 10 minutos. Não compartilhe com ninguém.`;
 const NOMES = { '/inicio': 'Início', '/mercado': 'Mercado', '/mercado/consultoria': 'Área do assinante', '/mercado/hoje': 'Mercado hoje', '/mercado/dados': 'Exportação do Brasil', '/mercado/historico': 'Histórico de preço', '/mercado/termometro': 'Termômetro', '/estimativas': 'Estimativas', '/agenda': 'Agenda', '/terminal': 'Terminal (exportação)', '/destinos': 'Preço por destino', '/dolar': 'Dólar', '/clima': 'Clima', '/ferramentas': 'Ferramentas', '/negociar': 'Negociar', '/alertas': 'Alertas', '/conta': 'Minha conta', '/perfil': 'Perfil' };
 const nomeTela = (r) => NOMES[r] || r;
+const TAGS = { confuso: ['Achei confuso', 'pilula-amendoim'], faltou: ['Faltou algo', 'pilula-azul'], ideia: ['Tenho uma ideia', 'pilula-verde'], gostei: ['Gostei', 'pilula-verde'] };
+const mmss = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, '0')}`;
 
 async function chamar(acao, corpo = {}) {
   try {
@@ -74,6 +76,20 @@ function cartaoConvidado(c, u) {
   </section>`;
 }
 
+function todosJuntos(convs) {
+  const us = est.uso;
+  if (!us) return '';
+  const cs = us.convidados || [];
+  const aberturas = cs.reduce((s, c) => s + (c.sessoes || 0), 0);
+  const min = us.minutosTotal ?? cs.reduce((s, c) => s + (c.minutos || 0), 0);
+  if (!aberturas && !min && !(us.telasTop || []).length) return `<section class="cartao" style="gap:6px"><span class="rotulo">Todos juntos</span><span class="mini">Ainda sem uso dos convidados. Quando entrarem, aqui aparece o que o grupo todo mais usa.</span></section>`;
+  const media = cs.filter((c) => c.sessoes > 0).length;
+  return `<section class="cartao" style="gap:10px"><div class="cartao-cab"><span class="rotulo">Todos juntos</span><span class="mini">últimos 60 dias · só convidados</span></div>
+    <div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Aberturas', aberturas)}${tile('Min. no total', min)}${tile('Min. por pessoa', media ? Math.round(min / media) : 0, 'de quem entrou')}</div>
+    <div class="pn-duas" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><span class="rotulo">Telas mais vistas</span>${lista(us.telasTop, 'sem uso ainda')}</div><div><span class="rotulo">Botões mais tocados</span>${lista(us.cliquesTop, 'sem toques ainda')}</div></div>
+  </section>`;
+}
+
 // ---------- a aba ----------
 export function telaTeste() {
   if (!est.dados) return `<section class="cartao"><div class="vazio">${est.erro ? `${esc(est.erro)} <button class="link-mini" type="button" data-pp-recarregar>Tentar de novo</button>` : 'Carregando…'}</div></section>`;
@@ -113,6 +129,7 @@ export function telaTeste() {
     <div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Convidados', convs.length)}${tile('Já entraram', entraram, `de ${convs.length}`)}${tile('Usaram hoje', hoje)}</div>
     <span class="mini">Só conta quem foi convidado. O seu uso (administrador) não entra aqui.</span>
   </section>
+  ${todosJuntos(convs)}
   ${convs.map((c) => cartaoConvidado(c, usoPor.get(c.id))).join('') || '<div class="vazio">Ninguém foi convidado ainda. Use "Liberar um convidado" abaixo.</div>'}
   ${admins.length ? `<span class="mini" style="padding:0 4px">Administrador (não conta no uso): ${admins.map((a) => esc(a.nome) + ' · ' + esc(fmtCel(a.celular))).join(', ')}</span>` : ''}
   <details class="cartao" id="pp-det-novo" ${e || est.novo ? 'open' : ''}><summary class="rotulo" style="cursor:pointer">${e ? 'Editar convidado' : '＋ Liberar um convidado'}</summary>
@@ -129,7 +146,7 @@ export function telaTeste() {
     </form>
   </details>
   <section class="cartao" style="gap:8px"><span class="rotulo">Opiniões enviadas (${fb.length})</span>
-    ${fb.length ? fb.map((f) => `<div style="border-top:1px solid var(--linha);padding-top:8px"><b style="font-size:14px">${esc(f.nome)}</b> <span class="mini">· ${quando(f.em)}${f.tela ? ' · em ' + esc(nomeTela(f.tela)) : ''}</span><div class="es-txt">${esc(f.texto)}</div></div>`).join('') : '<span class="mini">Nenhuma opinião ainda. O botão "Opinar" fica na tela dos convidados.</span>'}
+    ${fb.length ? fb.map((f) => `<div style="border-top:1px solid var(--linha);padding-top:8px;display:flex;flex-direction:column;gap:4px"><span><b style="font-size:14px">${esc(f.nome)}</b> <span class="mini">· ${quando(f.em)}${f.tela ? ' · em ' + esc(nomeTela(f.tela)) : ''}</span>${TAGS[f.tag] ? ` <span class="pilula ${TAGS[f.tag][1]}">${TAGS[f.tag][0]}</span>` : ''}</span>${f.texto ? `<div class="es-txt">${esc(f.texto)}</div>` : ''}${f.audio ? `<div data-pp-audio="${esc(f.id)}"><button class="chip" type="button" data-pp-ouvir="${esc(f.id)}">▶ Ouvir o áudio (${mmss(f.seg)})</button></div>` : ''}</div>`).join('') : '<span class="mini">Nenhuma opinião ainda. O botão "Opinar" fica na tela dos convidados.</span>'}
   </section>
   <details class="cartao tm-info" id="pp-det-zap" ${est.ver ? 'open' : ''}><summary>Ligar o envio automático do código no WhatsApp</summary>
     <form id="pp-form-zap" class="es-campos" style="margin-top:10px">
@@ -159,6 +176,16 @@ export function ligarPainelPiloto(desenhar, getChave) {
     const t = e.target;
     let x;
     if (t.closest('[data-pp-recarregar]')) { est.erro = ''; carregar(); return; }
+    if ((x = t.closest('[data-pp-ouvir]'))) {
+      const id = x.dataset.ppOuvir, caixa = x.parentElement;
+      x.disabled = true; x.textContent = 'Abrindo…';
+      const r = await chamar('admin_audio', { id: Number(id) });
+      if (!r.ok || !r.url) { x.disabled = false; x.textContent = '▶ Tentar de novo'; caixa.insertAdjacentHTML('beforeend', `<div class="mini">${esc(r.mensagem || 'Não foi possível abrir o áudio.')}</div>`); return; }
+      const a = document.createElement('audio');
+      a.controls = true; a.autoplay = true; a.preload = 'auto'; a.src = r.url; a.style.cssText = 'width:100%;max-width:340px';
+      caixa.replaceChildren(a);
+      return;
+    }
     if ((x = t.closest('[data-pp-editar]'))) {
       est.editando = (est.dados?.convidados || []).find((c) => c.id === x.dataset.ppEditar) || null; est.msg = '';
       redesenhar(); document.getElementById('pp-det-novo')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
