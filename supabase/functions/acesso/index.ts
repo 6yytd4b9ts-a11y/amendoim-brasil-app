@@ -99,6 +99,19 @@ async function enviarWhatsApp(cel: string, codigo: string): Promise<{ canal: str
   return { canal: "manual", enviado: false };
 }
 
+// ---------- aviso no celular do administrador (Web Push, enviado pela função da Netlify) ----------
+async function avisarPainel(titulo: string, corpo: string, tag: string) {
+  try {
+    const c = await cfg();
+    if (!c.aviso_segredo) return;
+    await fetch(`${ORIGEM_PADRAO}/api/alertas`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ acao: "painel_aviso", segredo: c.aviso_segredo, titulo, corpo, tag, url: "/painel" }),
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch (e) { console.error("aviso painel", String((e as Error).message ?? e).slice(0, 120)); }
+}
+
 // ---------- sessão ----------
 async function usuarioDe(req: Request) {
   const tk = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
@@ -142,6 +155,13 @@ async function pedir(req: Request, b: any) {
   const env = await enviarWhatsApp(cel, codigo);
   await db.from("codigos_login").update({ canal: env.canal, enviado: env.enviado, erro_envio: env.erro ?? null, codigo_manual: env.enviado ? null : codigo }).eq("id", ins.id);
   await registra(null, "pedir", `${env.canal}${env.enviado ? "" : " (manual)"} ${cel.slice(-4)}`);
+  const aviso = avisarPainel(
+    "Pedido de acesso ao teste",
+    env.enviado ? `${conv.nome} pediu o código. Ele já foi enviado pelo WhatsApp.` : `${conv.nome} pediu o código. Toque para abrir o painel e repassar.`,
+    `pedido-${cel.slice(-6)}`,
+  );
+  const er = (globalThis as any).EdgeRuntime;
+  if (er?.waitUntil) er.waitUntil(aviso); else await aviso;
   return resp(req, 200, {
     ok: true, canal: env.canal, enviado: env.enviado,
     mensagem: env.enviado ? "Enviamos um código de 6 dígitos para o seu WhatsApp." : "Peça o seu código de 6 dígitos ao Helder (ele recebe o pedido agora).",
@@ -350,34 +370,82 @@ async function admin(req: Request, b: any) {
       ? await db.from("feedback").select("id, user_id, texto, tela, tag, audio_path, audio_seg, criado_em").in("user_id", ids).order("criado_em", { ascending: false }).limit(50)
       : { data: [] as any[] };
     const hoje = diaBR(new Date().toISOString());
-    const telasGlobal = new Map<string, number>();
-    const cliquesGlobal = new Map<string, number>();
+    const dias14: string[] = [];
+    for (let i = 13; i >= 0; i--) dias14.push(diaBR(new Date(Date.now() - i * 86_400_000).toISOString()));
+    const BEAT = 30; // cada batida vale 30 segundos de uso
+    type Tela = { v: number; s: number };
+    const telaDe = (m: Map<string, Tela>, k: string) => { let t = m.get(k); if (!t) { t = { v: 0, s: 0 }; m.set(k, t); } return t; };
+    const rankTelas = (m: Map<string, Tela>, n: number) => [...m.entries()].map(([t, x]) => ({ t, v: x.v, s: x.s })).sort((a, b) => b.s - a.s || b.v - a.v).slice(0, n);
+    const telasGlobal = new Map<string, number>(), cliquesGlobal = new Map<string, number>();
+    const telasDetGlobal = new Map<string, Tela>();
+    const diaGlobal = new Map<string, { a: number; s: number }>();
+    const dia = (m: Map<string, { a: number; s: number }>, d: string) => { let x = m.get(d); if (!x) { x = { a: 0, s: 0 }; m.set(d, x); } return x; };
     const convidados = lista.map(({ c, uid, ult }) => {
       const meus = (rows ?? []).filter((r: any) => r.user_id === uid);
       const dias = new Set<string>(), telas = new Map<string, number>(), cliques = new Map<string, number>();
+      const telasDet = new Map<string, Tela>(), porDia = new Map<string, { a: number; s: number }>();
       let sessoes = 0, beats = 0, beats7 = 0;
       const sete = Date.now() - 7 * 86_400_000;
       for (const r of meus) {
-        dias.add(diaBR(r.criado_em));
-        if (r.tipo === "abriu") sessoes++;
-        else if (r.tipo === "beat") { beats++; if (new Date(r.criado_em).getTime() >= sete) beats7++; }
-        else if (r.tipo === "tela" && r.detalhe) { somar(telas, r.detalhe); somar(telasGlobal, r.detalhe); }
+        const d = diaBR(r.criado_em);
+        dias.add(d);
+        if (r.tipo === "abriu") { sessoes++; dia(porDia, d).a++; dia(diaGlobal, d).a++; }
+        else if (r.tipo === "beat") {
+          beats++; if (new Date(r.criado_em).getTime() >= sete) beats7++;
+          dia(porDia, d).s += BEAT; dia(diaGlobal, d).s += BEAT;
+          if (r.detalhe) { telaDe(telasDet, r.detalhe).s += BEAT; telaDe(telasDetGlobal, r.detalhe).s += BEAT; }
+        }
+        else if (r.tipo === "tela" && r.detalhe) { somar(telas, r.detalhe); somar(telasGlobal, r.detalhe); telaDe(telasDet, r.detalhe).v++; telaDe(telasDetGlobal, r.detalhe).v++; }
         else if (r.tipo === "clique" && r.detalhe) { somar(cliques, r.detalhe); somar(cliquesGlobal, r.detalhe); }
       }
       return {
         id: c.id, nome: c.nome, empresa: c.empresa ?? "", celular: c.celular, plano: c.plano, ativo: c.ativo, perfil_ok: c.perfil_ok,
         ultimo_acesso: ult, sessoes, dias: dias.size, hoje: dias.has(hoje), minutos: Math.round(beats / 2), minutos7: Math.round(beats7 / 2),
-        telas: ranking(telas, 6), cliques: ranking(cliques, 5),
-        ultimas: meus.filter((r: any) => r.tipo !== "beat").slice(0, 10).map((r: any) => ({ t: r.tipo, d: r.detalhe, em: r.criado_em })),
+        seg: beats * BEAT, seg7: beats7 * BEAT,
+        porDia: dias14.map((d) => [d, porDia.get(d)?.a ?? 0, porDia.get(d)?.s ?? 0]),
+        telasDet: rankTelas(telasDet, 12),
+        telas: ranking(telas, 6), cliques: ranking(cliques, 8),
+        ultimas: meus.filter((r: any) => r.tipo !== "beat").slice(0, 12).map((r: any) => ({ t: r.tipo, d: r.detalhe, em: r.criado_em })),
       };
     });
     const nomePor: Record<string, string> = {};
     lista.forEach((x) => { if (x.uid) nomePor[x.uid] = x.c.nome; });
+    const cfgAtual = await cfg();
     return resp(req, 200, {
       ok: true, convidados, telasTop: ranking(telasGlobal, 10), cliquesTop: ranking(cliquesGlobal, 10),
       minutosTotal: convidados.reduce((s: number, c: any) => s + c.minutos, 0),
+      geral: {
+        aberturas: convidados.reduce((s: number, c: any) => s + c.sessoes, 0),
+        seg: convidados.reduce((s: number, c: any) => s + c.seg, 0),
+        pessoas: convidados.filter((c: any) => c.sessoes > 0 || c.seg > 0).length,
+        porDia: dias14.map((d) => [d, diaGlobal.get(d)?.a ?? 0, diaGlobal.get(d)?.s ?? 0]),
+        telas: rankTelas(telasDetGlobal, 15),
+        cliques: ranking(cliquesGlobal, 12),
+        ranking: convidados.filter((c: any) => c.sessoes > 0 || c.seg > 0).map((c: any) => ({ id: c.id, nome: c.nome, seg: c.seg, aberturas: c.sessoes, dias: c.dias })).sort((a: any, b: any) => b.seg - a.seg || b.aberturas - a.aberturas),
+      },
+      desde: cfgAtual.uso_desde ?? null,
       feedback: (fb ?? []).map((f: any) => ({ id: f.id, nome: nomePor[f.user_id] ?? "", texto: f.texto, tela: f.tela, tag: f.tag, audio: !!f.audio_path, seg: f.audio_seg, em: f.criado_em })),
     });
+  }
+  if (acao === "admin_zerar_uso") {
+    const { data: cs } = await db.from("convidados").select("id, perfis(user_id)").neq("papel", "admin");
+    const uids = (cs ?? []).flatMap((c: any) => (Array.isArray(c.perfis) ? c.perfis : c.perfis ? [c.perfis] : []).map((p: any) => p.user_id)).filter(Boolean) as string[];
+    let opinioes = 0;
+    if (uids.length) {
+      await db.from("uso").delete().in("user_id", uids);
+      await db.from("perfis").update({ ultimo_acesso: null }).in("user_id", uids);
+      if (b.opinioes === true) {
+        const { data: fb } = await db.from("feedback").select("id, audio_path").in("user_id", uids);
+        const caminhos = (fb ?? []).map((f: any) => f.audio_path).filter(Boolean) as string[];
+        if (caminhos.length) await db.storage.from("feedback-audio").remove(caminhos);
+        await db.from("feedback").delete().in("user_id", uids);
+        opinioes = fb?.length ?? 0;
+      }
+    }
+    const desde = new Date().toISOString();
+    await db.from("config").upsert({ chave: "uso_desde", valor: desde, atualizado_em: desde }, { onConflict: "chave" });
+    await registra(uid, "admin_zerar_uso", b.opinioes === true ? "com opiniões" : "só uso");
+    return resp(req, 200, { ok: true, desde, opinioes });
   }
   if (acao === "admin_audio") {
     const { data: f } = await db.from("feedback").select("audio_path").eq("id", Number(b.id) || -1).maybeSingle();
