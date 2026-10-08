@@ -1,0 +1,218 @@
+<<<<<<< public/app.js
+import { telaTerminal, ligarTerminal } from '/terminal.js';
+
+=======
+import { telaTerminal, ligarTerminal } from '/terminal.js';
+import { assinante } from '/esboco-dados.js';
+import { telaDolar, ligarDolar } from '/dolar.js';
+
+>>>>>>>
+<<<<<<< public/app.js
+  <section class="cartao">
+=======
+  <section class="cartao" id="sec-historico">
+>>>>>>>
+<<<<<<< public/app.js
+      ${['3M', '6M'].map((p) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${p}</button>`).join('')}
+      ${['1 ano', '5 anos'].map((p) => `<a class="chip" href="#/mercado/consultoria" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}</a>`).join('')}
+=======
+      ${[['3M', '3M'], ['6M', '6M'], ...(assinante() ? [['1A', '1 ano']] : [])].map(([p, t]) => `<button class="chip" data-periodo="${p}" aria-pressed="${estado.periodo === p}">${t}</button>`).join('')}
+      ${(assinante() ? [['5 anos', '#/conta/em-breve', 'em breve']] : [['1 ano', '#/conta/planos', ''], ['5 anos', '#/conta/planos', '']]).map(([p, href, extra]) => `<a class="chip" href="${href}" data-ev="assinar" style="text-decoration:none;border-style:dashed">${ic(I.cadeado, 'style="width:13px;height:13px"')}${p}${extra ? ' · ' + extra : ''}</a>`).join('')}
+>>>>>>>
+<<<<<<< public/app.js
+  terminal: () => telaTerminal(H()),
+  biblioteca: () => telaBiblioteca(H())
+=======
+  terminal: () => telaTerminal(H()),
+  dolar: () => telaDolar(D, H()),
+  biblioteca: () => telaBiblioteca(H())
+>>>>>>>
+<<<<<<< public/app.js
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado', terminal: 'mercado' };
+=======
+const ABA_DA_ROTA = { boletim: 'mercado', alertas: 'inicio', numeros: 'inicio', anuncie: 'inicio', 'balcao-admin': 'negociar', conta: 'mercado', estimativas: 'mercado', termos: 'mercado', privacidade: 'mercado', agenda: 'inicio', perfil: 'inicio', destinos: 'mercado', biblioteca: 'mercado', terminal: 'mercado', dolar: 'mercado' };
+>>>>>>>
+<<<<<<< public/app.js
+ligarTerminal(render, evento);
+document.addEventListener('click', (e) => {
+=======
+ligarTerminal(render, evento);
+ligarDolar(render, evento);
+document.addEventListener('click', (e) => {
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do amendoim', 'Eventos, feiras e relatórios, com lembrete')}
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+=======
+  ${card('#/agenda', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>', 'Agenda do amendoim', 'Eventos, feiras e relatórios, com lembrete')}
+  ${empresa ? card('#/terminal', navio, 'Terminal Amendoim Brasil', 'Exportação, preço por destino e por tipo, mundo') : card('#/mercado/dados', navio, 'Exportação do Brasil', 'Mês a mês, destinos, preço por país e mundo')}
+  ${card('#/mercado/historico', grafico, 'Histórico de preço', '1 ano liberado · 5 anos em breve')}
+  ${card('#/conta/em-breve', h.I.doc, 'Leitura semanal do mercado', 'Toda segunda · em breve')}
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${card(empresa ? '#/terminal' : '#/conta/planos', navio, 'Terminal Amendoim Brasil', empresa ? 'Exportação, preço por destino e por tipo, para decidir' : 'Plano Empresa', !empresa)}
+  ${card(empresa ? '#/destinos' : '#/conta/planos', navio, 'Preço por destino', empresa ? 'Argélia, Rússia, África do Sul e Europa' : 'Plano Empresa', !empresa)}
+  ${card('#/mercado/dados', navio, 'Dados de exportação', 'Mês a mês, destinos, preço por país e mundo')}
+  ${card('#/conta/em-breve', h.I.doc, 'Histórico e sazonalidade', 'Preço de 1 e 5 anos · em breve')}
+  ${card(empresa ? '#/conta/em-breve' : '#/conta/planos', calc, 'Paridade de exportação', empresa ? 'R$/saca a partir do preço externo · em breve' : 'Plano Empresa', !empresa)}
+  ${card(empresa ? '#/alertas' : '#/conta/planos', sinoMais, 'Alertas avançados', empresa ? 'Exportação, destino e preço por país' : 'Plano Empresa', !empresa)}
+=======
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+};
+const icone = (h, tipo, tam = 28) => h.ic(ICONES[tipo][0], `style="width:${tam}px;height:${tam}px;stroke:${ICONES[tipo][1]};stroke-width:1.9" aria-label="${ICONES[tipo][2]}"`);
+=======
+};
+// Ícone grande do topo: desenho preenchido, com volume, para o produtor bater o olho e saber o tempo.
+const HERO = {
+  sol: '<circle cx="32" cy="32" r="13" fill="#F6B73C"/><g stroke="#F6B73C" stroke-width="3.5" stroke-linecap="round"><path d="M32 8v7M32 49v7M8 32h7M49 32h7M15 15l5 5M44 44l5 5M15 49l5-5M44 20l5-5"/></g>',
+  solNuvem: '<circle cx="24" cy="24" r="11" fill="#F6B73C"/><g stroke="#F6B73C" stroke-width="3" stroke-linecap="round"><path d="M24 5v5M5 24h5M10 10l3.5 3.5M38 10l-3.5 3.5"/></g><path d="M46 50H22a10 10 0 1 1 2.4-19.7A13 13 0 0 1 49 34a8 8 0 0 1-3 16z" fill="#F4F2EC" stroke="#C9C3B6" stroke-width="2"/>',
+  nuvem: '<path d="M46 48H20a10 10 0 1 1 2.4-19.7A13 13 0 0 1 49 32a8 8 0 0 1-3 16z" fill="#E6E2D9" stroke="#AEB7BF" stroke-width="2"/><path d="M50 40H30a7 7 0 1 1 1.6-13.8A9 9 0 0 1 52 29a5.5 5.5 0 0 1-2 11z" fill="#F7F6F2" stroke="#C3CBD2" stroke-width="1.5"/>',
+  garoa: '<path d="M46 40H20a10 10 0 1 1 2.4-19.7A13 13 0 0 1 49 24a8 8 0 0 1-3 16z" fill="#DCE3EA" stroke="#9FB0C0" stroke-width="2"/><g fill="#5C8FBF"><ellipse cx="25" cy="50" rx="2.2" ry="3.2"/><ellipse cx="35" cy="54" rx="2.2" ry="3.2"/><ellipse cx="44" cy="49" rx="2.2" ry="3.2"/></g>',
+  chuva: '<path d="M46 38H20a10 10 0 1 1 2.4-19.7A13 13 0 0 1 49 22a8 8 0 0 1-3 16z" fill="#C9D6E3" stroke="#7F98B1" stroke-width="2"/><g fill="#2F6FA3"><path d="M24 44c-2 3-3 5-3 6.5a3 3 0 0 0 6 0c0-1.5-1-3.5-3-6.5z"/><path d="M34 48c-2 3-3 5-3 6.5a3 3 0 0 0 6 0c0-1.5-1-3.5-3-6.5z"/><path d="M44 44c-2 3-3 5-3 6.5a3 3 0 0 0 6 0c0-1.5-1-3.5-3-6.5z"/></g>',
+  forte: '<path d="M46 36H20a10 10 0 1 1 2.4-19.7A13 13 0 0 1 49 20a8 8 0 0 1-3 16z" fill="#9AA6B8" stroke="#5B6B80" stroke-width="2"/><path d="M34 38l-7 11h6l-3 10 9-13h-6l3-8z" fill="#F6B73C"/><g fill="#2F6FA3"><path d="M20 42c-1.6 2.4-2.4 4-2.4 5.2a2.4 2.4 0 0 0 4.8 0c0-1.2-.8-2.8-2.4-5.2z"/><path d="M48 42c-1.6 2.4-2.4 4-2.4 5.2a2.4 2.4 0 0 0 4.8 0c0-1.2-.8-2.8-2.4-5.2z"/></g>'
+};
+const iconeHero = (tipo, tam = 64) => `<svg viewBox="0 0 64 64" width="${tam}" height="${tam}" aria-label="${ICONES[tipo][2]}" role="img">${HERO[tipo] || HERO.nuvem}</svg>`;
+const icone = (h, tipo, tam = 28) => h.ic(ICONES[tipo][0], `style="width:${tam}px;height:${tam}px;stroke:${ICONES[tipo][1]};stroke-width:1.9" aria-label="${ICONES[tipo][2]}"`);
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const raio = (mm) => 2 + Math.min(2.2, Math.sqrt(mm || 0) * 0.36);
+=======
+  const raio = (mm) => 2.4 + Math.min(2.6, Math.sqrt(mm || 0) * 0.4);
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+  const rotulos = pts.map((p) => {
+=======
+  const rotulos = pts.map((p, i) => {
+    if (p.mm < 10 && i >= 6) return ''; // só os maiores ganham rótulo no mapa; o resto fica na lista
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <span class="mini" style="text-align:center">Milímetros que choveram nos últimos 7 dias · estados produtores em verde claro (recorte do Centro-Sul)</span></div>`;
+=======
+    <div class="es-mapa-lista">${pts.slice().sort((a, b) => b.mm - a.mm).map((p) => `<span><i style="background:${cor(p.mm)}"></i>${esc(p.r.nome)}<b class="num">${numBr(p.mm)}</b></span>`).join('')}</div>
+    <span class="mini" style="text-align:center">Chuva dos últimos 7 dias, em mm · estados produtores em verde claro</span></div>`;
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <h1>Clima</h1>
+=======
+    <div class="topo-marca"><img src="/icons/icon-512.png" alt=""><h1>Clima</h1></div>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+      <span class="es-clima-ic">${icone(h, ceu, 64)}</span>
+=======
+      <span class="es-clima-ic">${iconeHero(ceu, 66)}</span>
+>>>>>>>
+<<<<<<< public/esboco3.css
+.fh-mini .fh-ic svg { width: 16px; height: 16px; }
+=======
+.fh-mini .fh-ic svg { width: 16px; height: 16px; }
+
+/* Mapa de chuva: lista das regiões em duas colunas, para ler sem depender dos rótulos no mapa */
+.es-mapa-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: 12px; color: var(--texto-2); margin-top: 4px; }
+.es-mapa-lista span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.es-mapa-lista span i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.es-mapa-lista span b { margin-left: auto; color: var(--texto); font-size: 12px; }
+.es-mapa svg .mc-mm { font-size: 8.5px; font-weight: 700; fill: #1B1B17; paint-order: stroke; stroke: #fff; stroke-width: 2.5px; stroke-linejoin: round; }
+.es-clima-ic svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  ['Sua lavoura', ['custo', 'arrendamento', 'barter']],
+  ['Vender melhor', ['avista', 'armazenar']]
+=======
+  ['Veja se a conta fecha', ['custo', 'arrendamento', 'barter']],
+  ['Venda melhor', ['avista', 'armazenar']]
+>>>>>>>
+<<<<<<< public/ferramentas.js
+];
+const icone = (id) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[id] || ''}</svg>`;
+=======
+];
+// Chamada de cada ferramenta no hub (o nome curto continua dentro da ferramenta).
+const CHAMADA = {
+  custo: ['Calcule sua rentabilidade', 'Custo por saca, ponto de equilíbrio e lucro por área'],
+  arrendamento: ['Vale a pena arrendar?', 'Quantas sacas vão para a terra e o que sobra para você'],
+  barter: ['Calculadora de barter', 'Quantas sacas pagam os insumos e se o pacote compensa'],
+  avista: ['À vista ou a prazo?', 'Qual proposta paga mais de verdade, com o dinheiro no tempo'],
+  armazenar: ['Armazenar ou vender agora?', 'Quanto custa segurar o amendoim e que preço precisa ter']
+};
+const icone = (id) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[id] || ''}</svg>`;
+>>>>>>>
+<<<<<<< public/ferramentas.js
+  return `<header class="topo"><div><h1>Ferramentas</h1><div class="sub">Faça a conta da sua lavoura</div></div></header>
+=======
+  return `<header class="topo"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><div><h1>Ferramentas</h1><div class="sub">Veja se a sua conta fecha</div></div></div></header>
+>>>>>>>
+<<<<<<< public/ferramentas.js
+    <div class="fh-lista">${ids.map((id) => `<a class="fh-item" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span><span class="cresce"><b>${esc(FERR[id].nome)}</b><span class="mini">${esc(FERR[id].desc)}</span></span><svg class="fh-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>`).join('')}</div>
+=======
+    <div class="fh-lista">${ids.map((id) => `<a class="fh-item" href="#/ferramentas/${id}"><span class="fh-ic">${icone(id)}</span><span class="cresce"><b>${esc((CHAMADA[id] || [FERR[id].nome])[0])}</b><span class="mini">${esc((CHAMADA[id] || [, FERR[id].desc])[1])}</span></span><svg class="fh-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/balcao.js
+    <div class="topo-linha"><div><h1>Negociar</h1><div class="sub">Balcão de compra e venda de amendoim</div></div>
+=======
+    <div class="topo-linha"><div class="topo-marca"><img src="/icons/icon-512.png" alt=""><div><h1>Negociar</h1><div class="sub">Balcão de compra e venda de amendoim</div></div></div>
+>>>>>>>
+<<<<<<< public/exportacao.js
+  const anos = Object.keys(s).map(Number).sort((x, y) => y - x).slice(0, 4); // 4 anos, mais recente primeiro (cabe no celular)
+=======
+  const anos = Object.keys(s).map(Number).sort((x, y) => x - y).slice(-4); // 4 anos, do mais antigo para o atual (como se lê uma série)
+>>>>>>>
+<<<<<<< public/exportacao.js
+    return `<tr><th>${MESES[i]}</th>${vals.map((x) => `<td class="${x != null && x === max && vals.filter((y) => y != null).length > 1 ? 'dx-max' : ''}">${mil(x)}</td>`).join('')}<td class="dx-var">${i < n ? vc(v) : ''}</td></tr>`;
+=======
+    return `<tr><th>${MESES[i]}</th>${vals.map((x, k) => `<td class="${k < anos.length - 3 ? 'dx-ant ' : ''}${x != null && x === max && vals.filter((y) => y != null).length > 1 ? 'dx-max' : ''}">${mil(x)}</td>`).join('')}<td class="dx-var">${i < n ? vc(v) : ''}</td></tr>`;
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="tabela-rolar"><table class="tabela dx-tabela">
+        <thead><tr><th>Mês</th>${anos.map((a) => `<th>${a}</th>`).join('')}<th>${String(atual).slice(2)}×${String(atual - 1).slice(2)}</th></tr></thead>
+=======
+      <div class="tabela-rolar"><table class="tabela dx-tabela dx-serie">
+        <thead><tr><th>Mês</th>${anos.map((a, i) => `<th class="${i < anos.length - 3 ? 'dx-ant' : ''}">${a}</th>`).join('')}<th>${String(atual).slice(2)}×${String(atual - 1).slice(2)}</th></tr></thead>
+>>>>>>>
+<<<<<<< public/exportacao.js
+          <tr><th>Até ${ate}</th>${anos.map((a) => `<td>${mil(ytd[a])}</td>`).join('')}<td class="dx-var">${vc(vAno)}</td></tr>
+          <tr><th>Ano x ano</th>${anos.map((a) => { const v = varia(ytd[a], ytd[a - 1]); return `<td class="dx-var">${ytd[a - 1] ? vc(v) : ''}</td>`; }).join('')}<td></td></tr>
+          <tr><th>Ano todo</th>${anos.map((a) => `<td>${a === atual ? `<i>${mil(projecao)}</i>` : mil(soma(a))}</td>`).join('')}<td class="dx-var">${vc(vProj)}</td></tr>
+          <tr><th>US$/t</th>${anos.map((a) => `<td>${nf(precoYtd[a])}</td>`).join('')}<td class="dx-var">${vc(vPreco)}</td></tr>
+=======
+          <tr><th>Até ${ate}</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'dx-ant' : ''}">${mil(ytd[a])}</td>`).join('')}<td class="dx-var">${vc(vAno)}</td></tr>
+          <tr><th>Ano x ano</th>${anos.map((a, k) => { const v = varia(ytd[a], ytd[a - 1]); return `<td class="dx-var ${k < anos.length - 3 ? 'dx-ant' : ''}">${ytd[a - 1] ? vc(v) : ''}</td>`; }).join('')}<td></td></tr>
+          <tr><th>Ano todo</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'dx-ant' : ''}">${a === atual ? `<i>${mil(projecao)}</i>` : mil(soma(a))}</td>`).join('')}<td class="dx-var">${vc(vProj)}</td></tr>
+          <tr><th>US$/t</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'dx-ant' : ''}">${nf(precoYtd[a])}</td>`).join('')}<td class="dx-var">${vc(vPreco)}</td></tr>
+>>>>>>>
+<<<<<<< public/exportacao.js
+function telaMundo(m, b) {
+=======
+export function telaMundo(m, b) {
+>>>>>>>
+<<<<<<< public/painel.js
+const DESTINO = { dolar: '#/mercado/hoje', exportacao: '#/mercado/exportacao', demanda: '#/mercado/termometro', oferta: '#/mercado/termometro' };
+=======
+const DESTINO = { dolar: '#/dolar', exportacao: '#/mercado/exportacao', demanda: '#/mercado/termometro', oferta: '#/mercado/termometro' };
+>>>>>>>
+<<<<<<< netlify/functions/coleta-agendada.mjs
+import { coletar } from '../lib/coleta.mjs';
+
+=======
+import { coletar } from '../lib/coleta.mjs';
+import { registrarDia } from '../lib/diario.mjs';
+
+>>>>>>>
+<<<<<<< netlify/functions/coleta-agendada.mjs
+  const r = await coletar();
+  console.log('coleta', JSON.stringify({ iea: r.iea?.data, pracas: r.iea?.pracas, ieaErro: r.iea?.erro, conab: r.conab?.semanas?.slice(-1), conabErro: r.conab?.erro }));
+=======
+  const r = await coletar();
+  try { await registrarDia(r); } catch (e) { console.log('diario', String(e?.message || e)); }
+  console.log('coleta', JSON.stringify({ iea: r.iea?.data, pracas: r.iea?.pracas, ieaErro: r.iea?.erro, conab: r.conab?.semanas?.slice(-1), conabErro: r.conab?.erro }));
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v21';
+=======
+const VERSAO = 'ab-v22';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
