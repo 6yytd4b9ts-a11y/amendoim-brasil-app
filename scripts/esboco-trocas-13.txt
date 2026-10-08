@@ -1,0 +1,127 @@
+<<<<<<< public/esboco-dados.js
+export const sessao = () => ler(CHAVE_SESSAO);
+=======
+export const sessao = () => {
+  const s = ler(CHAVE_SESSAO);
+  // Plano Empresa só vale quando vem do servidor (convite); um teste local não libera o Empresa.
+  if (s && s.plano === 'empresa' && emProducao() && !s.remoto) return { ...s, plano: 'produtor', empresaTravada: true };
+  return s;
+};
+>>>>>>>
+<<<<<<< public/esboco.js
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao } from '/esboco-dados.js';
+=======
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao } from '/esboco-dados.js';
+import { pedirCodigo, verificarCodigo, sairRemoto, loginReal } from '/auth.js';
+import { telaConvidados } from '/convidados.js';
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (sub === 'entrar') return telaEntrar();
+=======
+  if (sub === 'convidados') return telaConvidados(hh);
+  if (sub === 'entrar') return telaEntrar();
+>>>>>>>
+<<<<<<< public/esboco.js
+  const zap = est.modo === 'whatsapp';
+=======
+  const zap = loginReal() || est.modo === 'whatsapp';
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="segmento">${[['whatsapp', 'Código no WhatsApp'], ['email', 'E-mail e senha']].map(([k, t]) => `<button type="button" data-esb-modo="${k}" aria-pressed="${est.modo === k}">${t}</button>`).join('')}</div>
+=======
+    ${loginReal() ? '' : `<div class="segmento">${[['whatsapp', 'Código no WhatsApp'], ['email', 'E-mail e senha']].map(([k, t]) => `<button type="button" data-esb-modo="${k}" aria-pressed="${est.modo === k}">${t}</button>`).join('')}</div>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+        <span class="es-txt">${emProducao() ? `Digite o código de acesso que o Helder enviou no seu WhatsApp (<b>${h.esc(est.cel)}</b>).` : `Mandamos um código de 6 números para o WhatsApp <b>${h.esc(est.cel)}</b>.`}</span>
+=======
+        <span class="es-txt">${loginReal() && est.manual ? `Peça o seu código de 6 números ao Helder: ele recebeu o seu pedido agora. O código vale por 10 minutos (<b>${h.esc(est.cel)}</b>).` : `Mandamos um código de 6 números para o WhatsApp <b>${h.esc(est.cel)}</b>.`}</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+        ${emProducao() ? '' : aviso('Esboço: nenhuma mensagem é enviada. Use o código <b>123456</b>.')}
+=======
+        ${loginReal() ? '' : aviso('Esboço: nenhuma mensagem é enviada. Use o código <b>123456</b>.')}
+>>>>>>>
+<<<<<<< public/esboco.js
+        <button class="btn btn-verde" type="submit">${h.ic(h.I.zap, 'style="stroke:#fff"')}${emProducao() ? 'Continuar' : 'Receber código no WhatsApp'}</button>
+=======
+        <button class="btn btn-verde" type="submit">${h.ic(h.I.zap, 'style="stroke:#fff"')}${loginReal() ? 'Receber o código' : 'Receber código no WhatsApp'}</button>
+>>>>>>>
+<<<<<<< public/esboco.js
+        <span class="mini" style="text-align:center">${emProducao() ? 'Assinante e cliente da consultoria: o Helder envia o seu código de acesso pelo WhatsApp.' : 'Sem senha para lembrar. O código vale por 10 minutos.'}</span>
+=======
+        <span class="mini" style="text-align:center">${loginReal() ? 'Acesso por convite durante o piloto: só entram os números liberados. Sem senha, o código vale por 10 minutos.' : 'Sem senha para lembrar. O código vale por 10 minutos.'}</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+    if (id === 'esb-form-cel') { est.cel = v('esb-cel'); est.codigo = true; ctx.render(false); setTimeout(() => document.getElementById('esb-cod')?.focus(), 50); return; }
+=======
+    if (id === 'esb-form-cel') {
+      est.cel = v('esb-cel');
+      if (loginReal()) {
+        est.msg = 'Pedindo o código…'; ctx.render(false);
+        pedirCodigo(est.cel).then((r) => {
+          if (r.ok) { est.codigo = true; est.manual = !r.enviado; est.msg = ''; } else est.msg = r.mensagem || 'Não foi possível pedir o código agora.';
+          ctx.render(false); setTimeout(() => document.getElementById('esb-cod')?.focus(), 50);
+        });
+        return;
+      }
+      est.codigo = true; ctx.render(false); setTimeout(() => document.getElementById('esb-cod')?.focus(), 50); return;
+    }
+>>>>>>>
+<<<<<<< public/esboco.js
+      if (emProducao()) {
+        est.msg = 'Conferindo…'; ctx.render(false);
+        fetch('/api/exportacao', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ codigo: cod }) })
+          .then((r) => { if (r.ok) { try { localStorage.setItem('ab-cod-consultoria', cod); } catch (er) { /* ignora */ } est.msg = ''; entrar({ celular: est.cel, status: 'cortesia', plano: 'empresa' }); } else { est.msg = r.status === 429 ? 'Muitas tentativas hoje. Fale com o Helder.' : 'Código não confere. Peça o seu código ao Helder no WhatsApp.'; ctx.render(false); } })
+          .catch(() => { est.msg = 'Sem conexão agora. Tente de novo.'; ctx.render(false); });
+        return;
+      }
+=======
+      if (loginReal()) {
+        est.msg = 'Conferindo…'; ctx.render(false);
+        verificarCodigo(est.cel, cod).then((r) => {
+          if (r.ok) { est.msg = ''; est.codigo = false; est.manual = false; ctx.evento('esb-login'); location.hash = '#/mercado/consultoria'; }
+          else { est.msg = r.mensagem || 'Não foi possível entrar agora.'; ctx.render(false); }
+        });
+        return;
+      }
+>>>>>>>
+<<<<<<< public/esboco.js
+    if (q('[data-esb-sair]')) { salvarSessao(null); location.hash = '#/mercado/consultoria'; return; }
+=======
+    if (q('[data-esb-sair]')) { sairRemoto(); salvarSessao(null); location.hash = '#/mercado/consultoria'; return; }
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${emProducao() && s.teste && s.status === 'ativo' ? `<section class="cartao" style="gap:10px">
+=======
+  ${false && s.teste && s.status === 'ativo' ? `<section class="cartao" style="gap:10px">
+>>>>>>>
+<<<<<<< public/esboco.js
+  <button class="btn btn-escuro" type="button" data-esb-sair>Sair da conta</button>
+=======
+  ${s.remoto && s.papel === 'admin' ? `<a class="cartao es-cartao" href="#/conta/convidados"><span class="cresce"><b style="font-size:16px;display:block">Convidados do piloto</b><span class="mini">Liberar acesso, ver códigos e quem entrou</span></span>${h.ic(h.I.seta)}</a>` : ''}
+  <button class="btn btn-escuro" type="button" data-esb-sair>Sair da conta</button>
+>>>>>>>
+<<<<<<< public/app.js
+import { telaDolar, ligarDolar } from '/dolar.js';
+=======
+import { telaDolar, ligarDolar } from '/dolar.js';
+import { iniciarAuth } from '/auth.js';
+import { ligarConvidados } from '/convidados.js';
+>>>>>>>
+<<<<<<< public/app.js
+ligarDolar(render, evento);
+=======
+ligarDolar(render, evento);
+ligarConvidados(render, evento);
+iniciarAuth(render);
+>>>>>>>
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v22';
+=======
+const VERSAO = 'ab-v23';
+>>>>>>>
+<<<<<<< public/sw.js
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+=======
+const APP = ['/', '/index.html', '/styles.css', '/app.js', '/clima.js', '/ferramentas.js', '/painel.js', '/alertas.js', '/balcao.js', '/bandeiras.js', '/medicao.js', '/esboco.js', '/esboco2.js', '/esboco-clima.js', '/esboco-mapa.js', '/esboco3.js', '/terminal.js', '/dolar.js', '/auth.js', '/convidados.js', '/esboco-dados.js', '/esboco-export.js', '/esboco.css', '/esboco2.css', '/esboco3.css', '/terminal.css', '/extra.css', '/visual.css', '/manifest.webmanifest', '/img/logo.png', '/icons/icon-512.png', '/icons/icon-32.png'];
+>>>>>>>
