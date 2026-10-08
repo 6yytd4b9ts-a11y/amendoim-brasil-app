@@ -1,0 +1,29 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v49';
+=======
+const VERSAO = 'ab-v50';
+>>>>>>>
+<<<<<<< public/auth.js
+  const selo = s.papel === 'admin' ? 'ADMINISTRADOR' : s.status === 'cortesia' ? 'CORTESIA' : 'ASSINANTE';
+=======
+  const selo = s.papel === 'admin' ? 'ADMINISTRADOR' : 'TESTE';
+>>>>>>>
+<<<<<<< public/auth.js
+    <span style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#8A6A1E">ÁREA EXCLUSIVA</span><span style="font-size:10px;font-weight:800;letter-spacing:.05em;color:#8A6A1E;border:1px solid #C2A04C;border-radius:999px;padding:1px 8px">${selo}</span></span>
+    <b style="font-size:15px">Entrar na minha área ›</b>
+    <span style="font-size:12px;line-height:1.3;color:var(--texto-3);text-wrap:balance">${txt}</span>
+=======
+    <span style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A6A1E">ÁREA EXCLUSIVA${s.papel === 'admin' ? '' : ' · ASSINANTES'}</span><span style="font-size:10px;font-weight:800;letter-spacing:.05em;color:#8A6A1E;border:1px solid #C2A04C;border-radius:999px;padding:1px 8px">${selo}</span></span>
+    <b style="font-size:14px">Entrar na minha área ›</b>
+    <span style="font-size:11.5px;line-height:1.3;color:var(--texto-3);text-wrap:balance">${txt}</span>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="cartao-cab"><span class="rotulo">Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}</span><span class="pilula ${s.papel === 'admin' ? '' : 'pilula-verde'}"${s.papel === 'admin' ? ' style="background:linear-gradient(180deg,#F7EDCB,#EBDAA6);color:#6F5214;box-shadow:inset 0 0 0 1px #C2A04C;font-weight:800"' : ''}>${s.papel === 'admin' ? 'Administrador' : s.status === 'cortesia' ? 'Cortesia' : 'Plano ' + (empresa ? 'Empresa' : 'Produtor')}</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Olá, ${h.esc((s.nome || 'assinante').split(' ')[0])}</span><span class="pilula ${s.papel === 'admin' ? '' : 'pilula-verde'}"${s.papel === 'admin' ? ' style="background:linear-gradient(180deg,#F7EDCB,#EBDAA6);color:#6F5214;box-shadow:inset 0 0 0 1px #C2A04C;font-weight:800"' : ''}>${s.papel === 'admin' ? 'Administrador' : s.remoto ? 'Teste' : s.status === 'cortesia' ? 'Cortesia' : 'Plano ' + (empresa ? 'Empresa' : 'Produtor')}</span></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+  const st = s.teste && s.status === 'ativo' ? ['Teste grátis', 'pilula-verde'] : { ativo: ['Ativa', 'pilula-verde'], cortesia: ['Cortesia', 'pilula-verde'], atrasado: ['Pagamento atrasado', 'pilula-amendoim'], cancelado: ['Cancelada', 'pilula-amendoim'], sem: ['Sem assinatura', 'pilula-amendoim'] }[s.status || 'sem'];
+=======
+  const st = s.remoto && s.papel !== 'admin' ? ['Teste', 'pilula-verde'] : s.teste && s.status === 'ativo' ? ['Teste grátis', 'pilula-verde'] : { ativo: ['Ativa', 'pilula-verde'], cortesia: ['Cortesia', 'pilula-verde'], atrasado: ['Pagamento atrasado', 'pilula-amendoim'], cancelado: ['Cancelada', 'pilula-amendoim'], sem: ['Sem assinatura', 'pilula-amendoim'] }[s.status || 'sem'];
+>>>>>>>
