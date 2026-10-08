@@ -1,0 +1,24 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v44-previa';
+=======
+const VERSAO = 'ab-v45-previa';
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    <div class="cartao-cab"><span class="rotulo">Choveu de verdade</span><span class="mini">medido · até ontem</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Últimas chuvas</span><span class="mini">até ontem</span></div>
+>>>>>>>
+<<<<<<< public/esboco-clima.js
+    ${(() => { const n = a.normal || {}; const fr = (dias, v) => { const nm = n[dias]; if (!nm || !nm.mm) return ''; const p = Math.round((v / nm.mm - 1) * 100); return `<span class="cl-normal ${p <= -30 ? 'cai' : p >= 30 ? 'sobe' : ''}">${dias === 30 ? 'No mês' : `Em ${dias} dias`}: ${Math.abs(p) < 10 ? 'dentro do normal' : `${Math.abs(p)}% ${p < 0 ? 'abaixo' : 'acima'} do normal`} <small>(normal ${numBr(Math.round(nm.mm))} mm)</small></span>`; }; const l = [fr(30, a.chuva30passados || 0), fr(15, a.chuva15passados || 0), fr(7, a.chuva7passados || 0)].filter(Boolean); return l.length ? `<div class="cl-normais">${l.join('')}</div>` : ''; })()}
+    <span class="mini">Chuva estimada para o ponto da lavoura (Open-Meteo). Normal = média dos últimos 10 anos no mesmo período.</span>
+=======
+    ${(() => { const nm = (a.normal || {})[30]; if (!nm || !nm.mm) return ''; const p = Math.round(((a.chuva30passados || 0) / nm.mm - 1) * 100); return `<div class="cl-normal ${p <= -30 ? 'cai' : p >= 30 ? 'sobe' : ''}"><span>${Math.abs(p) < 10 ? 'Mês dentro do normal' : `Choveu ${Math.abs(p)}% ${p < 0 ? 'abaixo' : 'acima'} do normal no mês`}</span><small>normal: ${numBr(Math.round(nm.mm))} mm</small></div>`; })()}
+    <span class="mini">Estimativa para o ponto da lavoura (Open-Meteo) · normal = média de 10 anos no mesmo período</span>
+>>>>>>>
+<<<<<<< public/esboco3.css
+.cl-normal { font-size: 13.5px; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: var(--fundo); }
+.cl-normal small { font-weight: 600; color: var(--texto-3); }
+=======
+.cl-normal { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 700; padding: 8px 12px; border-radius: 10px; background: var(--fundo); }
+.cl-normal small { font-weight: 600; color: var(--texto-3); white-space: nowrap; }
+>>>>>>>

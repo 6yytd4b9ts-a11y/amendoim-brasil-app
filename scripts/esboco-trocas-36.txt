@@ -1,0 +1,13 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v45-previa';
+=======
+const VERSAO = 'ab-v46-previa';
+>>>>>>>
+<<<<<<< public/esboco3.js
+const BIBLIOTECA = [
+=======
+const BIBLIOTECA = [
+  { tema: 'colheita', titulo: 'Cultivo de amendoim (sistema de produção)', autor: 'A. G. F. Costa, D. J. Soares e T. M. F. Suassuna', fonte: 'Embrapa Algodão', ano: 2025, resumo: 'O guia mais recente da Embrapa para a cultura: cultivares runner para colheita mecanizada, manejo de solo e da lavoura, arranquio, secagem e controle de qualidade pós-colheita.', pratica: 'Use como referência de base para toda a safra. Para arranquio e cura, siga o capítulo de colheita: ponto de maturação, umidade da vagem e tempo na leira antes do recolhimento.', link: 'https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1183110/1/SISTEMAS-DE-PRODUCAO-AMENDOIM-2025.pdf' },
+  { tema: 'nutricao', titulo: 'Instruções agrícolas para as principais culturas econômicas (Boletim IAC 200) · capítulo Amendoim', autor: 'Instituto Agronômico (vários autores)', fonte: 'IAC · 7ª edição', ano: 2014, resumo: 'A recomendação oficial do IAC para calagem, gesso e adubação do amendoim em São Paulo. É a referência ainda usada hoje para o estado.', pratica: 'Calcário dolomítico até dois meses antes da semeadura, para saturação por bases de 60%. Gesso agrícola de 500 a 1.000 kg/ha no florescimento pleno (fornece cálcio e cerca de 20 kg/ha de enxofre). Adubação típica para cultivares de alto potencial: 10 a 15 kg/ha de N, 90 a 100 kg/ha de P₂O₅ e 30 a 40 kg/ha de K₂O, sempre ajustada pela análise de solo.', link: 'https://www.iac.sp.gov.br/media/publicacoes/iacboletim200.pdf' },
+  { tema: 'aflatoxina', titulo: 'Segurança e qualidade na produção primária do amendoim (Circular Técnica 88)', autor: 'T. M. F. Suassuna, N. D. Suassuna, R. P. de Almeida, A. E. de Araújo e H. Fonseca', fonte: 'Embrapa Algodão · ESALQ/USP', ano: 2005, resumo: 'Onde a aflatoxina entra na lavoura e no armazém, e o que evita: estresse hídrico no fim do ciclo, colheita fora do ponto, secagem lenta e armazém úmido.', pratica: 'Evite falta de água nas 4 a 6 semanas antes da colheita. Colha no ponto de maturação. Seque as vagens o mais rápido possível até 10% de umidade ou menos. Armazene em local seco e ventilado, com umidade relativa abaixo de 70%.', link: 'https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1092029/1/CircTec88Segurancaequalidade....pdf' },
+>>>>>>>
