@@ -1,0 +1,23 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v44';
+=======
+const VERSAO = 'ab-v45';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+      ${e ? `<label class="es-check"><input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''}><span>Acesso ativo (desmarque para encerrar na hora)</span></label>` : ''}
+=======
+      ${e ? `<div class="cartao" style="background:var(--fundo);gap:6px;padding:12px"><span class="rotulo">Acesso</span><span class="mini">${e.ativo ? 'Ativo. Para encerrar na hora, corte o acesso: a pessoa sai do app e não consegue pedir outro código. Dá para reativar depois.' : 'Cortado. A pessoa não entra. Reative para liberar de novo.'}</span>
+        ${e.ativo ? `<button class="btn btn-pequeno btn-perigo" type="button" data-pp-ed-ativo="0" style="align-self:flex-start">Cortar o acesso agora</button>` : `<button class="btn btn-pequeno btn-verde" type="button" data-pp-ed-ativo="1" style="align-self:flex-start">Reativar o acesso</button>`}
+        <input type="checkbox" id="pp-ativo" ${e.ativo ? 'checked' : ''} hidden></div>` : ''}
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    if (t.closest('[data-pp-cancelar]')) { est.editando = null; est.novo = false; est.msg = ''; redesenhar(); return; }
+=======
+    if (t.closest('[data-pp-cancelar]')) { est.editando = null; est.novo = false; est.msg = ''; redesenhar(); return; }
+    if ((x = t.closest('[data-pp-ed-ativo]'))) {
+      const ed = est.editando; if (!ed) return;
+      const ligar = x.dataset.ppEdAtivo === '1';
+      x.disabled = true; est.editando = null; est.sub = 'pessoas';
+      await mudarPessoa(ed.id, ligar ? { ativo: true } : { ativo: false }, ligar ? 'acesso reativado.' : 'acesso cortado.'); return;
+    }
+>>>>>>>
