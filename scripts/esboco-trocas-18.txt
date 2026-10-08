@@ -1,0 +1,15 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v27';
+=======
+const VERSAO = 'ab-v28';
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="mini" style="text-align:center">Depois: R$ ${nf(c.planos.produtor.mensal, 2)} por mês, ou R$ ${nf(c.planos.produtor.anual / 12, 2)}/mês no plano anual</span>
+=======
+    ${s?.remoto && s.piloto && s.papel !== 'admin' ? '' : `<span class="mini" style="text-align:center">Depois: R$ ${nf(c.planos.produtor.mensal, 2)} por mês, ou R$ ${nf(c.planos.produtor.anual / 12, 2)}/mês no plano anual</span>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${blocoPlanos(c, false)}
+=======
+  ${s?.remoto && s.piloto && s.papel !== 'admin' ? '' : blocoPlanos(c, false)}
+>>>>>>>
