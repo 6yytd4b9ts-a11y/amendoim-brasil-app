@@ -3,3 +3,41 @@
 =======
   const cor = sobe ? '#007731' : '#B3261E'; // dólar subindo: exportação paga mais em R$ (verde); caindo: vermelho
 >>>>>>>
+<<<<<<< public/dolar.js
+    <div><b class="num" style="font-size:34px">${brl(agora)}</b> <span class="${vAgora > 0 ? 'dx-cai' : vAgora < 0 ? 'dx-sobe' : ''}" style="font-weight:800">${pc(vAgora)} hoje</span></div>
+=======
+    <div><b class="num" style="font-size:34px">${brl(agora)}</b> <span class="${vAgora > 0 ? 'dx-sobe' : vAgora < 0 ? 'dx-cai' : ''}" style="font-weight:800">${pc(vAgora)} hoje</span></div>
+>>>>>>>
+<<<<<<< public/dolar.js
+    ${ultimos.map((x, i) => { const a = ultimos[i + 1]; const v = a ? ((x.bid - a.bid) / a.bid) * 100 : null; return `<div class="lista-linha"><span class="cresce">${diaDe(x.ts)}</span><b class="num">${brl(x.bid)}</b><span class="mini ${v > 0 ? 'dx-cai' : v < 0 ? 'dx-sobe' : ''}" style="min-width:64px;text-align:right">${pc(v)}</span></div>`; }).join('')}
+=======
+    ${ultimos.map((x, i) => { const a = ultimos[i + 1]; const v = a ? ((x.bid - a.bid) / a.bid) * 100 : null; return `<div class="lista-linha"><span class="cresce">${diaDe(x.ts)}</span><b class="num">${brl(x.bid)}</b><span class="mini ${v > 0 ? 'dx-sobe' : v < 0 ? 'dx-cai' : ''}" style="min-width:64px;text-align:right">${pc(v)}</span></div>`; }).join('')}
+>>>>>>>
+<<<<<<< public/dolar.js
+    <span class="mini">Verde quando o dólar cai (amendoim brasileiro mais caro lá fora, pior para exportar); vermelho quando sobe (exportação paga mais em R$).</span>
+=======
+    <span class="mini">Verde quando o dólar sobe (exportação paga mais em R$); vermelho quando cai (amendoim brasileiro mais caro lá fora, pior para exportar).</span>
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (itens.length < 3 && atual.fato && (!base || atual.fato === base.fato)) linha(bola('#F4AD46'), `Fato do dia: ${h.esc(atual.fato)}`, '#/mercado/hoje');
+=======
+  // o Fato do dia já tem cartão próprio no Início: aqui só entra quando é novo
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function definirNoticias(l) { NOTICIAS_APP = Array.isArray(l) ? l : []; }
+=======
+let FATO_APP = '';
+export function definirNoticias(l, fato) { NOTICIAS_APP = Array.isArray(l) ? l : []; FATO_APP = fato || ''; }
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const lista = noticiasDoDia();
+  if (!lista.length) return '';
+=======
+  const lista = noticiasDoDia().filter((n) => !compacto || n.titulo !== FATO_APP); // no Início, sem repetir o Fato do dia
+  if (!lista.length) return '';
+>>>>>>>
+<<<<<<< public/app.js
+  ARQUIVOS.forEach((a, i) => { if (a === 'mercado') definirNoticias(res[i]?.noticias); });
+=======
+  ARQUIVOS.forEach((a, i) => { if (a === 'mercado') definirNoticias(res[i]?.noticias, res[i]?.fato?.titulo); });
+>>>>>>>
