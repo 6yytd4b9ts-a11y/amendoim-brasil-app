@@ -231,6 +231,14 @@ async function perfil(req: Request, b: any) {
   return resp(req, 200, { ok: true, conta: contaOut(data, pilotoDe(await cfg())) });
 }
 
+// "l=Presidente Prudente/SP|g=1|a=1|i=1|d=iphone" -> objeto para o painel
+function lerConfig(r: any) {
+  if (!r?.detalhe) return null;
+  const m: Record<string, string> = {};
+  String(r.detalhe).split("|").forEach((p) => { const i = p.indexOf("="); if (i > 0) m[p.slice(0, i)] = p.slice(i + 1); });
+  return { local: m.l || "", gps: m.g === "1", avisos: m.a === "1", app: m.i === "1", aparelho: m.d || "", em: r.criado_em };
+}
+
 async function evento(req: Request, b: any) {
   const u = await usuarioDe(req);
   if (!u || !vigente(u.conv)) return resp(req, 401, { ok: false, motivo: "sessao_invalida" });
@@ -241,7 +249,7 @@ async function evento(req: Request, b: any) {
   const linhas = itens.map((i: any) => ({
     user_id: u.user.id, tipo: String(i?.t ?? ""), detalhe: String(i?.d ?? "").slice(0, 120) || null,
     criado_em: new Date(Math.min(agora, Math.max(agora - 86_400_000, Number(i?.ts) || agora))).toISOString(),
-  })).filter((l: any) => ["abriu", "tela", "clique", "beat"].includes(l.tipo));
+  })).filter((l: any) => ["abriu", "tela", "clique", "beat", "config"].includes(l.tipo));
   if (linhas.length) await db.from("uso").insert(linhas);
   return resp(req, 200, { ok: true });
 }
@@ -388,6 +396,7 @@ async function admin(req: Request, b: any) {
       const dias = new Set<string>(), telas = new Map<string, number>(), cliques = new Map<string, number>();
       const telasDet = new Map<string, Tela>(), porDia = new Map<string, { a: number; s: number }>();
       let sessoes = 0, beats = 0, beats7 = 0;
+      let cfgRow: any = null; // a configuração mais recente do celular (localização, avisos, tela inicial)
       const sete = Date.now() - 7 * 86_400_000;
       for (const r of meus) {
         const d = diaBR(r.criado_em);
@@ -400,6 +409,7 @@ async function admin(req: Request, b: any) {
         }
         else if (r.tipo === "tela" && r.detalhe) { somar(telas, r.detalhe); somar(telasGlobal, r.detalhe); telaDe(telasDet, r.detalhe).v++; telaDe(telasDetGlobal, r.detalhe).v++; }
         else if (r.tipo === "clique" && r.detalhe) { somar(cliques, r.detalhe); somar(cliquesGlobal, r.detalhe); }
+        else if (r.tipo === "config" && !cfgRow) cfgRow = r;
       }
       return {
         id: c.id, nome: c.nome, empresa: c.empresa ?? "", celular: c.celular, plano: c.plano, ativo: c.ativo, perfil_ok: c.perfil_ok,
@@ -408,7 +418,8 @@ async function admin(req: Request, b: any) {
         porDia: dias14.map((d) => [d, porDia.get(d)?.a ?? 0, porDia.get(d)?.s ?? 0]),
         telasDet: rankTelas(telasDet, 12),
         telas: ranking(telas, 6), cliques: ranking(cliques, 8),
-        ultimas: meus.filter((r: any) => r.tipo !== "beat").slice(0, 12).map((r: any) => ({ t: r.tipo, d: r.detalhe, em: r.criado_em })),
+        config: lerConfig(cfgRow),
+        ultimas: meus.filter((r: any) => r.tipo !== "beat" && r.tipo !== "config").slice(0, 12).map((r: any) => ({ t: r.tipo, d: r.detalhe, em: r.criado_em })),
       };
     });
     const nomePor: Record<string, string> = {};
