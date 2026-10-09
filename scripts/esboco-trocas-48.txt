@@ -1,0 +1,47 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v57';
+=======
+const VERSAO = 'ab-v58';
+>>>>>>>
+<<<<<<< public/index.html
+  <link rel="manifest" href="/manifest.webmanifest">
+=======
+  <script>
+    // iPhone: o ícone da Tela de Início usa o manifesto lido quando a página abre. Quem já entrou no navegador
+    // leva junto o passe de entrada (o ícone abre já logado). Sem passe, é o manifesto de sempre.
+    (function () {
+      var h = '/manifest.webmanifest', t = '';
+      try {
+        var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+        var p = JSON.parse(localStorage.getItem('ab-passe') || 'null');
+        if (ios && !app && p && /^[A-Za-z0-9_-]{20,80}$/.test(p.t || '') && localStorage.getItem('ab-auth')) { t = p.t; h = '/api/manifesto?t=' + t; }
+      } catch (e) { /* sem armazenamento: manifesto de sempre */ }
+      window.__passeNaPagina = t;
+      document.write('<link rel="manifest" href="' + h + '">');
+    })();
+  </script>
+>>>>>>>
+<<<<<<< public/auth.js
+    p = { t: r.passe, em: Date.now() };
+    try { localStorage.setItem('ab-passe', JSON.stringify(p)); } catch (e) { /* sem armazenamento */ }
+    por(p.t);
+  } catch (e) { /* sem passe: pelo ícone pede o código, como antes */ }
+=======
+    p = { t: r.passe, em: Date.now() };
+    localStorage.setItem('ab-passe', JSON.stringify(p));
+    por(p.t);
+    // O iPhone guarda o manifesto lido quando a página abriu. Se o passe desta página não é o atual (acabou de entrar,
+    // ou o passe foi trocado), recarrega uma vez para o ícone levar o passe certo. Uma vez por passe, nunca em laço.
+    if ((window.__passeNaPagina || '') !== p.t) {
+      if (sessionStorage.getItem('ab-passe-recarga') === p.t) return;
+      sessionStorage.setItem('ab-passe-recarga', p.t);
+      if (sessionStorage.getItem('ab-passe-recarga') === p.t) location.reload();
+    }
+  } catch (e) { /* sem passe ou sem armazenamento: pelo ícone pede o código, como antes */ }
+>>>>>>>
+<<<<<<< public/auth.js
+  setTimeout(prepararPasse, 3000); // independente do resto da abertura, como a conferência acima
+=======
+  setTimeout(prepararPasse, 1000); // independente do resto da abertura, como a conferência acima
+>>>>>>>
