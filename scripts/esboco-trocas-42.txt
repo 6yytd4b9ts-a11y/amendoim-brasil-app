@@ -1,0 +1,24 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v51';
+=======
+const VERSAO = 'ab-v52';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+function blocoPush() {
+=======
+// O último aviso de "pediu o código": a quantos celulares do painel ele chegou.
+function ultimoAviso() {
+  const a = est.dados?.ultimoAviso;
+  if (!a) return '';
+  const m = {}; String(a.detalhe || '').split(' ').forEach((p) => { const i = p.indexOf('='); if (i > 0) m[p.slice(0, i)] = p.slice(i + 1); });
+  const ent = Number(m.entregues || 0);
+  const txt = m.erro ? 'não saiu (falha no envio)' : ent > 0 ? `chegou em ${ent} celular${ent > 1 ? 'es' : ''}` : 'não chegou a nenhum celular: ligue os avisos de novo neste aparelho';
+  return `<span class="mini" style="${ent > 0 ? '' : 'color:#B3261E;font-weight:700'}">Último aviso de pedido (${quando(a.criado_em, '')}): ${txt}.</span>`;
+}
+function blocoPush() {
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  return `<div class="cartao-cab"><span class="rotulo">Avisos no celular</span><span class="pilula ${e === 'ligado' ? 'pilula-verde' : 'pilula-amendoim'}">${e === 'ligado' ? 'LIGADOS' : 'desligados'}</span></div>${corpo}${p.msg ? `<div class="mini" role="status">${esc(p.msg)}</div>` : ''}`;
+=======
+  return `<div class="cartao-cab"><span class="rotulo">Avisos no celular</span><span class="pilula ${e === 'ligado' ? 'pilula-verde' : 'pilula-amendoim'}">${e === 'ligado' ? 'LIGADOS' : 'desligados'}</span></div>${corpo}${p.msg ? `<div class="mini" role="status">${esc(p.msg)}</div>` : ''}${ultimoAviso()}`;
+>>>>>>>

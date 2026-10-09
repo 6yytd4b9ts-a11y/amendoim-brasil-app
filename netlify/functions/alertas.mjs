@@ -59,7 +59,12 @@ export default async (req) => {
     return json({ erro: 'acao' }, 400);
   }
 
-  if (b.acao === 'remover') { await l.delete(id); return json({ ok: true }); }
+  if (b.acao === 'remover') { // desligar os alertas do app não pode desligar os avisos do painel no mesmo celular
+    const antigo = await l.get(id, { type: 'json' });
+    if (antigo?.painel) await l.setJSON(id, { ...antigo, prefs: PREFS_VAZIAS, atualizado: new Date().toISOString() });
+    else await l.delete(id);
+    return json({ ok: true });
+  }
 
   if (b.acao === 'teste') {
     const insc = await l.get(id, { type: 'json' });
@@ -86,6 +91,7 @@ export default async (req) => {
       sub: { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } },
       prefs,
       admin: antigo.admin || chaveOk(b.k),
+      ...(antigo.painel ? { painel: true } : {}), // mantém os avisos do painel deste celular
       criado: antigo.criado || new Date().toISOString(),
       atualizado: new Date().toISOString(),
       // o aviso de preço-alvo dispara uma vez por alvo; ao trocar o alvo, volta a valer

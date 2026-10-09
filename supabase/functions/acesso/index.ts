@@ -104,12 +104,18 @@ async function avisarPainel(titulo: string, corpo: string, tag: string) {
   try {
     const c = await cfg();
     if (!c.aviso_segredo) return;
-    await fetch(`${ORIGEM_PADRAO}/api/alertas`, {
+    const r = await fetch(`${ORIGEM_PADRAO}/api/alertas`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ acao: "painel_aviso", segredo: c.aviso_segredo, titulo, corpo, tag, url: "/painel" }),
       signal: AbortSignal.timeout(8000),
     });
-  } catch (e) { console.error("aviso painel", String((e as Error).message ?? e).slice(0, 120)); }
+    const j: any = await r.json().catch(() => ({}));
+    // fica registrado se o aviso chegou a algum celular do painel (o painel mostra o último)
+    await registra(null, "aviso_painel", r.ok ? `celulares=${j.alvos ?? "?"} entregues=${j.enviados ?? 0} expirados=${j.removidos ?? 0}` : `erro=${r.status}`);
+  } catch (e) {
+    console.error("aviso painel", String((e as Error).message ?? e).slice(0, 120));
+    await registra(null, "aviso_painel", `erro=${String((e as Error).message ?? e).slice(0, 80)}`).catch(() => {});
+  }
 }
 
 // ---------- sessão ----------
@@ -329,9 +335,11 @@ async function admin(req: Request, b: any) {
     const { data: peds } = await db.from("codigos_login").select("celular, criado_em").order("criado_em", { ascending: false }).limit(500);
     const ultPedido: Record<string, string> = {};
     (peds ?? []).forEach((x: any) => { if (!ultPedido[x.celular]) ultPedido[x.celular] = x.criado_em; });
+    const { data: av } = await db.from("acessos").select("detalhe, criado_em").eq("evento", "aviso_painel").order("criado_em", { ascending: false }).limit(1).maybeSingle();
     return resp(req, 200, {
       ok: true,
       piloto: pilotoDe(c),
+      ultimoAviso: av ?? null,
       convidados: (convs ?? []).map((x: any) => ({ ...x, ultimo_acesso: x.perfis?.[0]?.ultimo_acesso ?? x.perfis?.ultimo_acesso ?? null, entrou: Array.isArray(x.perfis) ? x.perfis.length > 0 : !!x.perfis, ultimo_pedido: ultPedido[x.celular] ?? null, perfis: undefined })),
       codigos: (pend ?? []).map((x: any) => ({ celular: x.celular, nome: nomes[x.celular] ?? "", codigo: x.codigo_manual, criado_em: x.criado_em, expira_em: x.expira_em })),
       whatsapp: { provedor: c.whatsapp_provedor || "manual" },
