@@ -1,0 +1,71 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v50';
+=======
+const VERSAO = 'ab-v51';
+>>>>>>>
+<<<<<<< public/auth.js
+  atualizarUI();
+  reg('abriu', telaAtual());
+  await validar();
+  reg('tela', telaAtual());
+}
+=======
+  atualizarUI();
+  reg('abriu', telaAtual());
+  setTimeout(regConfig, 4000); // independente do resto da abertura: se algo falhar lá, a conferência sai igual
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - cfgEm > 10 * 60000) regConfig(); });
+  await validar();
+  reg('tela', telaAtual());
+}
+
+// Configuração do celular do convidado (localização, avisos, app na tela inicial), para o painel.
+// Só lê o que já está no aparelho: não pede permissão nenhuma e nunca atrapalha o app.
+let cfgEm = 0;
+async function regConfig() {
+  try {
+    if (!restrito()) return;
+    cfgEm = Date.now();
+    let l = '', g = 0, a = 0;
+    try { const m = (await import('/clima.js')).municipioSalvo(); if (m) { g = m.gps ? 1 : 0; l = m.gps ? (m.perto || 'Sua localização') : `${m.nome}/${m.uf}`; } } catch (e) { /* sem local */ }
+    try { a = (await import('/alertas.js')).alertasAtivos() ? 1 : 0; } catch (e) { /* sem avisos */ }
+    const i = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true ? 1 : 0;
+    const ua = navigator.userAgent, d = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? 'iphone' : /Android/.test(ua) ? 'android' : 'computador';
+    reg('config', `l=${String(l).replace(/[|=]/g, ' ').slice(0, 60)}|g=${g}|a=${a}|i=${i}|d=${d}`);
+  } catch (e) { /* medição nunca atrapalha o app */ }
+}
+>>>>>>>
+<<<<<<< public/auth.js
+  if (r.ok && r.sessao) { guardarSessao(r.sessao); aplicarConta(r.conta); atualizarUI(); }
+=======
+  if (r.ok && r.sessao) { guardarSessao(r.sessao); aplicarConta(r.conta); atualizarUI(); setTimeout(regConfig, 4000); }
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+// ---------- uso: geral e por pessoa ----------
+=======
+// ---------- uso: geral e por pessoa ----------
+const APARELHO = { iphone: 'iPhone', android: 'Android', computador: 'Computador' };
+const okc = (v, txt) => `<span style="font-weight:700;color:${v ? 'var(--verde-escuro)' : 'var(--texto-3)'}">${v ? '✓' : '–'}${txt ? ' ' + txt : ''}</span>`;
+function tabelaConfig() {
+  const todos = est.uso?.convidados || [];
+  const cs = todos.filter((c) => c.config), n = cs.length, conta = (f) => cs.filter(f).length;
+  if (!todos.length) return '<span class="mini">Sem convidados ainda.</span>';
+  const linhas = todos.map((c) => { const k = c.config; return `<tr style="border-top:1px solid var(--borda,#EFEBE2)"><td style="padding:8px 4px 8px 0"><b style="font-size:14px">${esc(String(c.nome || '').split(' ')[0])}</b></td>${k ? `<td style="text-align:center">${k.local ? okc(true, k.gps ? 'GPS' : 'escolheu') : okc(false)}</td><td style="text-align:center">${okc(k.avisos)}</td><td style="text-align:center">${okc(k.app)}</td>` : '<td colspan="3" class="mini" style="text-align:center">ainda não abriu</td>'}</tr>`; }).join('');
+  return `<div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Localização', conta((c) => c.config.local) + ' de ' + n, 'de quem abriu')}${tile('Avisos', conta((c) => c.config.avisos) + ' de ' + n, 'de quem abriu')}${tile('Tela inicial', conta((c) => c.config.app) + ' de ' + n, 'de quem abriu')}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr class="mini"><th style="text-align:left;font-weight:600">Pessoa</th><th style="font-weight:600">Local</th><th style="font-weight:600">Avisos</th><th style="font-weight:600">Tela inicial</th></tr></thead><tbody>${linhas}</tbody></table>
+  <span class="mini">✓ = ligado no celular da pessoa na última vez que abriu o app. Local: GPS = usou a localização do celular; escolheu = marcou o município na mão.</span>`;
+}
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  <section class="cartao" style="gap:6px"><span class="rotulo">Onde mais ficaram</span><span class="mini">tempo de tela aberta e mexendo, por tela</span>${rankTelas(g.telas)}</section>
+=======
+  <section class="cartao" style="gap:8px"><div class="cartao-cab"><span class="rotulo">Quem configurou o app</span><span class="mini">conferido ao abrir</span></div>${tabelaConfig()}</section>
+  <section class="cartao" style="gap:6px"><span class="rotulo">Onde mais ficaram</span><span class="mini">tempo de tela aberta e mexendo, por tela</span>${rankTelas(g.telas)}</section>
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+      <span class="rotulo">Aberturas por dia · 14 dias</span>${barrasDia(uso.porDia)}
+      <span class="rotulo">Onde mais ficou</span>${rankTelas(uso.telasDet)}
+=======
+      ${uso.config ? `<span class="rotulo">Configuração do app</span><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="pilula ${uso.config.local ? 'pilula-verde' : 'pilula-amendoim'}">Localização: ${uso.config.local ? esc(uso.config.local) + (uso.config.gps ? ' (GPS)' : ' (escolheu)') : 'não'}</span><span class="pilula ${uso.config.avisos ? 'pilula-verde' : 'pilula-amendoim'}">Avisos: ${uso.config.avisos ? 'ligados' : 'não'}</span><span class="pilula ${uso.config.app ? 'pilula-verde' : 'pilula-amendoim'}">Tela inicial: ${uso.config.app ? 'sim' : 'não'}</span></div><span class="mini">${esc(APARELHO[uso.config.aparelho] || '')}${uso.config.aparelho ? ' · ' : ''}conferido ${quando(uso.config.em)}</span>` : (entrou ? '<span class="mini">Configuração do app: aparece na próxima vez que a pessoa abrir.</span>' : '')}
+      <span class="rotulo">Aberturas por dia · 14 dias</span>${barrasDia(uso.porDia)}
+      <span class="rotulo">Onde mais ficou</span>${rankTelas(uso.telasDet)}
+>>>>>>>
