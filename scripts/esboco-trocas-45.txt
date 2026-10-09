@@ -1,0 +1,15 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v54';
+=======
+const VERSAO = 'ab-v55';
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  return `<br><a class="chip" style="display:inline-block;margin-top:4px;padding:3px 10px;font-size:12px;text-decoration:none" target="_blank" rel="noopener" data-pp-lembrar="${esc(c.id)}" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgLembrete(c))}">Lembrar</a>`;
+=======
+  return `<br><button class="chip" type="button" style="display:inline-block;margin-top:4px;padding:3px 10px;font-size:12px" data-pp-lembrar="${esc(c.id)}">Lembrar</button>`;
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  <span class="mini"><b style="color:var(--verde-escuro)">✓</b> ativou · <b style="color:#B3261E">✗</b> recusou (tocou em Não permitir) · <b>–</b> ainda não ativou (pulou). Local = localização do celular (GPS). Conferido na última vez que a pessoa abriu o app. <b>Lembrar</b> abre o WhatsApp com a mensagem pronta e, na próxima abertura, o app mostra para ela a tela de colocar na tela inicial ou de ativar os avisos.</span>`;
+=======
+  <span class="mini"><b style="color:var(--verde-escuro)">✓</b> ativou · <b style="color:#B3261E">✗</b> recusou (tocou em Não permitir) · <b>–</b> ainda não ativou (pulou). Local = localização do celular (GPS). Conferido na última vez que a pessoa abriu o app. <b>Lembrar</b>: na próxima vez que a pessoa abrir o app, aparece para ela a tela de colocar na tela inicial ou de ativar os avisos. Nada é enviado pelo WhatsApp.</span>`;
+>>>>>>>
