@@ -1,0 +1,87 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v56';
+=======
+const VERSAO = 'ab-v57';
+>>>>>>>
+<<<<<<< public/auth.js
+const iphoneSafari = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+=======
+// qualquer navegador do iPhone/iPad (Safari, Chrome, Edge, Firefox): todos criam o ícone com o armazenamento separado
+const iphoneSafari = () => (/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+>>>>>>>
+<<<<<<< public/auth.js
+    let p = null;
+    try { p = JSON.parse(localStorage.getItem('ab-passe') || 'null'); } catch (e) { /* sem armazenamento */ }
+    if (!p?.t || Date.now() - (p.em || 0) > 3 * 86400000) {
+      const tk = await tokenValido();
+      if (!tk) return;
+      const r = await chamar('passe', {}, tk);
+      if (!r.ok || !r.passe) return;
+      p = { t: r.passe, em: Date.now() };
+      try { localStorage.setItem('ab-passe', JSON.stringify(p)); } catch (e) { /* sem armazenamento */ }
+    }
+    const l = document.querySelector('link[rel="manifest"]');
+    if (l) l.setAttribute('href', '/api/manifesto?t=' + encodeURIComponent(p.t));
+=======
+    const l = document.querySelector('link[rel="manifest"]');
+    const por = (t) => { if (l) l.setAttribute('href', '/api/manifesto?t=' + encodeURIComponent(t)); };
+    let p = null;
+    try { p = JSON.parse(localStorage.getItem('ab-passe') || 'null'); } catch (e) { /* sem armazenamento */ }
+    if (p?.t && Date.now() - (p.em || 0) < 3600000) por(p.t); // conferido há pouco: já vale
+    // a cada abertura o servidor confere: devolve o mesmo passe se ainda vale, ou um novo se já foi usado ou está vencendo
+    const tk = await tokenValido();
+    if (!tk) return;
+    const r = await chamar('passe', { atual: p?.t || '' }, tk);
+    if (!r.ok || !r.passe) return;
+    p = { t: r.passe, em: Date.now() };
+    try { localStorage.setItem('ab-passe', JSON.stringify(p)); } catch (e) { /* sem armazenamento */ }
+    por(p.t);
+>>>>>>>
+<<<<<<< public/auth.js
+  await validar();
+  reg('tela', telaAtual());
+  prepararPasse();
+}
+=======
+  setTimeout(prepararPasse, 3000); // independente do resto da abertura, como a conferência acima
+  await validar();
+  reg('tela', telaAtual());
+}
+>>>>>>>
+<<<<<<< public/esboco.js
+const iphone = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
+=======
+const iphone = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const navIos = () => /CriOS/.test(navigator.userAgent) ? 'chrome' : /FxiOS|EdgiOS|OPiOS|GSA\//.test(navigator.userAgent) ? 'outro' : 'safari';
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${iphone() ? `<ol class="es-ios"><li>Toque em <b>Compartilhar</b> ${h.ic(h.I.enviar, 'style="width:18px;height:18px;vertical-align:-3px;stroke:#2F6FA3"')} na barra do Safari (ou nos <b>três pontinhos</b> e depois em Compartilhar)</li><li>Escolha <b>Adicionar à Tela de Início</b></li><li>Toque em <b>Adicionar</b> e abra o app pelo ícone</li></ol>
+=======
+    ${iphone() ? `<ol class="es-ios"><li>Toque em <b>Compartilhar</b> ${h.ic(h.I.enviar, 'style="width:18px;height:18px;vertical-align:-3px;stroke:#2F6FA3"')} ${navIos() === 'chrome' ? 'no alto, na barra de endereço do Chrome' : navIos() === 'outro' ? 'no menu do navegador' : 'na barra do Safari'} (ou nos <b>três pontinhos</b> e depois em Compartilhar)</li><li>Escolha <b>Adicionar à Tela de Início</b></li><li>Toque em <b>Adicionar</b> e abra o app pelo ícone. Você entra direto, sem código.</li></ol>
+      ${navIos() !== 'safari' ? '<span class="mini">Não apareceu “Adicionar à Tela de Início”? Abra o link no Safari e faça por lá.</span>' : ''}
+>>>>>>>
+<<<<<<< public/boasvindas.js
+  const ios = /iphone|ipad|ipod/i.test(ua), android = /android/i.test(ua);
+=======
+  const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1), android = /android/i.test(ua);
+  const chromeIos = /CriOS/.test(ua), outroIos = /FxiOS|EdgiOS|OPiOS|GSA\//.test(ua);
+>>>>>>>
+<<<<<<< public/boasvindas.js
+    `Toque nos <b>três pontinhos</b> ${PONTINHOS} na barra de baixo do Safari (ou direto em <b>Compartilhar</b> ${COMPARTILHAR}, se ele já aparecer)`,
+    `Toque em <b>Compartilhar</b> ${COMPARTILHAR}`,
+    `Role e escolha <b>Adicionar à Tela de Início</b> ${ADICIONAR}`,
+    'Toque em <b>Adicionar</b>. O nome já vem como <b>Amendoim Brasil</b>'
+  ]);
+=======
+    ...(chromeIos ? [`Toque em <b>Compartilhar</b> ${COMPARTILHAR} no alto, na barra de endereço do Chrome (ou nos <b>três pontinhos</b> ${PONTINHOS} e depois em Compartilhar)`]
+      : outroIos ? [`Abra o menu do navegador e toque em <b>Compartilhar</b> ${COMPARTILHAR}`]
+      : [`Toque nos <b>três pontinhos</b> ${PONTINHOS} na barra de baixo do Safari (ou direto em <b>Compartilhar</b> ${COMPARTILHAR}, se ele já aparecer)`, `Toque em <b>Compartilhar</b> ${COMPARTILHAR}`]),
+    `Role e escolha <b>Adicionar à Tela de Início</b> ${ADICIONAR}`,
+    'Toque em <b>Adicionar</b> e abra pelo ícone. Você entra direto, sem código'
+  ]) + (chromeIos || outroIos ? '<span class="bv-sub">Não apareceu “Adicionar à Tela de Início”? Abra o link no Safari e faça por lá.</span>' : '');
+>>>>>>>
+<<<<<<< public/alertas.js
+        <li>No Safari, toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li>
+=======
+        <li>${/CriOS/.test(navigator.userAgent) ? 'No Chrome, toque em <b>Compartilhar</b> (no alto, na barra de endereço)' : 'No Safari, toque em <b>Compartilhar</b> (o quadrado com a seta para cima)'}.</li>
+>>>>>>>
