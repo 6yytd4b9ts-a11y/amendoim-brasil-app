@@ -26,13 +26,14 @@ export async function avisar(filtro) {
   const v = await chavesVapid();
   const l = loja('alertas');
   const { blobs } = await l.list();
-  let enviados = 0, removidos = 0;
+  let enviados = 0, removidos = 0, alvos = 0;
   const fila = blobs.map((b) => b.key);
   async function um(chave) {
     const insc = await l.get(chave, { type: 'json' });
     if (!insc?.sub) return;
     const antes = JSON.stringify(insc);
     const lista = [].concat((await filtro(insc)) || []);
+    if (lista.length) alvos++;
     for (const dados of lista) {
       const st = await enviarPush(insc.sub, dados, v, { urgencia: dados.urgencia });
       if (st === 404 || st === 410) { await l.delete(chave); removidos++; return; }
@@ -41,5 +42,5 @@ export async function avisar(filtro) {
     if (JSON.stringify(insc) !== antes) await l.setJSON(chave, insc);
   }
   for (let i = 0; i < fila.length; i += 10) await Promise.all(fila.slice(i, i + 10).map(um));
-  return { inscritos: fila.length, enviados, removidos };
+  return { inscritos: fila.length, alvos, enviados, removidos };
 }
