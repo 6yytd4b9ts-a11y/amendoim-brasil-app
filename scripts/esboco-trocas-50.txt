@@ -41,3 +41,8 @@ export function definirNoticias(l, fato) { NOTICIAS_APP = Array.isArray(l) ? l :
 =======
   ARQUIVOS.forEach((a, i) => { if (a === 'mercado') definirNoticias(res[i]?.noticias, res[i]?.fato?.titulo); });
 >>>>>>>
+<<<<<<< public/data/mercado.json
+      "texto": "No dia 15 de outubro a Conab publica a primeira estimativa oficial de área e produção de amendoim da safra 26/27. O mercado espera a confirmação de área menor em São Paulo. Se o corte vier abaixo de 25%, reforça a leitura de oferta apertada e preço firme; se vier mais forte, pode mexer no preço já na semana seguinte."
+=======
+      "texto": "No dia 15 de outubro a Conab publica a primeira estimativa oficial de área e produção de amendoim da safra 26/27. O mercado espera a confirmação de área menor em São Paulo, entre 25% e 30% abaixo da safra passada."
+>>>>>>>
