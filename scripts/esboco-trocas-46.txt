@@ -1,0 +1,74 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v55';
+=======
+const VERSAO = 'ab-v56';
+>>>>>>>
+<<<<<<< public/auth.js
+// Porteiro imediato (antes de o app desenhar a primeira tela): com cache, é na hora; sem cache, uma tela de abertura curta.
+if (typeof document !== 'undefined' && document.body && !location.pathname.startsWith('/painel') && lerCache() !== 'off' && !logado()) {
+  porteiro(lerCache() === 'on' ? 'login' : 'carregando');
+}
+=======
+// ---------- passe da tela inicial (iPhone) ----------
+// No iPhone, o app aberto pelo ícone da Tela de Início não enxerga o login feito no Safari. Quem já entrou no Safari
+// recebe um passe de uso único e o manifesto passa a apontar para ele: o ícone criado abre com ?entrar=<passe>
+// e o app troca o passe por uma sessão, sem pedir o código de novo.
+const temPasse = () => /[?&]entrar=/.test(location.search);
+const iphoneSafari = () => /iPhone|iPad|iPod/.test(navigator.userAgent) && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone === true);
+async function usarPasse() {
+  try {
+    const q = new URLSearchParams(location.search), passe = q.get('entrar');
+    if (!passe) return;
+    q.delete('entrar');
+    history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash);
+    if (logado()) return;
+    const r = await chamar('passe_usar', { passe });
+    if (r?.ok && r.sessao) { guardarSessao(r.sessao); aplicarConta(r.conta); atualizarUI(); setTimeout(regConfig, 4000); }
+  } catch (e) { /* sem passe válido: segue para o login normal */ }
+}
+async function prepararPasse() {
+  try {
+    if (!iphoneSafari() || !logado()) return;
+    let p = null;
+    try { p = JSON.parse(localStorage.getItem('ab-passe') || 'null'); } catch (e) { /* sem armazenamento */ }
+    if (!p?.t || Date.now() - (p.em || 0) > 3 * 86400000) {
+      const tk = await tokenValido();
+      if (!tk) return;
+      const r = await chamar('passe', {}, tk);
+      if (!r.ok || !r.passe) return;
+      p = { t: r.passe, em: Date.now() };
+      try { localStorage.setItem('ab-passe', JSON.stringify(p)); } catch (e) { /* sem armazenamento */ }
+    }
+    const l = document.querySelector('link[rel="manifest"]');
+    if (l) l.setAttribute('href', '/api/manifesto?t=' + encodeURIComponent(p.t));
+  } catch (e) { /* sem passe: pelo ícone pede o código, como antes */ }
+}
+
+// Porteiro imediato (antes de o app desenhar a primeira tela): com cache, é na hora; sem cache, uma tela de abertura curta.
+if (typeof document !== 'undefined' && document.body && !location.pathname.startsWith('/painel') && (lerCache() !== 'off' || temPasse()) && !logado()) {
+  porteiro(lerCache() === 'on' && !temPasse() ? 'login' : 'carregando');
+}
+>>>>>>>
+<<<<<<< public/auth.js
+  atualizarUI();
+  reg('abriu', telaAtual());
+=======
+  atualizarUI();
+  await usarPasse(); // aberto pelo ícone com passe: entra sem pedir o código
+  reg('abriu', telaAtual());
+>>>>>>>
+<<<<<<< public/auth.js
+  await validar();
+  reg('tela', telaAtual());
+}
+=======
+  await validar();
+  reg('tela', telaAtual());
+  prepararPasse();
+}
+>>>>>>>
+<<<<<<< public/auth.js
+  if (r.ok && r.sessao) { guardarSessao(r.sessao); aplicarConta(r.conta); atualizarUI(); setTimeout(regConfig, 4000); }
+=======
+  if (r.ok && r.sessao) { guardarSessao(r.sessao); aplicarConta(r.conta); atualizarUI(); setTimeout(regConfig, 4000); prepararPasse(); }
+>>>>>>>

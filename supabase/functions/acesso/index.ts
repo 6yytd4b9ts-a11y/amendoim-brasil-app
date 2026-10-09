@@ -189,6 +189,12 @@ async function verificar(req: Request, b: any) {
   const { data: conv } = await db.from("convidados").select("*").eq("celular", cel).maybeSingle();
   if (!vigente(conv)) return resp(req, 200, { ok: false, motivo: "nao_autorizado", mensagem: "Este número não tem acesso ativo." });
 
+  return await abrirSessao(req, conv, "entrou");
+}
+
+// Abre uma sessão de login para o convidado (usada pelo código do WhatsApp e pelo passe da tela inicial).
+async function abrirSessao(req: Request, conv: any, evento: string, detalhe?: string) {
+  const cel = conv.celular as string;
   const email = emailDe(cel);
   await db.auth.admin.createUser({ email, email_confirm: true, user_metadata: { nome: conv.nome, celular: cel } }); // se já existe, o erro é ignorado
   const { data: link, error: e1 } = await db.auth.admin.generateLink({ type: "magiclink", email });
@@ -196,9 +202,40 @@ async function verificar(req: Request, b: any) {
   await db.from("perfis").upsert({ user_id: link.user.id, convidado_id: conv.id, ultimo_acesso: new Date().toISOString() }, { onConflict: "user_id" });
   const { data: sess, error: e2 } = await anon().auth.verifyOtp({ token_hash: link.properties.hashed_token, type: "magiclink" });
   if (e2 || !sess?.session) return resp(req, 500, { ok: false, motivo: "erro", mensagem: "Não foi possível abrir a sessão agora." });
-  await registra(link.user.id, "entrou");
+  await registra(link.user.id, evento, detalhe);
   const s = sess.session;
   return resp(req, 200, { ok: true, sessao: { access_token: s.access_token, refresh_token: s.refresh_token, expira: s.expires_at }, conta: contaOut(conv, pilotoDe(await cfg())) });
+}
+
+// ---------- passe da tela inicial (iPhone) ----------
+// No iPhone, o app da Tela de Início não enxerga o login feito no Safari. Quem já entrou recebe um passe de uso único
+// (vale 7 dias); o Safari grava o passe no ícone e, na primeira abertura pelo ícone, o app troca o passe por uma sessão.
+const PASSE_DIAS = 7;
+async function passeCriar(req: Request) {
+  const u = await usuarioDe(req);
+  if (!u || !vigente(u.conv)) return resp(req, 401, { ok: false, motivo: "sessao_invalida" });
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  const passe = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const agora = Date.now();
+  await db.from("config").upsert({ chave: `passe:${await sha256(passe)}`, valor: JSON.stringify({ id: u.conv.id, exp: agora + PASSE_DIAS * 86_400_000 }), atualizado_em: new Date(agora).toISOString() }, { onConflict: "chave" });
+  // limpeza: passes vencidos de todo mundo
+  const { data: velhos } = await db.from("config").select("chave, valor").like("chave", "passe:%");
+  const vencidos = (velhos ?? []).filter((r: any) => { try { return JSON.parse(r.valor).exp < agora; } catch { return true; } }).map((r: any) => r.chave);
+  if (vencidos.length) await db.from("config").delete().in("chave", vencidos);
+  return resp(req, 200, { ok: true, passe });
+}
+async function passeUsar(req: Request, b: any) {
+  const passe = String(b.passe ?? "");
+  if (!/^[A-Za-z0-9_-]{20,80}$/.test(passe)) return resp(req, 200, { ok: false });
+  const chave = `passe:${await sha256(passe)}`;
+  const { data: r } = await db.from("config").select("valor").eq("chave", chave).maybeSingle();
+  if (!r) return resp(req, 200, { ok: false });
+  await db.from("config").delete().eq("chave", chave); // uso único
+  let d: any = null; try { d = JSON.parse((r as any).valor); } catch { /* inválido */ }
+  if (!d?.id || d.exp < Date.now()) return resp(req, 200, { ok: false });
+  const { data: conv } = await db.from("convidados").select("*").eq("id", d.id).maybeSingle();
+  if (!vigente(conv)) return resp(req, 200, { ok: false });
+  return await abrirSessao(req, conv, "entrou", "tela inicial");
 }
 
 async function renovar(req: Request, b: any) {
@@ -541,6 +578,8 @@ Deno.serve(async (req) => {
       case "feedback": return await feedback(req, b);
       case "sair": return await sair(req);
       case "lembrete_visto": return await lembreteVisto(req);
+      case "passe": return await passeCriar(req);
+      case "passe_usar": return await passeUsar(req, b);
       default:
         if (String(b.acao ?? "").startsWith("admin_")) return await admin(req, b);
         return resp(req, 400, { ok: false, motivo: "acao" });
