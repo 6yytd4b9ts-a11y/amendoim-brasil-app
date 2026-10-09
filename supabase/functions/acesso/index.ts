@@ -208,12 +208,21 @@ async function abrirSessao(req: Request, conv: any, evento: string, detalhe?: st
 }
 
 // ---------- passe da tela inicial (iPhone) ----------
-// No iPhone, o app da Tela de Início não enxerga o login feito no Safari. Quem já entrou recebe um passe de uso único
-// (vale 7 dias); o Safari grava o passe no ícone e, na primeira abertura pelo ícone, o app troca o passe por uma sessão.
-const PASSE_DIAS = 7;
-async function passeCriar(req: Request) {
+// No iPhone, o app da Tela de Início não enxerga o login feito no navegador (Safari, Chrome...). Quem já entrou recebe
+// um passe de uso único (vale 20 dias); o navegador grava o passe no ícone e, na primeira abertura pelo ícone, o app troca
+// o passe por uma sessão. O navegador confere o passe a cada abertura: se ainda vale, é o mesmo; se já foi usado ou está
+// perto de vencer, sai um novo.
+const PASSE_DIAS = 20;
+const PASSE_TROCA_DIAS = 10; // com menos que isso de validade, o navegador recebe um passe novo
+async function passeCriar(req: Request, b: any) {
   const u = await usuarioDe(req);
   if (!u || !vigente(u.conv)) return resp(req, 401, { ok: false, motivo: "sessao_invalida" });
+  const atual = String(b?.atual ?? "");
+  if (/^[A-Za-z0-9_-]{20,80}$/.test(atual)) {
+    const { data: r } = await db.from("config").select("valor").eq("chave", `passe:${await sha256(atual)}`).maybeSingle();
+    let d: any = null; try { d = r ? JSON.parse((r as any).valor) : null; } catch { /* inválido */ }
+    if (d?.id === u.conv.id && d.exp - Date.now() > PASSE_TROCA_DIAS * 86_400_000) return resp(req, 200, { ok: true, passe: atual });
+  }
   const bytes = crypto.getRandomValues(new Uint8Array(24));
   const passe = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   const agora = Date.now();
@@ -578,7 +587,7 @@ Deno.serve(async (req) => {
       case "feedback": return await feedback(req, b);
       case "sair": return await sair(req);
       case "lembrete_visto": return await lembreteVisto(req);
-      case "passe": return await passeCriar(req);
+      case "passe": return await passeCriar(req, b);
       case "passe_usar": return await passeUsar(req, b);
       default:
         if (String(b.acao ?? "").startsWith("admin_")) return await admin(req, b);
