@@ -1,13 +1,13 @@
 {
-  "atualizado": "09/10/2026",
+  "atualizado": "08/10/2026",
   "hoje": [
     {
       "id": "fisico",
       "rotulo": "Preço da casca",
       "valor": "R$ 77,00",
-      "nota": "IEA · Tupã · 08/10 · estável",
-      "efeito": "neutro",
-      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP): R$ 77,00 em 08/10, igual ao dia anterior. No mesmo boletim, Jaboticabal R$ 80,00 e Ribeirão Preto R$ 78,00. A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
+      "nota": "IEA · Tupã · 07/10 · −R$ 3,00",
+      "efeito": "baixa",
+      "detalhe": "Preço médio recebido pelo produtor em Tupã, segundo o IEA (Instituto de Economia Agrícola de SP): R$ 77,00 em 07/10, R$ 3,00 abaixo do dia anterior. No mesmo boletim, Presidente Prudente R$ 80,00. A Conab registrou média de R$ 76,00 em SP na semana de 28/09 a 02/10.",
       "link": "http://ciagri.iea.sp.gov.br/precosdiarios/"
     },
     {
