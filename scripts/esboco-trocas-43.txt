@@ -1,0 +1,228 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v52';
+=======
+const VERSAO = 'ab-v53';
+>>>>>>>
+<<<<<<< public/boasvindas.js
+    () => `${grande(ICONES.celular)}<b class="es-h1">Coloque o app na tela inicial</b>
+      <span class="es-txt">Abre num toque, como um aplicativo, e funciona mesmo com sinal fraco na roça.</span>
+=======
+    () => `${grande(ICONES.celular)}<b class="es-h1">Coloque o app na tela inicial</b>
+      ${instalado ? '' : `<span class="es-txt"><b>É pela tela inicial que chegam os avisos no celular:</b> preço, notícias e chuva da sua região${ios ? ' (no iPhone, só funciona assim)' : ''}. E o app abre num toque.</span>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (passo === 'avisos') miolo = `${icone(h.I.sino)}<b class="es-h1">Avisos de preço e chuva</b>
+    <span class="es-txt">Receba no celular quando o preço do IEA mudar, quando chegar o boletim ou chuva forte na sua região. Você escolhe o que quer.</span>
+    ${iphone() && !instalado() ? `<span class="mini">No iPhone, os avisos funcionam depois que o app está na tela inicial.</span>` : ''}
+    <button class="btn btn-verde" type="button" data-bv="avisos">Escolher meus avisos</button>`;
+=======
+  if (passo === 'avisos') miolo = `${icone(h.I.sino)}<b class="es-h1">Ative seus avisos</b>
+    <span class="es-txt">Receba no celular, sem precisar abrir o app:</span>
+    <div style="display:flex;flex-direction:column;gap:8px;align-self:stretch;text-align:left">${[['mudanca', 'Preço do amendoim', 'quando o preço do IEA mudar'], ['chuva', 'Chuva na sua região', 'aviso de chuva forte no seu município']].map(([k, t, d]) => `<label style="display:flex;gap:12px;align-items:center;background:var(--fundo);border-radius:12px;padding:10px 12px;cursor:pointer"><input type="checkbox" data-bv-av="${k}" checked style="width:22px;height:22px;accent-color:#007731;flex:none"><span style="display:flex;flex-direction:column;line-height:1.3"><b style="font-size:15px">${t}</b><small style="font-size:12.5px;color:var(--texto-3)">${d}</small></span></label>`).join('')}<div style="display:flex;gap:12px;align-items:center;padding:4px 12px"><span style="width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;color:#007731;font-weight:800">✓</span><span style="display:flex;flex-direction:column;line-height:1.3"><b style="font-size:15px">Relatórios e notícias importantes</b><small style="font-size:12.5px;color:var(--texto-3)">chegam sempre, quando a Amendoim Brasil publicar</small></span></div></div>
+    <button class="btn btn-verde" type="button" data-bv="ativar">Ativar avisos</button>
+    <span class="mini">O celular vai perguntar: toque em <b>Permitir</b>. Dá para mudar depois em Alertas.</span>`;
+>>>>>>>
+<<<<<<< public/esboco.js
+function passosBV() {
+  const l = ['local'];
+=======
+function passosBV() {
+  if (bv.so) return [bv.so];
+  if (instalado()) return ['avisos', 'local']; // aberto pelo ícone: primeiro os avisos
+  const l = ['local'];
+>>>>>>>
+<<<<<<< public/esboco.js
+function fecharBV() { marcarBV(); document.getElementById('esb-bv')?.remove(); }
+=======
+function fecharBV() { marcarBV(); if (passosBV().includes('avisos')) contarPedidoAvisos(); document.getElementById('esb-bv')?.remove(); }
+// Pedido de avisos: no máximo 2 vezes, com pelo menos 1 dia entre elas. Só onde funciona (iPhone na tela inicial, Android, computador).
+const PEDIDO_AV = 'ab-av-pedido';
+const lerPedidoAv = () => { try { return JSON.parse(localStorage.getItem(PEDIDO_AV) || 'null') || { n: 0, em: 0 }; } catch (e) { return { n: 0, em: 0 }; } };
+function contarPedidoAvisos() { try { const p = lerPedidoAv(); localStorage.setItem(PEDIDO_AV, JSON.stringify({ n: p.n + 1, em: Date.now() })); } catch (e) { /* ignora */ } }
+// Lembretes ao abrir o app (nunca mais de um por vez):
+// 1) fora da tela inicial (iPhone/Android): a cada 3ª abertura, "Adicione na tela inicial", no máximo 3 vezes;
+// 2) na tela inicial e sem avisos: "Ative seus avisos", no máximo 2 vezes, com 1 dia entre elas.
+const LEMB_INST = 'ab-inst-lembrete';
+const lerLembInst = () => { try { return JSON.parse(localStorage.getItem(LEMB_INST) || 'null') || { ab: 0, n: 0 }; } catch (e) { return { ab: 0, n: 0 }; } };
+const gravarLembInst = (v) => { try { localStorage.setItem(LEMB_INST, JSON.stringify(v)); } catch (e) { /* ignora */ } };
+const podeAvisar = () => 'Notification' in window && 'PushManager' in window && Notification.permission !== 'denied';
+async function avisosLigados() { try { return (await import('/alertas.js')).alertasAtivos(); } catch (e) { return false; } }
+function abrirLembrete(hh, passo) { h = hh; bv = { i: 0, msg: '', so: passo }; desenharBV(); }
+export async function talvezPedirAvisos(hh) {
+  try {
+    if (document.getElementById('esb-bv') || document.getElementById('ab-bv-teste')) return;
+    const celular = iphone() || /Android/i.test(navigator.userAgent);
+    if (!instalado() && celular) {
+      const li = lerLembInst(); li.ab++;
+      if (li.ab >= 3 && li.n < 3) { li.ab = 0; li.n++; gravarLembInst(li); abrirLembrete(hh, 'instalar'); return; }
+      gravarLembInst(li);
+      if (iphone()) return; // no iPhone fora da tela inicial os avisos não funcionam
+    }
+    if (!podeAvisar() || (await avisosLigados())) return;
+    const p = lerPedidoAv();
+    if (p.n >= 2 || Date.now() - p.em < 86400000) return;
+    abrirLembrete(hh, 'avisos');
+  } catch (e) { /* nunca atrapalha o app */ }
+}
+// Lembrete pedido pelo Helder no painel: aparece na próxima abertura, sem contar os limites acima.
+export async function mostrarLembrete(hh) {
+  try {
+    const fora = !instalado() && (iphone() || /Android/i.test(navigator.userAgent));
+    const passo = fora ? 'instalar' : podeAvisar() && !(await avisosLigados()) ? 'avisos' : '';
+    lembreteVisto();
+    if (!passo) return;
+    const abrir = () => { if (document.querySelector('#esb-bv, #ab-bv-teste, #ab-porteiro')) { setTimeout(abrir, 1500); return; } abrirLembrete(hh, passo); };
+    abrir();
+  } catch (e) { /* nunca atrapalha o app */ }
+}
+>>>>>>>
+<<<<<<< public/esboco.js
+      if (a === 'local') {
+        x.disabled = true; x.textContent = 'Buscando sua localização…';
+=======
+      if (a === 'ativar') {
+        const marcado = (k) => !!document.querySelector(`[data-bv-av="${k}"]`)?.checked;
+        x.disabled = true; x.textContent = 'Ativando…';
+        try {
+          const al = await import('/alertas.js'), cl = await import('/clima.js');
+          const m = cl.municipioAtual();
+          await al.ativar({ mudanca: marcado('mudanca'), boletim: true, chuva: marcado('chuva'), balcao: false, acima: null, abaixo: null, local: { lat: m.lat, lon: m.lon, nome: cl.nomeLocal(m) } });
+          ctx.evento('alertas-ativou');
+          avancarBV('Pronto: avisos ativados neste celular.');
+        } catch (er) {
+          x.disabled = false; x.textContent = 'Ativar avisos';
+          bv.msg = er.message === 'permissao' ? 'Sem o "Permitir", o celular não deixa o app avisar. Dá para ligar depois em Alertas.' : 'Não foi possível ativar agora. Tente de novo.';
+          const st = document.querySelector('#esb-bv [role=status]'); if (st) st.textContent = bv.msg;
+        }
+        return;
+      }
+      if (a === 'local') {
+        x.disabled = true; x.textContent = 'Buscando sua localização…';
+>>>>>>>
+<<<<<<< public/app.js
+  if (boasVindasFeitas()) localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } });
+=======
+  if (boasVindasFeitas()) { localInicial().then((m) => { if (m) { atualizarClima(m); registrarRegiao(); } }); if (rota().aba === 'inicio') setTimeout(() => talvezPedirAvisos(H()), 2500); }
+>>>>>>>
+<<<<<<< public/app.js
+import { telaAssinatura, telaConta, telaEstimativas, telaTermos, telaPrivacidade, boasVindasFeitas, mostrarBoasVindas, ligarEsboco } from '/esboco.js';
+=======
+import { telaAssinatura, telaConta, telaEstimativas, telaTermos, telaPrivacidade, boasVindasFeitas, mostrarBoasVindas, ligarEsboco, talvezPedirAvisos, mostrarLembrete } from '/esboco.js';
+if (typeof window !== 'undefined') window.addEventListener('ab-lembrete', () => mostrarLembrete(H()));
+>>>>>>>
+<<<<<<< public/esboco.js
+    <div class="cartao-cab"><span class="rotulo">Bem-vindo ao Amendoim Brasil</span><button class="es-bv-fechar" type="button" data-bv="fechar" aria-label="Fechar">×</button></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">${bv.so ? 'Avisos no celular' : 'Bem-vindo ao Amendoim Brasil'}</span><button class="es-bv-fechar" type="button" data-bv="fechar" aria-label="Fechar">×</button></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <button class="dx-sair" type="button" data-bv="pular">${bv.i < lista.length - 1 ? 'Agora não' : 'Pular'}</button>
+=======
+    <button class="dx-sair" type="button" data-bv="pular">${bv.i < lista.length - 1 || bv.so ? 'Agora não' : 'Pular'}</button>
+>>>>>>>
+<<<<<<< public/boasvindas.js
+  ];
+  let i = 0;
+=======
+  ];
+  if (instalado) passos.splice(1, 1); // já está na tela inicial: o passo de instalar sai (o pedido de avisos vem logo depois)
+  let i = 0;
+>>>>>>>
+<<<<<<< public/alertas.js
+      ${chave('boletim', 'Novo boletim', 'Quando sair análise ou boletim do Helder')}
+=======
+      <div class="alerta-linha"><span class="cresce"><b>Relatórios e notícias importantes</b><small>Sempre ligado: chega quando a Amendoim Brasil publicar</small></span><input type="checkbox" name="boletim" checked hidden><span style="color:#007731;font-weight:800">✓</span></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+import { pedirCodigo, verificarCodigo, sairRemoto, loginReal } from '/auth.js';
+=======
+import { pedirCodigo, verificarCodigo, sairRemoto, loginReal, lembreteVisto } from '/auth.js';
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (passo === 'instalar') miolo = `${icone('<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>')}<b class="es-h1">Coloque o app na tela inicial</b>
+    <span class="es-txt">Abre num toque, como um aplicativo, e funciona mesmo com sinal fraco na roça.</span>
+    ${iphone() ? `<ol class="es-ios"><li>Toque em <b>Compartilhar</b> ${h.ic(h.I.enviar, 'style="width:18px;height:18px;vertical-align:-3px;stroke:#2F6FA3"')} na barra do Safari</li><li>Escolha <b>Adicionar à Tela de Início</b></li><li>Toque em <b>Adicionar</b></li></ol>
+      <button class="btn btn-verde" type="button" data-bv="proximo">Já adicionei</button>`
+=======
+  if (passo === 'instalar') miolo = `${icone('<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M12 7v7M9 11l3 3 3-3M10 18h4"/>')}<b class="es-h1">${bv.so ? 'Adicione na tela inicial' : 'Coloque o app na tela inicial'}</b>
+    <span class="es-txt"><b>E receba mais informações no celular:</b> avisos de preço, relatórios, notícias e chuva da sua região${iphone() ? ' (no iPhone, os avisos só chegam assim)' : ''}. O app abre num toque.</span>
+    ${iphone() ? `<ol class="es-ios"><li>Toque em <b>Compartilhar</b> ${h.ic(h.I.enviar, 'style="width:18px;height:18px;vertical-align:-3px;stroke:#2F6FA3"')} na barra do Safari (ou nos <b>três pontinhos</b> e depois em Compartilhar)</li><li>Escolha <b>Adicionar à Tela de Início</b></li><li>Toque em <b>Adicionar</b> e abra o app pelo ícone</li></ol>
+      <button class="btn btn-verde" type="button" data-bv="proximo">${bv.so ? 'Entendi' : 'Já adicionei'}</button>`
+>>>>>>>
+<<<<<<< public/auth.js
+    vence: ate ? new Date(c.expira_em).toLocaleDateString('pt-BR') : 'sem prazo'
+  });
+}
+=======
+    vence: ate ? new Date(c.expira_em).toLocaleDateString('pt-BR') : 'sem prazo'
+  });
+  if (c.lembrete && c.papel !== 'admin') setTimeout(() => window.dispatchEvent(new CustomEvent('ab-lembrete')), 1500); // o Helder pediu no painel
+}
+export async function lembreteVisto() { try { const tk = await tokenValido(); if (tk) await chamar('lembrete_visto', {}, tk); } catch (e) { /* ignora */ } }
+>>>>>>>
+<<<<<<< public/auth.js
+    try { a = (await import('/alertas.js')).alertasAtivos() ? 1 : 0; } catch (e) { /* sem avisos */ }
+=======
+    let pr = 0, ch = 0;
+    try { const al = await import('/alertas.js'); a = al.alertasAtivos() ? 1 : 0; const pf = al.prefsSalvas() || {}; pr = a && pf.mudanca ? 1 : 0; ch = a && pf.chuva ? 1 : 0; } catch (e) { /* sem avisos */ }
+>>>>>>>
+<<<<<<< public/auth.js
+    reg('config', `l=${String(l).replace(/[|=]/g, ' ').slice(0, 60)}|g=${g}|a=${a}|i=${i}|d=${d}`);
+=======
+    reg('config', `l=${String(l).replace(/[|=]/g, ' ').slice(0, 60)}|g=${g}|a=${a}|pr=${pr}|ch=${ch}|i=${i}|d=${d}`);
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+function tabelaConfig() {
+  const todos = est.uso?.convidados || [];
+  const cs = todos.filter((c) => c.config), n = cs.length, conta = (f) => cs.filter(f).length;
+  if (!todos.length) return '<span class="mini">Sem convidados ainda.</span>';
+  const linhas = todos.map((c) => { const k = c.config; return `<tr style="border-top:1px solid var(--borda,#EFEBE2)"><td style="padding:8px 4px 8px 0"><b style="font-size:14px">${esc(String(c.nome || '').split(' ')[0])}</b></td>${k ? `<td style="text-align:center">${k.local ? okc(true, k.gps ? 'GPS' : 'escolheu') : okc(false)}</td><td style="text-align:center">${okc(k.avisos)}</td><td style="text-align:center">${okc(k.app)}</td>` : '<td colspan="3" class="mini" style="text-align:center">ainda não abriu</td>'}</tr>`; }).join('');
+  return `<div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Localização', conta((c) => c.config.local) + ' de ' + n, 'de quem abriu')}${tile('Avisos', conta((c) => c.config.avisos) + ' de ' + n, 'de quem abriu')}${tile('Tela inicial', conta((c) => c.config.app) + ' de ' + n, 'de quem abriu')}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr class="mini"><th style="text-align:left;font-weight:600">Pessoa</th><th style="font-weight:600">Local</th><th style="font-weight:600">Avisos</th><th style="font-weight:600">Tela inicial</th></tr></thead><tbody>${linhas}</tbody></table>
+  <span class="mini">✓ = ligado no celular da pessoa na última vez que abriu o app. Local: GPS = usou a localização do celular; escolheu = marcou o município na mão.</span>`;
+}
+=======
+// Lembrete para um convidado: abre o WhatsApp com a mensagem pronta e marca no servidor para o app mostrar na próxima abertura.
+function msgLembrete(c) {
+  const k = c.config || {}, pn = String(c.nome || '').trim().split(/\s+/)[0];
+  const and = k.aparelho === 'android';
+  const instalar = and ? 'No Chrome, toque nos três pontinhos e em Instalar aplicativo.' : 'No Safari, toque em Compartilhar e depois em Adicionar à Tela de Início.';
+  const corpo = !k.app
+    ? `Para receber no celular os avisos do App Amendoim Brasil (preço, relatórios, notícias e chuva), coloque o app na tela inicial:\n\n${instalar}\n\nDepois abra pelo ícone e toque em Ativar avisos.`
+    : 'Para receber no celular os avisos do App Amendoim Brasil (preço, relatórios, notícias e chuva), abra o app pelo ícone da tela inicial e toque em Ativar avisos.';
+  return `${pn ? pn + ', tudo bem?' : 'Tudo bem?'}\n\n${corpo}\n\n🥜🇧🇷`;
+}
+function botaoLembrete(c) {
+  const k = c.config;
+  if (!k || (k.app && k.avisos)) return '';
+  const pend = (est.dados?.convidados || []).find((x) => x.id === c.id)?.lembrete;
+  if (pend) return `<span class="mini" style="display:block">lembrete ${quando(pend, '')} · aparece quando abrir</span>`;
+  return `<br><a class="chip" style="display:inline-block;margin-top:4px;padding:3px 10px;font-size:12px;text-decoration:none" target="_blank" rel="noopener" data-pp-lembrar="${esc(c.id)}" href="https://wa.me/${esc(c.celular)}?text=${encodeURIComponent(msgLembrete(c))}">Lembrar</a>`;
+}
+function tabelaConfig() {
+  const todos = est.uso?.convidados || [];
+  const cs = todos.filter((c) => c.config), n = cs.length, conta = (f) => cs.filter(f).length;
+  if (!todos.length) return '<span class="mini">Sem convidados ainda.</span>';
+  const tiposAv = (k) => [k.preco && 'preço', k.chuva && 'chuva'].filter(Boolean).join(' · ') || 'relatórios';
+  const linhas = todos.map((c) => { const k = c.config; return `<tr style="border-top:1px solid var(--borda,#EFEBE2)"><td style="padding:8px 4px 8px 0;vertical-align:middle"><b style="font-size:14px">${esc(String(c.nome || '').split(' ')[0])}</b>${botaoLembrete(c)}</td>${k ? `<td style="text-align:center">${k.local ? okc(true, k.gps ? 'GPS' : 'escolheu') : okc(false)}</td><td style="text-align:center">${okc(k.avisos)}${k.avisos ? `<small class="mini" style="display:block">${tiposAv(k)}</small>` : ''}</td><td style="text-align:center">${okc(k.app)}</td>` : '<td colspan="3" class="mini" style="text-align:center">ainda não abriu</td>'}</tr>`; }).join('');
+  return `<div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Localização', conta((c) => c.config.local) + ' de ' + n, 'de quem abriu')}${tile('Avisos', conta((c) => c.config.avisos) + ' de ' + n, 'de quem abriu')}${tile('Tela inicial', conta((c) => c.config.app) + ' de ' + n, 'de quem abriu')}</div>
+  <table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr class="mini"><th style="text-align:left;font-weight:600">Pessoa</th><th style="font-weight:600">Local</th><th style="font-weight:600">Avisos</th><th style="font-weight:600">Tela inicial</th></tr></thead><tbody>${linhas}</tbody></table>
+  <span class="mini">✓ = ligado no celular da pessoa na última vez que abriu o app. Local: GPS = usou a localização do celular; escolheu = marcou o município na mão. <b>Lembrar</b> abre o WhatsApp com a mensagem pronta e, na próxima vez que a pessoa abrir o app, aparece para ela a tela de colocar na tela inicial ou de ativar os avisos.</span>`;
+}
+
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+      ${uso.config ? `<span class="rotulo">Configuração do app</span><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="pilula ${uso.config.local ? 'pilula-verde' : 'pilula-amendoim'}">Localização: ${uso.config.local ? esc(uso.config.local) + (uso.config.gps ? ' (GPS)' : ' (escolheu)') : 'não'}</span><span class="pilula ${uso.config.avisos ? 'pilula-verde' : 'pilula-amendoim'}">Avisos: ${uso.config.avisos ? 'ligados' : 'não'}</span><span class="pilula ${uso.config.app ? 'pilula-verde' : 'pilula-amendoim'}">Tela inicial: ${uso.config.app ? 'sim' : 'não'}</span></div><span class="mini">${esc(APARELHO[uso.config.aparelho] || '')}${uso.config.aparelho ? ' · ' : ''}conferido ${quando(uso.config.em)}</span>` : (entrou ? '<span class="mini">Configuração do app: aparece na próxima vez que a pessoa abrir.</span>' : '')}
+=======
+      ${uso.config ? `<span class="rotulo">Configuração do app</span><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="pilula ${uso.config.local ? 'pilula-verde' : 'pilula-amendoim'}">Localização: ${uso.config.local ? esc(uso.config.local) + (uso.config.gps ? ' (GPS)' : ' (escolheu)') : 'não'}</span><span class="pilula ${uso.config.avisos ? 'pilula-verde' : 'pilula-amendoim'}">Avisos: ${uso.config.avisos ? 'ligados' + ([uso.config.preco && 'preço', uso.config.chuva && 'chuva'].filter(Boolean).length ? ' (' + [uso.config.preco && 'preço', uso.config.chuva && 'chuva'].filter(Boolean).join(', ') + ')' : '') : 'não'}</span><span class="pilula ${uso.config.app ? 'pilula-verde' : 'pilula-amendoim'}">Tela inicial: ${uso.config.app ? 'sim' : 'não'}</span></div><span class="mini">${esc(APARELHO[uso.config.aparelho] || '')}${uso.config.aparelho ? ' · ' : ''}conferido ${quando(uso.config.em)}</span>${botaoLembrete({ ...c, config: uso.config })}` : (entrou ? '<span class="mini">Configuração do app: aparece na próxima vez que a pessoa abrir.</span>' : '')}
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+    if (t.closest('[data-pp-recarregar]')) { est.erro = ''; carregar(); return; }
+=======
+    if (t.closest('[data-pp-recarregar]')) { est.erro = ''; carregar(); return; }
+    if ((x = t.closest('[data-pp-lembrar]'))) {
+      const id = x.dataset.ppLembrar;
+      chamar('admin_lembrete', { id }).then((r) => { if (r.ok) { const c = (est.dados?.convidados || []).find((y) => y.id === id); if (c) c.lembrete = r.em; redesenhar(); } });
+      return;
+    }
+>>>>>>>

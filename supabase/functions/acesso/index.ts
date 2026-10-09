@@ -223,7 +223,17 @@ async function conta(req: Request) {
   if (!vigente(u.conv)) return resp(req, 403, { ok: false, motivo: "revogado", mensagem: "Seu acesso foi encerrado." });
   const ult = u.perfil.ultimo_acesso ? new Date(u.perfil.ultimo_acesso).getTime() : 0;
   if (Date.now() - ult > 600_000) await db.from("perfis").update({ ultimo_acesso: new Date().toISOString() }).eq("user_id", u.user.id);
-  return resp(req, 200, { ok: true, conta: contaOut(u.conv, pilotoDe(await cfg())) });
+  const c = await cfg();
+  return resp(req, 200, { ok: true, conta: { ...contaOut(u.conv, pilotoDe(c)), lembrete: c[`lembrete:${u.conv.id}`] ?? null } });
+}
+
+// O app mostrou o lembrete (tela inicial / ativar avisos) que o Helder pediu no painel: some da fila.
+async function lembreteVisto(req: Request) {
+  const u = await usuarioDe(req);
+  if (!u) return resp(req, 401, { ok: false, motivo: "sessao_invalida" });
+  await db.from("config").delete().eq("chave", `lembrete:${u.conv.id}`);
+  await registra(u.user.id, "lembrete_visto");
+  return resp(req, 200, { ok: true });
 }
 
 async function perfil(req: Request, b: any) {
@@ -242,7 +252,7 @@ function lerConfig(r: any) {
   if (!r?.detalhe) return null;
   const m: Record<string, string> = {};
   String(r.detalhe).split("|").forEach((p) => { const i = p.indexOf("="); if (i > 0) m[p.slice(0, i)] = p.slice(i + 1); });
-  return { local: m.l || "", gps: m.g === "1", avisos: m.a === "1", app: m.i === "1", aparelho: m.d || "", em: r.criado_em };
+  return { local: m.l || "", gps: m.g === "1", avisos: m.a === "1", preco: m.pr === "1", chuva: m.ch === "1", app: m.i === "1", aparelho: m.d || "", em: r.criado_em };
 }
 
 async function evento(req: Request, b: any) {
@@ -340,7 +350,7 @@ async function admin(req: Request, b: any) {
       ok: true,
       piloto: pilotoDe(c),
       ultimoAviso: av ?? null,
-      convidados: (convs ?? []).map((x: any) => ({ ...x, ultimo_acesso: x.perfis?.[0]?.ultimo_acesso ?? x.perfis?.ultimo_acesso ?? null, entrou: Array.isArray(x.perfis) ? x.perfis.length > 0 : !!x.perfis, ultimo_pedido: ultPedido[x.celular] ?? null, perfis: undefined })),
+      convidados: (convs ?? []).map((x: any) => ({ ...x, ultimo_acesso: x.perfis?.[0]?.ultimo_acesso ?? x.perfis?.ultimo_acesso ?? null, entrou: Array.isArray(x.perfis) ? x.perfis.length > 0 : !!x.perfis, ultimo_pedido: ultPedido[x.celular] ?? null, lembrete: c[`lembrete:${x.id}`] ?? null, perfis: undefined })),
       codigos: (pend ?? []).map((x: any) => ({ celular: x.celular, nome: nomes[x.celular] ?? "", codigo: x.codigo_manual, criado_em: x.criado_em, expira_em: x.expira_em })),
       whatsapp: { provedor: c.whatsapp_provedor || "manual" },
     });
@@ -360,6 +370,15 @@ async function admin(req: Request, b: any) {
     if (error) return resp(req, 500, { ok: false, mensagem: "Não foi possível salvar." });
     await registra(uid, "admin_salvar", `${cel.slice(-4)} ${plano} ${reg.ativo ? "ativo" : "inativo"}`);
     return resp(req, 200, { ok: true });
+  }
+  if (acao === "admin_lembrete") {
+    const id = String(b.id ?? "");
+    const { data: cv } = await db.from("convidados").select("id, celular").eq("id", id).maybeSingle();
+    if (!cv) return resp(req, 404, { ok: false, mensagem: "Convidado não encontrado." });
+    const agora = new Date().toISOString();
+    await db.from("config").upsert({ chave: `lembrete:${id}`, valor: agora, atualizado_em: agora }, { onConflict: "chave" });
+    await registra(uid, "admin_lembrete", String((cv as any).celular).slice(-4));
+    return resp(req, 200, { ok: true, em: agora });
   }
   if (acao === "admin_whatsapp") {
     const prov = ["manual", "zapi", "meta"].includes(b.provedor) ? b.provedor : "manual";
@@ -518,6 +537,7 @@ Deno.serve(async (req) => {
       case "evento": return await evento(req, b);
       case "feedback": return await feedback(req, b);
       case "sair": return await sair(req);
+      case "lembrete_visto": return await lembreteVisto(req);
       default:
         if (String(b.acao ?? "").startsWith("admin_")) return await admin(req, b);
         return resp(req, 400, { ok: false, motivo: "acao" });
