@@ -1,0 +1,5 @@
+<<<<<<< public/dolar.js
+  const cor = sobe ? '#B3261E' : '#007731'; // dólar subindo pesa contra o comprador em R$: vermelho; caindo: verde
+=======
+  const cor = sobe ? '#007731' : '#B3261E'; // dólar subindo: exportação paga mais em R$ (verde); caindo: vermelho
+>>>>>>>
