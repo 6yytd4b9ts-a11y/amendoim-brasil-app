@@ -252,7 +252,10 @@ function lerConfig(r: any) {
   if (!r?.detalhe) return null;
   const m: Record<string, string> = {};
   String(r.detalhe).split("|").forEach((p) => { const i = p.indexOf("="); if (i > 0) m[p.slice(0, i)] = p.slice(i + 1); });
-  return { local: m.l || "", gps: m.g === "1", avisos: m.a === "1", preco: m.pr === "1", chuva: m.ch === "1", app: m.i === "1", aparelho: m.d || "", em: r.criado_em };
+  return {
+    local: m.l || "", gps: m.g === "1", gpsNegado: m.gl === "d", avisos: m.a === "1", avisosNegado: m.nt === "d",
+    preco: m.pr === "1", chuva: m.ch === "1", app: m.i === "1", aparelho: m.d || "", em: r.criado_em, bruto: m,
+  };
 }
 
 async function evento(req: Request, b: any) {
