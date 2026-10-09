@@ -1,0 +1,94 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v58';
+=======
+const VERSAO = 'ab-v59';
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  termometro: 'Estável a firme',
+=======
+  termometro: '', // vazio: vale o termômetro publicado (config.json); o painel só sobrescreve neste aparelho
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  leituraClima: 'Texto de exemplo: semana de chuva irregular no Oeste Paulista. Quem tem umidade boa no talhão pode avançar no plantio; quem está no seco, espere uma chuva de 15 a 20 mm. Você escreve esta leitura no painel (ou o Claude deixa um rascunho pronto toda segunda).',
+=======
+  leituraClima: '', // vazio: o bloco "Leitura do clima da semana" não aparece até o Helder escrever
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+    { id: 'e12', data: null, tipo: 'feira', titulo: 'Congresso INC 2027 (castanhas e frutas secas)', local: 'Maio · local e data a confirmar', detalhe: 'Encontro mundial do setor de castanhas e amendoim: estimativas de safra e negócios entre exportadores e importadores. Em 2026 foi em Macau, de 12 a 14 de maio.' },
+=======
+    { id: 'e12', data: null, tipo: 'feira', titulo: 'Congresso INC 2027 (castanhas e frutas secas)', local: 'maio · local e data a confirmar', detalhe: 'Encontro mundial do setor de castanhas e amendoim: estimativas de safra e negócios entre exportadores e importadores. Em 2026 foi em Macau, de 12 a 14 de maio.' },
+>>>>>>>
+<<<<<<< public/esboco.js
+  <section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Para onde vai a safra ${h.esc(ref.safra)}</span><span class="mini">mil t em casca</span></div>
+=======
+  ${b.exportExemplo && sessao()?.papel !== 'admin' ? '' : `<section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Para onde vai a safra ${h.esc(ref.safra)}</span><span class="mini">mil t em casca</span></div>
+>>>>>>>
+<<<<<<< public/esboco.js
+    <span class="mini dx-nota">Exportação: ${h.esc(b.exportFonte || 'Comex Stat')}${b.exportExemplo ? ' (valor de exemplo até você preencher no painel)' : ''}. Rendimento casca → grão de ${nf(b.rendimento)}%. Na versão final, a exportação entra sozinha do Comex Stat.</span>
+  </section>
+=======
+    <span class="mini dx-nota">Exportação: ${h.esc(b.exportFonte || 'Comex Stat')}${b.exportExemplo ? ' (valor de exemplo até você preencher no painel)' : ''}. Rendimento casca → grão de ${nf(b.rendimento)}%.</span>
+  </section>`}
+>>>>>>>
+<<<<<<< public/esboco.js
+  <article class="leitura">
+    <span class="tag-boletim">RASCUNHO · revisar com advogado(a) antes de cobrar</span>
+    <h1>Termos de uso</h1>
+=======
+  <article class="leitura">
+    <span class="tag-boletim">Versão preliminar · fase de teste</span>
+    <h1>Termos de uso</h1>
+>>>>>>>
+<<<<<<< public/esboco.js
+  <article class="leitura">
+    <span class="tag-boletim">RASCUNHO · revisar com advogado(a) antes de cobrar</span>
+    <h1>Política de privacidade</h1>
+=======
+  <article class="leitura">
+    <span class="tag-boletim">Versão preliminar · fase de teste</span>
+    <h1>Política de privacidade</h1>
+>>>>>>>
+<<<<<<< public/esboco.js
+    ${secao('Segurança', ['Conexão criptografada (https), senhas guardadas de forma cifrada e acesso aos dados restrito ao responsável pelo app.'])}
+=======
+    ${secao('Segurança', ['Conexão criptografada (https), entrada por código de uso único enviado ao seu celular e acesso aos dados restrito ao responsável pelo app.'])}
+>>>>>>>
+<<<<<<< public/esboco.js
+  if (sub === 'em-breve') return `${voltar('#/mercado/consultoria', 'Assinantes')}<div class="vazio">Esta parte entra numa próxima etapa.<br>No esboço ela só mostra onde vai ficar.</div>`;
+=======
+  if (sub === 'em-breve') return `${voltar('#/mercado/consultoria', 'Assinantes')}<div class="vazio">Esta parte entra numa próxima etapa.</div>`;
+>>>>>>>
+<<<<<<< public/esboco-export.js
+    <span class="mini">Gerado na hora com os dados de hoje. ${empresa ? 'Na versão final, o relatório mensal chega pronto no seu e-mail.' : 'Preço por destino e mercado físico fazem parte do plano Empresa.'}</span>
+=======
+    <span class="mini">Gerado na hora com os dados de hoje. ${empresa ? 'O relatório sai com os números mais recentes publicados no app.' : 'Preço por destino e mercado físico fazem parte do plano Empresa.'}</span>
+>>>>>>>
+<<<<<<< public/alertas.js
+        <li>Abra o Amendoim Brasil pelo ícone novo e volte nesta tela.</li>
+=======
+        <li>Abra o Amendoim Brasil pelo ícone novo e volte a esta tela.</li>
+>>>>>>>
+<<<<<<< public/alertas.js
+  <form id="form-alertas" class="cartao" style="gap:14px" ${s.ok ? '' : 'inert'}>
+=======
+  <form id="form-alertas" class="cartao" style="gap:14px${s.ok ? '' : ';opacity:.5'}" ${s.ok ? '' : 'inert'}>
+>>>>>>>
+<<<<<<< public/app.js
+    <div class="cresce"><b style="font-size:15px;display:block">Grupo no WhatsApp</b><span style="font-size:13px;color:#3E4A40">Radar de preços, chuva e boletins</span></div>
+=======
+    <div class="cresce"><b style="font-size:15px;display:block">Grupo do WhatsApp</b><span style="font-size:13px;color:#3E4A40">Radar de preços, chuva e boletins</span></div>
+>>>>>>>
+<<<<<<< public/app.js
+      <span class="rotulo">Termômetro do mercado</span>
+      <span class="grande">${esc(cfg.termometro.status)}</span>
+=======
+      <span class="rotulo">Termômetro do preço</span>
+      <span class="grande">${esc(cfg.termometro.status)}</span>
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="dx-tile"><span>Projeção ${atual}</span><b class="num">${nf(projecao)} t</b><small>${seta(vProj)}${pc(vProj)} vs ${atual - 1} inteiro</small></div>
+=======
+      <div class="dx-tile"><span>Projeção ${atual} (linear)</span><b class="num">${nf(projecao)} t</b><small>${seta(vProj)}${pc(vProj)} vs ${atual - 1} inteiro</small></div>
+>>>>>>>
