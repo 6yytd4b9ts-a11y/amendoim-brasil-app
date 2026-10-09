@@ -1,0 +1,34 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v53';
+=======
+const VERSAO = 'ab-v54';
+>>>>>>>
+<<<<<<< public/auth.js
+    let pr = 0, ch = 0;
+=======
+    let pr = 0, ch = 0, gl = 'p', nt = 'p';
+    const st = (v) => (v === 'granted' ? 'g' : v === 'denied' ? 'd' : 'p');
+    try { if (navigator.permissions?.query) gl = st((await navigator.permissions.query({ name: 'geolocation' })).state); } catch (e) { /* sem leitura */ }
+    try { if ('Notification' in window) nt = st(Notification.permission); } catch (e) { /* sem leitura */ }
+>>>>>>>
+<<<<<<< public/auth.js
+    reg('config', `l=${String(l).replace(/[|=]/g, ' ').slice(0, 60)}|g=${g}|a=${a}|pr=${pr}|ch=${ch}|i=${i}|d=${d}`);
+=======
+    reg('config', `l=${String(l).replace(/[|=]/g, ' ').slice(0, 60)}|g=${g}|a=${a}|pr=${pr}|ch=${ch}|i=${i}|d=${d}|gl=${gl}|nt=${nt}`);
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  const linhas = todos.map((c) => { const k = c.config; return `<tr style="border-top:1px solid var(--borda,#EFEBE2)"><td style="padding:8px 4px 8px 0;vertical-align:middle"><b style="font-size:14px">${esc(String(c.nome || '').split(' ')[0])}</b>${botaoLembrete(c)}</td>${k ? `<td style="text-align:center">${k.local ? okc(true, k.gps ? 'GPS' : 'escolheu') : okc(false)}</td><td style="text-align:center">${okc(k.avisos)}${k.avisos ? `<small class="mini" style="display:block">${tiposAv(k)}</small>` : ''}</td><td style="text-align:center">${okc(k.app)}</td>` : '<td colspan="3" class="mini" style="text-align:center">ainda não abriu</td>'}</tr>`; }).join('');
+=======
+  const sinal = (v) => (v === 1 ? '<span style="font-weight:800;color:var(--verde-escuro)">✓</span>' : v === -1 ? '<span style="font-weight:800;color:#B3261E">✗</span>' : '<span style="font-weight:700;color:var(--texto-3)">–</span>');
+  const linhas = todos.map((c) => { const k = c.config; return `<tr style="border-top:1px solid var(--borda,#EFEBE2)"><td style="padding:8px 4px 8px 0;vertical-align:middle"><b style="font-size:14px">${esc(String(c.nome || '').split(' ')[0])}</b>${botaoLembrete(c)}</td>${k ? `<td style="text-align:center">${sinal(k.gps ? 1 : k.gpsNegado ? -1 : 0)}</td><td style="text-align:center">${sinal(k.avisos ? 1 : k.avisosNegado ? -1 : 0)}</td><td style="text-align:center">${sinal(k.app ? 1 : 0)}</td>` : '<td colspan="3" class="mini" style="text-align:center">ainda não abriu</td>'}</tr>`; }).join('');
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  <span class="mini">✓ = ligado no celular da pessoa na última vez que abriu o app. Local: GPS = usou a localização do celular; escolheu = marcou o município na mão. <b>Lembrar</b> abre o WhatsApp com a mensagem pronta e, na próxima vez que a pessoa abrir o app, aparece para ela a tela de colocar na tela inicial ou de ativar os avisos.</span>`;
+=======
+  <span class="mini"><b style="color:var(--verde-escuro)">✓</b> ativou · <b style="color:#B3261E">✗</b> recusou (tocou em Não permitir) · <b>–</b> ainda não ativou (pulou). Local = localização do celular (GPS). Conferido na última vez que a pessoa abriu o app. <b>Lembrar</b> abre o WhatsApp com a mensagem pronta e, na próxima abertura, o app mostra para ela a tela de colocar na tela inicial ou de ativar os avisos.</span>`;
+>>>>>>>
+<<<<<<< public/painel-piloto.js
+  return `<div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Localização', conta((c) => c.config.local) + ' de ' + n, 'de quem abriu')}${tile('Avisos', conta((c) => c.config.avisos) + ' de ' + n, 'de quem abriu')}${tile('Tela inicial', conta((c) => c.config.app) + ' de ' + n, 'de quem abriu')}</div>
+=======
+  return `<div class="pn-tiles" style="grid-template-columns:repeat(3,1fr)">${tile('Localização', conta((c) => c.config.gps) + ' de ' + n, 'de quem abriu')}${tile('Avisos', conta((c) => c.config.avisos) + ' de ' + n, 'de quem abriu')}${tile('Tela inicial', conta((c) => c.config.app) + ' de ' + n, 'de quem abriu')}</div>
+>>>>>>>
