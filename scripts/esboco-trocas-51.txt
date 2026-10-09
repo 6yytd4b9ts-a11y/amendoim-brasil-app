@@ -1,0 +1,57 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v59';
+=======
+const VERSAO = 'ab-v60';
+>>>>>>>
+<<<<<<< public/clima.js
+  const [prev, hist, reg] = await Promise.allSettled([
+    getJSON(`${FORECAST}?${qPrev}`),
+    getJSON(`${ARCHIVE}?${qHist}`),
+    getJSON(`${FORECAST}?${qReg}`)
+  ]);
+=======
+  // O histórico de 10 safras (arquivo do Open-Meteo) é o pedido mais lento (2 a 4 s) e não muda durante o dia:
+  // fica guardado no celular e a previsão não espera por ele. Se ainda não chegou, a tela abre e o comparativo
+  // "Chuva desde 01/09" aparece sozinho logo depois.
+  let histGuardado = null;
+  try { const c = JSON.parse(localStorage.getItem('ab-clima-hist') || 'null'); if (c && c.q === qHist) histGuardado = c.v; } catch (e) { /* sem armazenamento */ }
+  const histP = histGuardado ? Promise.resolve(histGuardado) : getJSON(`${ARCHIVE}?${qHist}`).then((v) => {
+    try { localStorage.setItem('ab-clima-hist', JSON.stringify({ q: qHist, v })); } catch (e) { /* sem espaço: segue sem guardar */ }
+    return v;
+  });
+  const [prev, reg] = await Promise.allSettled([getJSON(`${FORECAST}?${qPrev}`), getJSON(`${FORECAST}?${qReg}`)]);
+  const hist = await Promise.race([
+    histP.then((value) => ({ status: 'fulfilled', value }), () => ({ status: 'rejected' })),
+    new Promise((ok) => setTimeout(() => ok({ status: 'pendente' }), 300))
+  ]);
+>>>>>>>
+<<<<<<< public/clima.js
+    inicioSafra: inicio, inicioPassada: `${anoIni - 1}-09-01`, fimPassada: somaDias(`${anoIni - 1}-09-01`, janela), ate: ontem, erro: null
+  };
+=======
+    inicioSafra: inicio, inicioPassada: `${anoIni - 1}-09-01`, fimPassada: somaDias(`${anoIni - 1}-09-01`, janela), ate: ontem, erro: null,
+    histPendente: hist.status === 'pendente' ? histP : null
+  };
+>>>>>>>
+<<<<<<< public/clima.js
+    } else if (inicio > corte) {
+      out.chuvaSafra = recentes;
+    }
+=======
+    } else if (inicio > corte && hist.status !== 'pendente') {
+      out.chuvaSafra = recentes;
+    }
+>>>>>>>
+<<<<<<< public/app.js
+  D.climaAuto = r;
+  const aba = rota().aba;
+  if (aba === 'clima' || aba === 'inicio') render(false);
+}
+=======
+  D.climaAuto = r;
+  const aba = rota().aba;
+  if (aba === 'clima' || aba === 'inicio') render(false);
+  // o histórico de 10 safras chega depois: quando chegar (e já guardado), completa o comparativo
+  if (r.histPendente) r.histPendente.then(() => { if (meu === pedidoClima) atualizarClima(local); }, () => {});
+}
+>>>>>>>
