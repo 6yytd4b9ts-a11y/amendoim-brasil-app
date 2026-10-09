@@ -193,6 +193,22 @@
       "texto": "O USDA informou 23% do amendoim americano colhido em 04/10, contra 12% na mesma data de 2025, com 57% das lavouras em condição boa ou excelente. A colheita adiantada põe o produto novo deles no mercado mais cedo. O que pesa para o preço aqui não é o ritmo, é o tamanho da safra americana, que vem menor este ano."
     },
     {
+      "id": "2026-10-08-argentina-moagem",
+      "dia": "2026-10-08",
+      "titulo": "Argentina mói 30,7% mais amendoim de janeiro a agosto",
+      "fonte": "Secretaria de Agricultura da Argentina · Todo Maní",
+      "link": "https://www.todomani.com.ar/la-molienda-de-mani-crecio-307-entre-enero-y-agosto-y-supera-las-213-000-toneladas",
+      "texto": "Segundo a Secretaria de Agricultura da Argentina, a moagem de amendoim somou 213.942 t de janeiro a agosto de 2026, alta de 30,7% sobre o mesmo período de 2025, com 84.147 t de óleo produzidas. As exportações de amendoim e derivados chegaram a 661.784 t (+22,7%), no valor de US$ 753 milhões."
+    },
+    {
+      "id": "2026-10-08-clima-sp",
+      "dia": "2026-10-08",
+      "titulo": "Calor no interior paulista; chuva acima da média prevista de 12 a 19/10",
+      "fonte": "Cepagri/Unicamp",
+      "link": "https://www.acidadeon.com/campinas/cotidiano/interior-de-sp-tera-alta-nas-temperaturas-a-partir-desta-quarta-feira-veja-previsao/",
+      "texto": "O Cepagri prevê tempo firme e máximas de 30 a 36 °C no interior paulista até sábado (10/10), com pancadas no oeste do estado a partir da tarde de sexta. Entre 12 e 19 de outubro, a chuva deve ficar acima da média em São Paulo, com acumulados de 10 a 60 mm."
+    },
+    {
       "id": "2026-10-07-argentina",
       "dia": "2026-10-07",
       "titulo": "Argentina deve plantar 8% menos amendoim na safra 26/27",
@@ -207,6 +223,22 @@
       "fonte": "Conab",
       "link": "https://www.conab.gov.br/info-agro/safras",
       "texto": "No dia 15 de outubro a Conab publica a primeira estimativa oficial de área e produção de amendoim da safra 26/27. O mercado espera a confirmação de área menor em São Paulo. Se o corte vier abaixo de 25%, reforça a leitura de oferta apertada e preço firme; se vier mais forte, pode mexer no preço já na semana seguinte."
+    },
+    {
+      "id": "2026-10-05-paraguai",
+      "dia": "2026-10-05",
+      "titulo": "Paraguai caminha para recorde na exportação de amendoim",
+      "fonte": "UGP/Cappema · Prensa Mercosur",
+      "link": "https://prensamercosur.org/2026/10/05/exportaciones-de-mani-apuntan-a-un-nuevo-record/",
+      "texto": "O Paraguai exportou cerca de US$ 21 milhões em amendoim de janeiro a agosto de 2026, acima dos US$ 14 milhões de todo o ano de 2025. A Câmara Paraguaia de Processadores e Exportadores de Amendoim (Cappema) projeta fechar 2026 entre US$ 25 e 30 milhões."
+    },
+    {
+      "id": "2026-10-02-usda-preco",
+      "dia": "2026-10-02",
+      "titulo": "Preço do amendoim ao produtor nos EUA sobe para US$ 494/t",
+      "fonte": "USDA · Peanut Prices",
+      "link": "https://esmis.nal.usda.gov/sites/default/release-files/796093/pnpr4026.pdf",
+      "texto": "O USDA informou preço médio de 22,4 centavos de dólar por libra-peso (cerca de US$ 494 por tonelada, em casca) pago ao produtor americano na semana encerrada em 26/09, contra 19,1 c/lb (cerca de US$ 421/t) na semana anterior. Foram comercializadas 187 milhões de libras-peso (cerca de 85 mil t) na semana."
     }
   ]
 }
