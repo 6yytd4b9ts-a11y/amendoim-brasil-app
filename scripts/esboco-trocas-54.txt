@@ -1,0 +1,128 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v62';
+=======
+const VERSAO = 'ab-v63';
+>>>>>>>
+<<<<<<< public/auth.js
+  return `<a class="cartao es-cartao es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" style="width:min(100%,290px);box-sizing:border-box;align-self:center;margin-left:auto;margin-right:auto;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;padding:6px 12px 7px;border:1.5px solid #C2A04C;background:linear-gradient(180deg,#FFFEFA,#FBF4E1)">
+    <span style="display:flex;align-items:center;justify-content:center;gap:8px"><span style="font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A6A1E">ÁREA EXCLUSIVA${s.papel === 'admin' ? '' : ' · ASSINANTES'}</span><span style="font-size:10px;font-weight:800;letter-spacing:.05em;color:#8A6A1E;border:1px solid #C2A04C;border-radius:999px;padding:1px 8px">${selo}</span></span>
+    <b style="font-size:14px">Entrar na minha área ›</b>
+    <span style="font-size:11.5px;line-height:1.3;color:var(--texto-3);text-wrap:balance">${txt}</span>
+  </a>`;
+=======
+  return `<a class="es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" aria-label="Entrar na minha área exclusiva (${txt})" style="display:flex;align-items:center;justify-content:center;gap:8px;width:min(100%,300px);box-sizing:border-box;margin:0 auto;padding:5px 12px;border:1.5px solid #C2A04C;border-radius:999px;background:linear-gradient(180deg,#FFFEFA,#FBF4E1);text-decoration:none;color:inherit">
+    <b style="font-size:13px;white-space:nowrap">Entrar na minha área exclusiva ›</b><span style="font-size:9.5px;font-weight:800;letter-spacing:.05em;color:#8A6A1E;border:1px solid #C2A04C;border-radius:999px;padding:0 7px;white-space:nowrap">${selo}</span>
+  </a>`;
+>>>>>>>
+<<<<<<< public/auth.js
+  const nome = esc((s.nome || '').split(' ')[0] || '');
+=======
+
+>>>>>>>
+<<<<<<< public/painel.js
+    ${m.leitura ? `<a class="hoje-leitura" href="#/mercado/termometro" data-ev="leitura-mercado" style="display:flex;flex-direction:column;gap:3px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--fundo);text-decoration:none;color:inherit"><b style="font-size:13px">Por que o mercado está assim</b><span style="font-size:13.5px;line-height:1.45;color:var(--texto-2)">${esc(m.leitura)}</span></a>` : ''}
+=======
+    ${m.leitura ? `<a class="hoje-leitura" href="#/mercado/termometro" data-ev="leitura-mercado" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;border-radius:12px;background:var(--fundo);text-decoration:none;color:inherit"><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13.5px;color:var(--texto-2)"><b style="color:var(--texto)">Por que está assim:</b> ${esc(m.leitura)}</span><span class="link-mini" style="flex:none">Ver ›</span></a>` : ''}
+>>>>>>>
+<<<<<<< public/painel.js
+    <details class="abre">
+      <summary>Ritmo dos embarques ${e.mensal?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
+      <div class="grafico">${e.mensal ? barrasMensais(h, e.mensal) : ''}</div>
+      <span class="mini"><i class="leg" style="background:#CFE3D5"></i>2025 · <i class="leg" style="background:#007731"></i>2026 · toneladas de grão por mês</span>
+      <p class="mini" style="margin:6px 0 0">${esc(e.ritmo || '')}</p>
+    </details>
+    <details class="abre">
+      <summary>Principais destinos ${e.destinos?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
+      <div class="destinos">${(e.destinos?.lista || []).map(([p, v]) => `<div class="destino"><span>${esc(p)}</span><span class="destino-barra"><i style="width:${v}%"></i></span><b class="num">${numBr(v, 1)}%</b></div>`).join('')}</div>
+      <span class="mini">Participação no volume de grão exportado em ${esc(e.periodo)}.</span>
+    </details>
+=======
+    <details class="abre" open>
+      <summary>Principais destinos ${e.destinos?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
+      <div class="destinos">${(e.destinos?.lista || []).map(([p, v]) => `<div class="destino"><span>${esc(p)}</span><span class="destino-barra"><i style="width:${v}%"></i></span><b class="num">${numBr(v, 1)}%</b></div>`).join('')}</div>
+      <span class="mini">Participação no volume de grão exportado em ${esc(e.periodo)}.</span>
+    </details>
+    <details class="abre">
+      <summary>Ritmo dos embarques ${e.mensal?.exemplo ? '<span class="aviso-exemplo">Exemplo</span>' : ''}</summary>
+      <div class="grafico">${e.mensal ? barrasMensais(h, e.mensal) : ''}</div>
+      <span class="mini"><i class="leg" style="background:#CFE3D5"></i>2025 · <i class="leg" style="background:#007731"></i>2026 · toneladas de grão por mês</span>
+      <p class="mini" style="margin:6px 0 0">${esc(e.ritmo || '')}</p>
+    </details>
+>>>>>>>
+<<<<<<< public/esboco3.js
+function previaMercado(D) {
+  const exp = { valor: 'Mais fraca', efeito: 'baixa', detalhe: 'Somando grão e óleo convertidos para casca, a exportação de março a setembro consumiu 491 mil t de amendoim, 9% menos que no mesmo período de 2025 (1,9 milhão de sacas a menos). O amendoim (grão) subiu 15%, mas o óleo caiu 29% (Comex Stat).' };
+  const t = D.config?.termometro;
+  if (t) {
+    t.status = 'Estável';
+    t.resumo = 'Mercado de lado. A área menor no Brasil e a oferta curta lá fora seguram o preço, mas a exportação total (grão e óleo) consome menos amendoim que em 2025 e a demanda interna está parada. A força de alta deve aparecer mais perto de março.';
+    (t.fatores || []).forEach((f) => { if (f.nome === 'Exportação') Object.assign(f, exp); });
+  }
+  if (D.config?.exportacao) D.config.exportacao.status = 'Mais fraca';
+  (D.mercado?.hoje || []).forEach((x) => { if (x.id === 'exportacao') Object.assign(x, exp, { nota: 'amendoim +15% · óleo −29%' }); });
+  if (D.mercado) D.mercado.leitura = 'Mercado de lado. A área menor no Brasil e a oferta curta lá fora seguram o preço, mas a exportação total (grão e óleo) está consumindo menos amendoim que em 2025 e a indústria compra só o necessário. A força de alta deve aparecer mais perto de março.';
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Exportação total 9% abaixo de 2025',
+    leitura: 'Pesa contra o preço: somando grão e óleo convertidos para casca, a exportação de março a setembro consumiu 1,9 milhão de sacas a menos que no mesmo período de 2025. O grão segue acima do ano passado, mas o óleo caiu forte, e cada tonelada de óleo leva cerca de 2,6 t de amendoim em casca.' });
+}
+export function ajustarDados(D) {
+=======
+function previaMercado(D) {
+  const expDet = 'O grão segue acima do ano passado, mas a exportação de óleo caiu forte. Somando os dois, a exportação está tirando menos amendoim do mercado que em 2025.';
+  const FAT = {
+    'Preço internacional': { valor: 'Subindo', efeito: 'alta', detalhe: 'Os preços de exportação estão em tendência de alta, porque a oferta mundial está mais curta.' },
+    'Safra mundial': { valor: 'Menor', efeito: 'alta', detalhe: 'EUA com produção menor, Argentina com estimativa de redução de 8% na área, Índia com quebra perto de 20% na safra atual e Brasil com estimativa de área 25% a 30% menor.' },
+    'Oferta brasileira': { valor: 'Menor', efeito: 'alta', detalhe: 'A venda de sementes indica que a área plantada na safra 26/27 vai ser menor, por falta de crédito e juros altos. A Conab publica a primeira estimativa em 15/10.' },
+    'Exportação': { valor: 'Mais fraca', efeito: 'baixa', detalhe: expDet }
+  };
+  const t = D.config?.termometro;
+  if (t) {
+    t.status = 'Estável';
+    t.resumo = 'O preço está andando de lado porque as forças se equilibram. Seguram o preço: safra menor no Brasil, nos EUA e na Índia, e preço de exportação firme lá fora. Pesam contra: a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+    (t.fatores || []).forEach((f) => { if (FAT[f.nome]) Object.assign(f, FAT[f.nome]); });
+  }
+  if (D.config?.exportacao) D.config.exportacao.status = 'Mais fraca';
+  (D.mercado?.hoje || []).forEach((x) => { if (x.id === 'exportacao') Object.assign(x, { valor: 'Mais fraca', efeito: 'baixa', nota: 'grão +16% · óleo −22%', detalhe: expDet }); });
+  (D.mercado?.ofertaDemanda || []).forEach((x) => { if (/export/i.test(x.nome)) Object.assign(x, { escala: ['Mais fraca', 'Normal', 'Forte'], nivel: 0, efeito: 'baixa', detalhe: expDet }); });
+  if (D.mercado) D.mercado.leitura = 'preço de lado: safra menor segura, mas indústria comprando pouco, dólar baixo e menos óleo exportado pesam contra.';
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Grão sobe, óleo cai',
+    leitura: 'O grão segue acima do ano passado, mas a exportação de óleo caiu forte. Como cada tonelada de óleo leva cerca de 2,6 t de amendoim em casca, a exportação como um todo está tirando menos amendoim do mercado que em 2025. Por isso ela deixou de ajudar o preço.' });
+}
+export function ajustarDados(D) {
+>>>>>>>
+<<<<<<< public/esboco3.js
+import { chuva7Unificada } from '/esboco-clima.js';
+=======
+import { chuva7Unificada } from '/esboco-clima.js';
+import { bandeira } from '/bandeiras.js';
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function noticiasDoDia() {
+=======
+// Miniatura da notícia: a foto, se tiver; senão a bandeira do país, um ícone de clima ou o símbolo do app.
+function miniNoticia(n, h) {
+  const caixa = (dentro, fundo = 'var(--fundo)') => `<span aria-hidden="true" style="flex:none;width:42px;height:42px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:${fundo}">${dentro}</span>`;
+  const img = n.imagem || n.capa;
+  if (/^https:\/\//.test(img || '')) return caixa(`<img src="${h.esc(img)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`);
+  const t = `${n.titulo || ''} ${n.fonte || ''}`;
+  if (/chuva|clima|calor|frio|geada|seca|Climatempo|Cepagri|INMET|previs/i.test(t)) return caixa(h.ic(h.I.chuva, 'style="width:24px;height:24px;stroke:#2F6FA3"'), '#E6F0F8');
+  const pais = /EUA|Estados Unidos|USDA|american/i.test(t) ? 'US' : /Argentin|Córdoba|Cordoba|Maní/i.test(t) ? 'AR' : /Índia|India/i.test(t) ? 'IN' : /China|chin[eê]s/i.test(t) ? 'CN' : /Conab|IEA|Brasil|paulista|SP\b|Comex/i.test(t) ? 'BR' : '';
+  if (pais) return caixa(bandeira(pais, 42));
+  return caixa('<img src="/icons/icon-maskable-512.png" alt="" style="width:100%;height:100%;object-fit:cover">');
+}
+export function noticiasDoDia() {
+>>>>>>>
+<<<<<<< public/esboco3.js
+      <summary style="cursor:pointer;list-style:none;display:flex;gap:10px;align-items:flex-start"><span class="es-not-ponto" style="margin-top:7px"></span><span class="cresce"><b style="font-size:15px;line-height:1.3;display:block">${h.esc(n.titulo)}</b>${n.fonte ? `<small class="mini">${h.esc(n.fonte)}</small>` : ''}</span><span aria-hidden="true" style="font-size:18px;color:var(--texto-3)">⌄</span></summary>
+=======
+      <summary style="cursor:pointer;list-style:none;display:flex;gap:10px;align-items:flex-start"><span class="es-not-ponto" style="margin-top:7px"></span>${miniNoticia(n, h)}<span class="cresce"><b style="font-size:15px;line-height:1.3;display:block">${h.esc(n.titulo)}</b>${n.fonte ? `<small class="mini">${h.esc(n.fonte)}</small>` : ''}</span><span aria-hidden="true" style="font-size:18px;color:var(--texto-3)">⌄</span></summary>
+>>>>>>>
+<<<<<<< public/terminal.js
+import { conteudo, assinante, sessao } from '/esboco-dados.js';
+=======
+import { conteudo, assinante, sessao, htmlExpCasca } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/terminal.js
+  if (est.aba === 'exportacao') corpo = est.comex ? blocoExportacao(est.comex, h) : '<div class="vazio">Comex Stat indisponível agora.</div>';
+=======
+  if (est.aba === 'exportacao') corpo = (est.comex ? blocoExportacao(est.comex, h) : '<div class="vazio">Comex Stat indisponível agora.</div>') + (soExp ? '' : htmlExpCasca(conteudo(), null, h.esc));
+>>>>>>>

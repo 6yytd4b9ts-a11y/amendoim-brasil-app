@@ -1,0 +1,48 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v63';
+=======
+const VERSAO = 'ab-v64';
+>>>>>>>
+<<<<<<< public/auth.js
+  return `<a class="es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" aria-label="Entrar na minha área exclusiva (${txt})" style="display:flex;align-items:center;justify-content:center;gap:8px;width:min(100%,300px);box-sizing:border-box;margin:0 auto;padding:5px 12px;border:1.5px solid #C2A04C;border-radius:999px;background:linear-gradient(180deg,#FFFEFA,#FBF4E1);text-decoration:none;color:inherit">
+=======
+  return `<a class="es-faixa-ass2" href="#/mercado/consultoria" data-ev="atalho-area" aria-label="Entrar na minha área exclusiva (${txt})" style="display:flex;align-items:center;justify-content:center;gap:8px;width:fit-content;max-width:100%;box-sizing:border-box;margin:0 auto;padding:5px 8px 5px 14px;border:1.5px solid #C2A04C;border-radius:999px;background:linear-gradient(180deg,#FFFEFA,#FBF4E1);text-decoration:none;color:inherit">
+>>>>>>>
+<<<<<<< public/painel.js
+    ${m.leitura ? `<a class="hoje-leitura" href="#/mercado/termometro" data-ev="leitura-mercado" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;border-radius:12px;background:var(--fundo);text-decoration:none;color:inherit"><span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13.5px;color:var(--texto-2)"><b style="color:var(--texto)">Por que está assim:</b> ${esc(m.leitura)}</span><span class="link-mini" style="flex:none">Ver ›</span></a>` : ''}
+=======
+    ${m.leitura ? `<details class="hoje-leitura"><summary data-ev="leitura-mercado"><span class="hl-txt"><b>Por que está assim:</b> ${esc(m.leitura)}</span><span class="hl-ver link-mini">Ver ›</span></summary></details>` : ''}
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-clima-ic svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
+=======
+.es-clima-ic svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
+/* Início › Mercado hoje: explicação em uma linha; tocando, abre o texto inteiro ali mesmo */
+.hoje-leitura { margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: var(--fundo); }
+.hoje-leitura summary { list-style: none; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.hoje-leitura summary::-webkit-details-marker { display: none; }
+.hoje-leitura .hl-txt { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13.5px; color: var(--texto-2); }
+.hoje-leitura .hl-txt b { color: var(--texto); }
+.hoje-leitura .hl-ver { flex: none; }
+.hoje-leitura[open] .hl-txt { white-space: normal; line-height: 1.45; }
+.hoje-leitura[open] .hl-ver { display: none; }
+>>>>>>>
+<<<<<<< public/esboco3.css
+.es-safra { border-top: 1px solid var(--linha); padding: 12px 0 10px; display: flex; flex-direction: column; gap: 8px; }
+.es-safra:first-of-type { border-top: 0; }
+.es-safra.atual { background: var(--verde-fundo); margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-radius: 12px; border-top: 0; }
+=======
+.es-safra { border: 1px solid var(--linha); border-radius: 12px; padding: 12px 12px 10px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.es-safra:first-of-type { margin-top: 4px; }
+.es-safra.atual { background: var(--verde-fundo); border-color: transparent; }
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (D.mercado) D.mercado.leitura = 'preço de lado: safra menor segura, mas indústria comprando pouco, dólar baixo e menos óleo exportado pesam contra.';
+=======
+  if (D.mercado) D.mercado.leitura = 'O mercado está andando de lado porque as forças se equilibram. Seguram o preço a safra menor no Brasil, nos EUA e na Índia e o preço de exportação firme lá fora. Pesam contra a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+>>>>>>>
+<<<<<<< public/esboco3.js
+    t.resumo = 'O preço está andando de lado porque as forças se equilibram. Seguram o preço: safra menor no Brasil, nos EUA e na Índia, e preço de exportação firme lá fora. Pesam contra: a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+=======
+    t.resumo = 'O mercado está andando de lado porque as forças se equilibram. Seguram o preço: safra menor no Brasil, nos EUA e na Índia, e preço de exportação firme lá fora. Pesam contra: a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+>>>>>>>

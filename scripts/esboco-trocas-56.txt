@@ -1,0 +1,102 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v64';
+=======
+const VERSAO = 'ab-v65';
+>>>>>>>
+<<<<<<< public/terminal.js
+const EM_CASCA = { grao: 1 / 0.7, oleo: 1 / 0.38 }; // total em casca: grão ÷ 0,70 + óleo ÷ 0,38 (quanto amendoim da roça a exportação consome)
+=======
+const TOTAL = { grao: 1, oleo: 1 }; // exportação total: toneladas de grão + toneladas de óleo
+>>>>>>>
+<<<<<<< public/terminal.js
+// ---------- Comex: série por produto (o total soma grão e óleo convertidos para casca) ----------
+=======
+// ---------- Comex: série por produto (o total soma as toneladas de grão e de óleo) ----------
+>>>>>>>
+<<<<<<< public/terminal.js
+  for (const [p, fator] of [['grao', EM_CASCA.grao], ['oleo', EM_CASCA.oleo]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+=======
+  for (const [p, fator] of [['grao', TOTAL.grao], ['oleo', TOTAL.oleo]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+>>>>>>>
+<<<<<<< public/terminal.js
+  const rot = { grao: 'Grão (NCM 1202)', oleo: 'Óleo (NCM 1508)', total: 'Total em casca' }[est.prod];
+=======
+  const rot = { grao: 'Grão (NCM 1202)', oleo: 'Óleo (NCM 1508)', total: 'Grão + óleo' }[est.prod];
+>>>>>>>
+<<<<<<< public/terminal.js
+    <div class="chips">${[['total', 'Total em casca'], ['grao', 'Grão'], ['oleo', 'Óleo']].map(([k, t]) => `<button class="chip" data-tm-prod="${k}" aria-pressed="${est.prod === k}">${t}</button>`).join('')}</div>
+=======
+    <div class="chips">${[['total', 'Grão + óleo'], ['grao', 'Só grão'], ['oleo', 'Só óleo']].map(([k, t]) => `<button class="chip" data-tm-prod="${k}" aria-pressed="${est.prod === k}">${t}</button>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/terminal.js
+    ${info('Como ler', `<b>Recorde</b> é o maior valor daquele mês entre os anos da tabela. <b>Até ${ate}</b> soma os mesmos meses de cada ano, para comparar igual com igual. <b>Projeção sazonal</b> usa o peso que jan–${ate} teve nos anos fechados; a linear (média × 12) subestima quando o pico de embarque é no segundo semestre. <b>Total em casca</b> soma grão e óleo convertidos para amendoim em casca (grão ÷ 0,70 + óleo ÷ 0,38): é quanto amendoim da roça a exportação consome. Fonte: Comex Stat/MDIC, publicado com cerca de um mês de atraso.`)}
+=======
+    ${info('Como ler', `<b>Recorde</b> é o maior valor daquele mês entre os anos da tabela. <b>Até ${ate}</b> soma os mesmos meses de cada ano, para comparar igual com igual. <b>Projeção sazonal</b> usa o peso que jan–${ate} teve nos anos fechados; a linear (média × 12) subestima quando o pico de embarque é no segundo semestre. <b>Grão + óleo</b> é a exportação total: soma as toneladas de grão e de óleo embarcadas. Fonte: Comex Stat/MDIC, publicado com cerca de um mês de atraso.`)}
+>>>>>>>
+<<<<<<< public/exportacao.js
+const PROD = { casca: 'Total em casca', grao: 'Grão', oleo: 'Óleo' }; // começa pelo total: é quanto amendoim da roça a exportação consome
+=======
+const PROD = { casca: 'Grão + óleo', grao: 'Só grão', oleo: 'Só óleo' }; // começa pela exportação total (grão + óleo)
+>>>>>>>
+<<<<<<< public/exportacao.js
+  if (prod !== 'casca') return b.series[prod] || {};
+  // Total em casca: grão ÷ 0,70 + óleo ÷ 0,38 (quanto amendoim da roça a exportação consome)
+=======
+  if (prod !== 'casca') return b.series[prod] || {};
+  // Exportação total: toneladas de grão + toneladas de óleo
+>>>>>>>
+<<<<<<< public/exportacao.js
+  for (const [p, f] of [['grao', RENDIMENTO], ['oleo', FATOR_OLEO]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+=======
+  for (const [p, f] of [['grao', 1], ['oleo', 1]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+>>>>>>>
+<<<<<<< public/exportacao.js
+        ${lin('<b>Total em casca</b>', 'grão ÷ 0,70 + óleo ÷ 0,38', casca(atual), casca(atual - 1))}
+=======
+        ${lin('<b>Grão + óleo</b>', 'exportação total', s('grao', atual) + s('oleo', atual), s('grao', atual - 1) + s('oleo', atual - 1))}
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <span class="mini">Total em casca: quanto amendoim da roça a exportação consome. Em sacas de 25 kg: ${nf((casca(atual - 1) * 40) / 1e6, 1)} mi em ${atual - 1} e ${nf((casca(atual) * 40) / 1e6, 1)} mi em ${atual}.</span>
+=======
+      <span class="mini">Convertido para casca (grão ÷ 0,70 + óleo ÷ 0,38), é quanto amendoim da roça a exportação consome: ${nf(casca(atual - 1) / 1000)} mil t em ${atual - 1} e ${nf(casca(atual) / 1000)} mil t em ${atual} (${pc(varia(casca(atual), casca(atual - 1)))}).</span>
+>>>>>>>
+<<<<<<< public/exportacao.js
+      ${est.prod === 'casca' ? `<div class="dx-tile"><span>Em sacas jan–${ate}</span><b class="num">${nf((ytd[atual] * 40) / 1e6, 1)} mi sc</b><small>${ytd[atual] - ytd[atual - 1] > 0 ? '+' : ''}${nf(((ytd[atual] - ytd[atual - 1]) * 40) / 1e6, 1)} mi vs ${atual - 1}</small></div>` : `<div class="dx-tile"><span>Preço médio</span><b class="num">US$ ${nf(precoYtd[atual])}/t</b><small>${seta(vPreco)}${pc(vPreco)} vs ${atual - 1}</small></div>`}
+=======
+      ${est.prod === 'casca' ? (() => { const g = (b.series.grao?.[atual]?.t || []).slice(0, n).reduce((x, v) => x + (v || 0), 0), pg = ytd[atual] ? (g / ytd[atual]) * 100 : null; return `<div class="dx-tile"><span>Divisão jan–${ate}</span><b class="num">${nf(pg)}% grão</b><small>${pg == null ? '–' : nf(100 - pg)}% óleo</small></div>`; })() : `<div class="dx-tile"><span>Preço médio</span><b class="num">US$ ${nf(precoYtd[atual])}/t</b><small>${seta(vPreco)}${pc(vPreco)} vs ${atual - 1}</small></div>`}
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="cartao-cab"><span class="rotulo">Exportação mês a mês · mil toneladas${est.prod === 'casca' ? ' em casca' : ''}</span><span class="mini">${est.prod === 'grao' ? 'NCM 1202' : est.prod === 'oleo' ? 'NCM 1508' : 'grão ÷ 0,70 + óleo ÷ 0,38'}</span></div>
+=======
+      <div class="cartao-cab"><span class="rotulo">Exportação mês a mês · mil toneladas</span><span class="mini">${est.prod === 'grao' ? 'NCM 1202' : est.prod === 'oleo' ? 'NCM 1508' : 'grão + óleo (1202 + 1508)'}</span></div>
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <span class="mini"><i class="dx-leg"></i> maior mês entre os anos · "Até ${ate}" compara os mesmos meses de cada ano · ${atual} em itálico é a projeção (média mensal × 12)${est.prod === 'casca' ? ' · Total em casca: grão ÷ 0,70 + óleo ÷ 0,38, é quanto amendoim da roça a exportação consome (o NCM 1202 inclui o pouco exportado em casca, menos de 1%).' : ' · US$/t é o preço médio FOB do período.'}</span>
+=======
+      <span class="mini"><i class="dx-leg"></i> maior mês entre os anos · "Até ${ate}" compara os mesmos meses de cada ano · ${atual} em itálico é a projeção (média mensal × 12)${est.prod === 'casca' ? ' · Grão + óleo: soma das toneladas de grão e de óleo exportadas.' : ' · US$/t é o preço médio FOB do período.'}</span>
+>>>>>>>
+<<<<<<< public/app.js
+  ${cartaoFisico(D, H())}
+
+  ${blocoExportacao(D, H())}
+
+=======
+  ${cartaoFisico(D, H())}
+
+>>>>>>>
+<<<<<<< public/app.js
+  ${cartaoTermometroDetalhe(D, H(), medidor)}
+
+  ${blocoMundo(D, H())}
+=======
+  ${cartaoTermometroDetalhe(D, H(), medidor)}
+
+  ${blocoExportacao(D, H())}
+
+  ${blocoMundo(D, H())}
+>>>>>>>
+<<<<<<< public/app.js
+  mercado: (sub) => sub === 'analises' ? telaAnalises() : sub === 'noticias' ? topoMercado('noticias') + telaNoticias(D, H()) : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? (assinante() && sessao()?.plano === 'produtor' ? telaTerminal(H()) : telaDadosAssinante(D, H(), telaDados)) : telaCotacoes(),
+=======
+  mercado: (sub) => sub === 'analises' || ['termometro', 'exportacao', 'mundo'].includes(sub) ? telaAnalises() : sub === 'noticias' ? topoMercado('noticias') + telaNoticias(D, H()) : sub === 'consultoria' ? topoMercado('consultoria') + telaAssinatura(H()) : sub === 'dados' ? (assinante() && sessao()?.plano === 'produtor' ? telaTerminal(H()) : telaDadosAssinante(D, H(), telaDados)) : telaCotacoes(),
+>>>>>>>

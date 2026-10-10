@@ -1,0 +1,373 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v60';
+=======
+const VERSAO = 'ab-v61';
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  // Balanço por exclusão. Exportação: grão em mil t de grão (vira casca pelo rendimento) e óleo já em casca equivalente. Valores de exemplo até você preencher no painel.
+  balanco: { consumoKgHab: 0.9, populacaoMi: 213, sementeKgHa: 200, rendimento: 70, exportGrao: 420, exportOleo: 60, exportExemplo: true, exportFonte: 'Comex Stat · mar/25 a fev/26' },
+=======
+  // Balanço por exclusão: consumo interno, semente e rendimento casca → grão. A exportação vem de exportCasca (abaixo).
+  balanco: { consumoKgHab: 0.9, populacaoMi: 213, sementeKgHa: 200, rendimento: 70 },
+  // Exportação somada e convertida para casca, como o mercado faz a conta: amendoim em casca + grão ÷ 0,70 + óleo ÷ 0,38.
+  // Mil toneladas por safra comercial (março a fevereiro), do Comex Stat. O app usa o que vier em config.json (exportCasca);
+  // sem isso, estes números. "anterior" é o mesmo período do ano anterior, para comparar.
+  exportCasca: {
+    fatorGrao: 0.70, fatorOleo: 0.38, fonte: 'Comex Stat/MDIC', atualizado: 'set/2026',
+    safras: {
+      '24/25': { periodo: 'mar/25 a fev/26', meses: 12, casca: 0.398, grao: 318.928, oleo: 178.619 },
+      '25/26': { periodo: 'mar a set/26', meses: 7, casca: 0.474, grao: 198.908, oleo: 78.513, anterior: { periodo: 'mar a set/25', casca: 0.105, grao: 173.886, oleo: 110.27 } }
+    }
+  },
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  return { scMin, scMax, tMin: scMin * SACA_KG / 1000, tMax: scMax * SACA_KG / 1000, scMeio: (scMin + scMax) / 2, tMeio: (scMin + scMax) * SACA_KG / 2000 };
+}
+=======
+  return { scMin, scMax, tMin: scMin * SACA_KG / 1000, tMax: scMax * SACA_KG / 1000, scMeio: (scMin + scMax) / 2, tMeio: (scMin + scMax) * SACA_KG / 2000 };
+}
+
+// Exportação de um período em casca equivalente (mil t): amendoim (em casca + grão ÷ fator) e óleo (÷ fator).
+export function exportEmCasca(x, X) {
+  if (!x) return null;
+  return { amend: (x.casca || 0) + (x.grao || 0) / (X.fatorGrao || 0.7), oleo: (x.oleo || 0) / (X.fatorOleo || 0.38) };
+}
+// Balanço por exclusão das safras que têm exportação (as duas últimas), em mil t em casca. Safra parcial: exportação
+// levada para 12 meses no ritmo atual. A sobra de uma safra entra como estoque inicial da seguinte.
+export function balancoSafras(c, X) {
+  X = X || c.exportCasca || PADRAO.exportCasca;
+  const b = { ...PADRAO.balanco, ...(c.balanco || {}) }, lista = c.estimativas || [];
+  const consumo = (b.consumoKgHab * b.populacaoMi) / ((b.rendimento || 70) / 100);
+  const cols = [];
+  let ant = null;
+  lista.forEach((e, i) => {
+    const x = X.safras?.[e.safra];
+    if (!x) { ant = null; return; }
+    const ex = exportEmCasca(x, X), meses = x.meses || 12, k = 12 / meses, prox = lista[i + 1];
+    const col = { safra: e.safra, periodo: x.periodo, meses, parcial: meses < 12, inicial: ant ? ant.sobra : null, producao: producao(e).tMeio / 1000,
+      amend: ex.amend * k, oleo: ex.oleo * k, consumo, semente: prox ? (prox.areaMin * b.sementeKgHa) / 1000 : 0 };
+    col.sobra = (col.inicial || 0) + col.producao - col.amend - col.oleo - col.consumo - col.semente;
+    cols.push(col); ant = col;
+  });
+  return { cols: cols.slice(-2), X, b };
+}
+
+// Cartões usados nas Estimativas e na aba Balanço dos Dados de exportação.
+const nfE = (n, d = 0) => (n == null || !isFinite(n) ? '–' : Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }));
+const varE = (a, b) => (b ? ((a - b) / b) * 100 : null);
+const sinalE = (v) => (v == null ? '<span class="es-var es-var-neutro">—</span>' : `<span class="es-var ${v > 0.5 ? 'sobe' : v < -0.5 ? 'cai' : 'es-var-neutro'}">${v > 0.5 ? '▲ +' : v < -0.5 ? '▼ ' : '= '}${nfE(v, 0)}%</span>`);
+const pctE = (v) => `${v > 0 ? '+' : ''}${nfE(v, 0)}%`;
+export function htmlExpCasca(c, X, esc) {
+  X = X || c.exportCasca || PADRAO.exportCasca;
+  const lista = c.estimativas || [], ref = lista[lista.length - 2] || lista[lista.length - 1];
+  const xAtu = ref && X.safras?.[ref.safra], xAnt = xAtu?.anterior;
+  if (!xAtu || !xAnt) return '';
+  const ant = exportEmCasca(xAnt, X), atu = exportEmCasca(xAtu, X);
+  const tA = ant.amend + ant.oleo, tU = atu.amend + atu.oleo, dSc = ((tU - tA) * 40) / 1000;
+  const lin = (rot, sub, a, u) => `<tr><th>${rot}<br><small>${sub}</small></th><td class="num">${nfE(a, 0)}</td><td class="num">${nfE(u, 0)}</td><td class="num">${sinalE(varE(u, a))}</td></tr>`;
+  return `<section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Exportação total em casca</span><span class="mini">mil t em casca</span></div>
+    <span class="es-txt">Amendoim e óleo somados e convertidos para casca: é quanto amendoim da roça a exportação consome.</span>
+    <div class="tabela-rolar"><table class="tabela dx-tabela es-balanco">
+      <thead><tr><th></th><th>${esc(xAnt.periodo)}</th><th>${esc(xAtu.periodo)}</th><th>Var.</th></tr></thead>
+      <tbody>
+        ${lin('Amendoim', `grão ÷ ${nfE(X.fatorGrao, 2)} + em casca`, ant.amend, atu.amend)}
+        ${lin('Óleo', `óleo ÷ ${nfE(X.fatorOleo, 2)}`, ant.oleo, atu.oleo)}
+      </tbody>
+      <tfoot>
+        <tr><th>Total</th><td class="num">${nfE(tA, 0)}</td><td class="num">${nfE(tU, 0)}</td><td class="num">${sinalE(varE(tU, tA))}</td></tr>
+        <tr><th>Em sacas de 25 kg</th><td class="num">${nfE((tA * 40) / 1000, 1)} mi</td><td class="num">${nfE((tU * 40) / 1000, 1)} mi</td><td class="num">${dSc > 0 ? '+' : ''}${nfE(dSc, 1)} mi</td></tr>
+      </tfoot>
+    </table></div>
+    <span class="mini dx-nota">Amendoim ${pctE(varE(atu.amend, ant.amend))}, óleo ${pctE(varE(atu.oleo, ant.oleo))}. Somando os dois, a exportação consumiu ${nfE(Math.abs(dSc), 1)} mi de sacas ${dSc < 0 ? 'a menos' : 'a mais'} que no mesmo período do ano anterior. Fonte: ${esc(X.fonte)}, até ${esc(X.atualizado)}.</span>
+  </section>`;
+}
+export function htmlBalanco(c, X, esc) {
+  const BAL = balancoSafras(c, X), C = BAL.cols;
+  X = BAL.X;
+  if (!C.length) return '';
+  const par = C.find((x) => x.parcial);
+  const cel = (v, p) => (v == null ? '–' : `${nfE(v, 0)}${p ? '*' : ''}`);
+  const lin = (rot, sub, k) => `<tr><th>${rot}${sub ? `<br><small>${sub}</small>` : ''}</th>${C.map((x) => `<td class="num">${cel(x[k], x.parcial && ['amend', 'oleo', 'sobra'].includes(k))}</td>`).join('')}</tr>`;
+  return `<section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Balanço por safra</span><span class="mini">mil t em casca</span></div>
+    <span class="es-txt">Conta por exclusão: à produção soma-se o que sobrou da safra anterior; tira-se a exportação (amendoim e óleo), o consumo interno e a semente. O que fica é o estoque de passagem, junto com o óleo consumido no Brasil.</span>
+    <div class="tabela-rolar"><table class="tabela dx-tabela es-balanco">
+      <thead><tr><th></th>${C.map((x) => `<th>Safra ${esc(x.safra)}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${lin('+ Sobra da safra anterior', '', 'inicial')}
+        ${lin('+ Produção', 'estimativa Amendoim Brasil', 'producao')}
+        ${lin('− Exportação de amendoim', `grão ÷ ${nfE(X.fatorGrao, 2)} + em casca`, 'amend')}
+        ${lin('− Exportação de óleo', `óleo ÷ ${nfE(X.fatorOleo, 2)}`, 'oleo')}
+        ${lin('− Consumo interno', `${nfE(BAL.b.consumoKgHab, 1)} kg/hab × ${nfE(BAL.b.populacaoMi)} mi hab`, 'consumo')}
+        ${lin('− Semente', 'para plantar a safra seguinte', 'semente')}
+      </tbody>
+      <tfoot>${lin('= Sobra', 'estoque de passagem', 'sobra')}</tfoot>
+    </table></div>
+    ${par ? `<span class="mini dx-nota">* ${esc(par.safra)}: exportação de ${esc(par.periodo)} (${par.meses} meses) levada para 12 meses no ritmo atual.${par.sobra < 0 ? ' Sobra negativa: nesse ritmo, as saídas passam do amendoim disponível. Ou a exportação desacelera, ou a produção foi maior que a estimada.' : ''}</span>` : ''}
+    <span class="mini dx-nota">Safra comercial de março a fevereiro. Exportação: ${esc(X.fonte)}, até ${esc(X.atualizado)}. Semente: ${nfE(BAL.b.sementeKgHa)} kg/ha na área da safra seguinte.</span>
+  </section>`;
+}
+>>>>>>>
+<<<<<<< public/app.js
+  h.patrocinio = (local) => seloPatrocinio(D, local, h);
+  return h;
+=======
+  h.patrocinio = (local) => seloPatrocinio(D, local, h);
+  h.cfg = () => D.config || {};
+  return h;
+>>>>>>>
+<<<<<<< public/esboco.js
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao } from '/esboco-dados.js';
+=======
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao, htmlExpCasca, htmlBalanco } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/esboco.js
+  const expGraoCasca = (b.exportGrao || 0) / rend; // mil t casca
+  const expOleo = b.exportOleo || 0;
+  const sobra = tRef - expGraoCasca - expOleo - consumoCasca - semente;
+  const pctRef = (v) => (tRef ? Math.max(0, Math.min(100, (v / tRef) * 100)) : 0);
+=======
+  // Exportação em casca equivalente (grão ÷ 0,70 + óleo ÷ 0,38): vem do config.json (banco) ou do padrão do app.
+  const XC = h.cfg?.().exportCasca;
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${b.exportExemplo && sessao()?.papel !== 'admin' ? '' : `<section class="cartao dx-cartao" style="gap:8px">
+    <div class="cartao-cab"><span class="rotulo">Para onde vai a safra ${h.esc(ref.safra)}</span><span class="mini">mil t em casca</span></div>
+    <span class="es-txt">Conta por exclusão: da produção, tira-se o que sai do país, o que o brasileiro come e o que vira semente. O que sobra vai para esmagamento (óleo) e estoque.</span>
+    <div class="es-bal">
+      <div class="es-bal-linha es-bal-total"><span><b>Produção ${h.esc(ref.safra)}</b><small>${faixa(ref.areaMin, ref.areaMax)} mil ha × ${faixa(ref.prodMin, ref.prodMax)} sc/alq</small></span><b class="num">${nf(tRef, 0)}</b></div>
+      <div class="es-bal-linha"><span><b>− Exportação de amendoim</b><small>${nf(b.exportGrao, 0)} mil t de grão ÷ ${nf(b.rendimento)}% de rendimento${b.exportExemplo ? ' · <i>exemplo</i>' : ''}</small></span><b class="num">${nf(expGraoCasca, 0)}</b><i class="es-bal-barra" style="width:${pctRef(expGraoCasca)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Exportação de óleo</b><small>em casca equivalente${b.exportExemplo ? ' · <i>exemplo</i>' : ''}</small></span><b class="num">${nf(expOleo, 0)}</b><i class="es-bal-barra" style="width:${pctRef(expOleo)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Consumo interno</b><small>${nf(b.consumoKgHab, 1)} kg/hab × ${nf(b.populacaoMi)} mi hab ÷ ${nf(b.rendimento)}%</small></span><b class="num">${nf(consumoCasca, 0)}</b><i class="es-bal-barra" style="width:${pctRef(consumoCasca)}%"></i></div>
+      <div class="es-bal-linha"><span><b>− Semente para ${h.esc(ult.safra)}</b><small>${nf(ult.areaMin)} mil ha × ${nf(b.sementeKgHa)} kg/ha</small></span><b class="num">${nf(semente, 0)}</b><i class="es-bal-barra" style="width:${pctRef(semente)}%"></i></div>
+      <div class="es-bal-linha es-bal-sobra ${sobra < 0 ? 'neg' : ''}"><span><b>= Sobra para esmagamento e estoque</b><small>${sobra < 0 ? 'negativo: as saídas superam a produção estimada; revise os números' : `${nf(pctRef(sobra), 0)}% da safra`}</small></span><b class="num">${nf(sobra, 0)}</b><i class="es-bal-barra" style="width:${pctRef(Math.max(0, sobra))}%"></i></div>
+    </div>
+    <span class="mini dx-nota">Exportação: ${h.esc(b.exportFonte || 'Comex Stat')}${b.exportExemplo ? ' (valor de exemplo até você preencher no painel)' : ''}. Rendimento casca → grão de ${nf(b.rendimento)}%.</span>
+  </section>`}
+=======
+  ${htmlExpCasca(c, XC, h.esc)}
+
+  ${htmlBalanco(c, XC, h.esc)}
+>>>>>>>
+<<<<<<< public/esboco-export.js
+import { conteudo, sessao, assinante, producao, ALQUEIRE_HA } from '/esboco-dados.js';
+=======
+import { conteudo, sessao, assinante, producao, ALQUEIRE_HA, balancoSafras } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/esboco-export.js
+  const b = c.balanco || {}, ult = c.estimativas[c.estimativas.length - 1], ref = c.estimativas[c.estimativas.length - 2] || ult, pRef = producao(ref);
+  const consumoCasca = (b.consumoKgHab * b.populacaoMi) / (b.rendimento / 100), semente = ult.areaMin * b.sementeKgHa / 1000;
+  out.push({ nome: 'Balanço', titulo: `Balanço ${ref.safra} por exclusão (mil t em casca)`, cab: ['Item', 'mil t', 'Base'], linhas: [
+    ['Produção', Math.round(pRef.tMeio / 1000), `${ref.areaMin}–${ref.areaMax} mil ha × ${ref.prodMin}–${ref.prodMax} sc/alq`],
+    ['(−) Consumo interno', Math.round(consumoCasca), `${b.consumoKgHab} kg/hab × ${b.populacaoMi} mi hab · rendimento ${b.rendimento}%`],
+    ['(−) Semente', Math.round(semente), `${ult.areaMin} mil ha × ${b.sementeKgHa} kg/ha`],
+    ['(−) Exportação de grão e óleo', 'Comex Stat', 'entra sozinho na versão final'],
+    ['(=) Sobra para esmagamento e estoque', 'calculado', '']
+  ] });
+=======
+  const BAL = balancoSafras(c);
+  if (BAL.cols.length) {
+    const C = BAL.cols, f = (v) => (v == null ? '' : Math.round(v));
+    const L = [['(+) Sobra da safra anterior', 'inicial'], ['(+) Produção (estimativa Amendoim Brasil)', 'producao'], [`(−) Exportação de amendoim (grão ÷ ${BAL.X.fatorGrao} + em casca)`, 'amend'], [`(−) Exportação de óleo (óleo ÷ ${BAL.X.fatorOleo})`, 'oleo'], ['(−) Consumo interno', 'consumo'], ['(−) Semente da safra seguinte', 'semente'], ['(=) Sobra / estoque de passagem', 'sobra']];
+    out.push({ nome: 'Balanço', titulo: 'Balanço por safra (mil t em casca)', cab: ['Item', ...C.map((x) => `Safra ${x.safra}`)], linhas: L.map(([rot, k]) => [rot, ...C.map((x) => f(x[k]))]),
+      nota: `Safra comercial de março a fevereiro. ${C.filter((x) => x.parcial).map((x) => `${x.safra}: exportação de ${x.periodo} (${x.meses} meses) levada para 12 meses no ritmo atual.`).join(' ')} Exportação: ${BAL.X.fonte}, até ${BAL.X.atualizado}.` });
+  }
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+        <div class="campo"><label>Exportação de grão (mil t de grão)</label>${inp('pe-expg', c.balanco.exportGrao ?? '', 'number')}</div>
+        <div class="campo"><label>Exportação de óleo (mil t, em casca)</label>${inp('pe-expo', c.balanco.exportOleo ?? '', 'number')}</div>
+        <div class="campo"><label>Fonte/período da exportação</label>${inp('pe-expf', c.balanco.exportFonte || '')}</div>
+      </div>
+      <span class="mini">Ao salvar, a exportação deixa de ser "exemplo" no app.</span>
+=======
+      </div>
+      <span class="mini">Exportação: automática, do Comex Stat (amendoim em casca + grão ÷ 0,70 + óleo ÷ 0,38), atualizada todo mês.</span>
+>>>>>>>
+<<<<<<< public/painel-esboco.js
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70, exportGrao: n('pe-expg'), exportOleo: n('pe-expo'), exportFonte: t('pe-expf'), exportExemplo: false };
+=======
+      c.balanco = { consumoKgHab: n('pe-consumo'), populacaoMi: n('pe-pop'), sementeKgHa: n('pe-semente'), rendimento: n('pe-rend') || 70 };
+>>>>>>>
+<<<<<<< public/exportacao.js
+const PROD = { grao: 'Amendoim', oleo: 'Óleo', total: 'Total' };
+=======
+const PROD = { casca: 'Total em casca', grao: 'Grão', oleo: 'Óleo' }; // começa pelo total: é quanto amendoim da roça a exportação consome
+const FATOR_OLEO = 0.38; // 1 t de óleo = 1 ÷ 0,38 t de amendoim em casca (conta do mercado)
+>>>>>>>
+<<<<<<< public/exportacao.js
+  if (prod !== 'total') return b.series[prod] || {};
+  const out = {};
+  for (const p of ['grao', 'oleo']) for (const [a, s] of Object.entries(b.series[p] || {})) {
+    const o = (out[a] = out[a] || { t: Array(12).fill(null), usd: Array(12).fill(null) });
+    s.t.forEach((v, i) => { if (v != null) { o.t[i] = (o.t[i] || 0) + v; o.usd[i] = (o.usd[i] || 0) + (s.usd[i] || 0); } });
+=======
+  if (prod !== 'casca') return b.series[prod] || {};
+  // Total em casca: grão ÷ 0,70 + óleo ÷ 0,38 (quanto amendoim da roça a exportação consome)
+  const out = {};
+  for (const [p, f] of [['grao', RENDIMENTO], ['oleo', FATOR_OLEO]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+    const o = (out[a] = out[a] || { t: Array(12).fill(null), usd: Array(12).fill(null) });
+    s.t.forEach((v, i) => { if (v != null) { o.t[i] = (o.t[i] || 0) + v / f; o.usd[i] = (o.usd[i] || 0) + (s.usd[i] || 0); } });
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="dx-tile"><span>Preço médio</span><b class="num">US$ ${nf(precoYtd[atual])}/t</b><small>${seta(vPreco)}${pc(vPreco)} vs ${atual - 1}</small></div>
+=======
+      ${est.prod === 'casca' ? `<div class="dx-tile"><span>Em sacas jan–${ate}</span><b class="num">${nf((ytd[atual] * 40) / 1e6, 1)} mi sc</b><small>${ytd[atual] - ytd[atual - 1] > 0 ? '+' : ''}${nf(((ytd[atual] - ytd[atual - 1]) * 40) / 1e6, 1)} mi vs ${atual - 1}</small></div>` : `<div class="dx-tile"><span>Preço médio</span><b class="num">US$ ${nf(precoYtd[atual])}/t</b><small>${seta(vPreco)}${pc(vPreco)} vs ${atual - 1}</small></div>`}
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="cartao-cab"><span class="rotulo">Exportação mês a mês · mil toneladas</span><span class="mini">${est.prod === 'grao' ? 'NCM 1202' : est.prod === 'oleo' ? 'NCM 1508' : '1202 + 1508'}</span></div>
+=======
+      <div class="cartao-cab"><span class="rotulo">Exportação mês a mês · mil toneladas${est.prod === 'casca' ? ' em casca' : ''}</span><span class="mini">${est.prod === 'grao' ? 'NCM 1202' : est.prod === 'oleo' ? 'NCM 1508' : 'grão ÷ 0,70 + óleo ÷ 0,38'}</span></div>
+>>>>>>>
+<<<<<<< public/exportacao.js
+          <tr><th>US$/t</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'dx-ant' : ''}">${nf(precoYtd[a])}</td>`).join('')}<td class="dx-var">${vc(vPreco)}</td></tr>
+=======
+          ${est.prod === 'casca' ? '' : `<tr><th>US$/t</th>${anos.map((a, k) => `<td class="${k < anos.length - 3 ? 'dx-ant' : ''}">${nf(precoYtd[a])}</td>`).join('')}<td class="dx-var">${vc(vPreco)}</td></tr>`}
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <span class="mini"><i class="dx-leg"></i> maior mês entre os anos · "Até ${ate}" compara os mesmos meses de cada ano · ${atual} em itálico é a projeção (média mensal × 12) · US$/t é o preço médio FOB do período.</span>
+=======
+      <span class="mini"><i class="dx-leg"></i> maior mês entre os anos · "Até ${ate}" compara os mesmos meses de cada ano · ${atual} em itálico é a projeção (média mensal × 12)${est.prod === 'casca' ? ' · Total em casca: grão ÷ 0,70 + óleo ÷ 0,38, é quanto amendoim da roça a exportação consome (o NCM 1202 inclui o pouco exportado em casca, menos de 1%).' : ' · US$/t é o preço médio FOB do período.'}</span>
+>>>>>>>
+<<<<<<< public/exportacao.js
+  const sr = b.series?.grao || {};
+  let t = 0, meses = 0;
+=======
+  const sr = b.series?.grao || {}, so = b.series?.oleo || {};
+  let t = 0, meses = 0;
+>>>>>>>
+<<<<<<< public/exportacao.js
+    t += v; meses++;
+  }
+  return meses ? { mil: t / RENDIMENTO / 1000, meses } : null;
+=======
+    t += v / RENDIMENTO + (so[y]?.t?.[mi] || 0) / FATOR_OLEO; meses++;
+  }
+  return meses ? { mil: t / 1000, meses } : null;
+>>>>>>>
+<<<<<<< public/exportacao.js
+// Exportação por safra comercial (mar a fev), do Comex Stat, convertida para casca. Devolve também quantos meses já saíram.
+=======
+// Exportação por safra comercial (mar a fev), do Comex Stat, em casca: grão ÷ 0,70 + óleo ÷ 0,38. Devolve também quantos meses já saíram.
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <tr><th>Exportação</th>${anos.map((a) => `<td>${ex[a] ? cel(ex[a].mil, ex[a].meses < 12) : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+=======
+      <tr><th>Exportação · grão + óleo</th>${anos.map((a) => `<td>${ex[a] ? cel(ex[a].mil, ex[a].meses < 12) : '–'}</td>`).join('')}<td class="dx-var"></td></tr>
+>>>>>>>
+<<<<<<< public/exportacao.js
+    ${FONTE_PEQ('Fontes: Amendoim Brasil (estimativa), Conab (' + CONAB_FONTE + '), USDA e Comex Stat/MDIC (exportação, grão ÷ 0,70)')}
+=======
+    ${FONTE_PEQ('Fontes: Amendoim Brasil (estimativa), Conab (' + CONAB_FONTE + '), USDA e Comex Stat/MDIC (exportação em casca: grão ÷ 0,70 + óleo ÷ 0,38)')}
+>>>>>>>
+<<<<<<< public/exportacao.js
+import { conteudo, producao as producaoEst } from '/esboco-dados.js';
+=======
+import { conteudo, producao as producaoEst, htmlBalanco } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/exportacao.js
+const est = { dados: null, carregando: false, erro: '', aba: 'brasil', prod: 'grao', anoMundo: null };
+=======
+const est = { dados: null, carregando: false, erro: '', aba: 'brasil', prod: 'casca', anoMundo: null };
+>>>>>>>
+<<<<<<< public/exportacao.js
+function telaBrasil(b) {
+=======
+// Resumo do ano no topo: total em casca, grão e óleo, contra os mesmos meses do ano anterior.
+function resumoBrasil(b) {
+  const atual = b.ano, n = b.mes, ate = MESES[n - 1].toLowerCase();
+  const s = (p, a) => (b.series[p]?.[a]?.t || []).slice(0, n).reduce((x, v) => x + (v || 0), 0);
+  const casca = (a) => s('grao', a) / RENDIMENTO + s('oleo', a) / FATOR_OLEO;
+  const lin = (rot, sub, u, a) => `<tr><th>${rot}${sub ? `<br><small>${sub}</small>` : ''}</th><td class="num">${nf(a)} t</td><td class="num">${nf(u)} t</td><td class="dx-var">${vc(varia(u, a))}</td></tr>`;
+  return `<section class="cartao dx-cartao" style="gap:6px">
+      <div class="cartao-cab"><span class="rotulo">Exportações jan–${ate}</span><span class="mini">${atual - 1} × ${atual}</span></div>
+      <table class="tabela dx-tabela"><thead><tr><th></th><th>${atual - 1}</th><th>${atual}</th><th>Var.</th></tr></thead><tbody>
+        ${lin('<b>Total em casca</b>', 'grão ÷ 0,70 + óleo ÷ 0,38', casca(atual), casca(atual - 1))}
+        ${lin('Grão', 'NCM 1202', s('grao', atual), s('grao', atual - 1))}
+        ${lin('Óleo', 'NCM 1508', s('oleo', atual), s('oleo', atual - 1))}
+      </tbody></table>
+      <span class="mini">Total em casca: quanto amendoim da roça a exportação consome. Em sacas de 25 kg: ${nf((casca(atual - 1) * 40) / 1e6, 1)} mi em ${atual - 1} e ${nf((casca(atual) * 40) / 1e6, 1)} mi em ${atual}.</span>
+    </section>`;
+}
+
+function telaBrasil(b) {
+>>>>>>>
+<<<<<<< public/exportacao.js
+  return `<div class="dx-tiles">
+=======
+  return `${resumoBrasil(b)}<div class="dx-tiles">
+>>>>>>>
+<<<<<<< public/exportacao.js
+  const abas = [['brasil', 'Brasil'], ['destinos', 'Destinos'], ['mundo', 'Mundo']]; // 'Balanço' (USDA do Brasil) fora por enquanto: o Brasil agora usa Conab e Comex
+=======
+  const abas = [['brasil', 'Brasil'], ['destinos', 'Destinos'], ['mundo', 'Mundo'], ['balanco', 'Balanço']]; // Balanço: conta da Amendoim Brasil (Comex) e, embaixo, a visão do USDA
+>>>>>>>
+<<<<<<< public/exportacao.js
+  if (est.aba === 'balanco' && m) corpo = telaBalanco(m, b);
+=======
+  if (est.aba === 'balanco') corpo = htmlBalanco(conteudo(), D.config?.exportCasca, esc) + (m ? telaBalanco(m, b) : '');
+>>>>>>>
+<<<<<<< public/exportacao.js
+      <div class="cartao-cab"><span class="rotulo">Para onde vai o amendoim do Brasil</span><span class="mini">mil t em casca</span></div>
+=======
+      <div class="cartao-cab"><span class="rotulo">Para onde vai o amendoim do Brasil · visão do USDA</span><span class="mini">mil t em casca</span></div>
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (s.startsWith('fraco a') || s === 'estavel a fraco') return 1;
+  if (s.startsWith('estavel a firme') || s === 'firme a estavel') return 3;
+  if (s.startsWith('fra')) return 0;
+  if (s.startsWith('fir')) return 4;
+=======
+  if (s.startsWith('fraco a') || s.startsWith('baixa a') || s === 'estavel a fraco' || s === 'estavel a baixa') return 1;
+  if (s.startsWith('estavel a firme') || s.startsWith('estavel a alta') || s === 'firme a estavel' || s === 'alta a estavel') return 3;
+  if (s.startsWith('fra') || s.startsWith('bai')) return 0;
+  if (s.startsWith('fir') || s.startsWith('alt')) return 4;
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const nomes = ['Fraco', 'Estável', 'Firme'];
+=======
+  const nomes = ['Baixa', 'Estável', 'Alta']; // tendência do preço nas próximas semanas
+>>>>>>>
+<<<<<<< public/esboco3.js
+  const t = conteudo().termometro;
+  if (t && D.config?.termometro) D.config.termometro.status = t;
+=======
+  const t = conteudo().termometro;
+  if (t && D.config?.termometro) D.config.termometro.status = t;
+  // PRÉVIA (só no link de teste): leitura de mercado nova, para o Helder aprovar. Na publicação estes textos vão para o
+  // banco (config.json e mercado.json) e este bloco sai. No app oficial nada muda até lá.
+  if (/^deploy-preview-\d+--/.test(location.hostname)) previaMercado(D);
+>>>>>>>
+<<<<<<< public/esboco3.js
+export function ajustarDados(D) {
+=======
+function previaMercado(D) {
+  const exp = { valor: 'Mais fraca', efeito: 'baixa', detalhe: 'Somando grão e óleo convertidos para casca, a exportação de março a setembro consumiu 491 mil t de amendoim, 9% menos que no mesmo período de 2025 (1,9 milhão de sacas a menos). O amendoim (grão) subiu 15%, mas o óleo caiu 29% (Comex Stat).' };
+  const t = D.config?.termometro;
+  if (t) {
+    t.status = 'Estável';
+    t.resumo = 'Mercado de lado. A área menor no Brasil e a oferta curta lá fora seguram o preço, mas a exportação total (grão e óleo) consome menos amendoim que em 2025 e a demanda interna está parada. A força de alta deve aparecer mais perto de março.';
+    (t.fatores || []).forEach((f) => { if (f.nome === 'Exportação') Object.assign(f, exp); });
+  }
+  if (D.config?.exportacao) D.config.exportacao.status = 'Mais fraca';
+  (D.mercado?.hoje || []).forEach((x) => { if (x.id === 'exportacao') Object.assign(x, exp, { nota: 'amendoim +15% · óleo −29%' }); });
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Exportação total 9% abaixo de 2025',
+    leitura: 'Pesa contra o preço: somando grão e óleo convertidos para casca, a exportação de março a setembro consumiu 1,9 milhão de sacas a menos que no mesmo período de 2025. O grão segue acima do ano passado, mas o óleo caiu forte, e cada tonelada de óleo leva cerca de 2,6 t de amendoim em casca.' });
+}
+export function ajustarDados(D) {
+>>>>>>>
+<<<<<<< public/painel-esboco2.js
+    <div class="chips">${['Fraco', 'Fraco a estável', 'Estável', 'Estável a firme', 'Firme'].map((t) => `<button class="chip" data-pe-termo="${t}" aria-pressed="${conteudo().termometro === t}">${t}</button>`).join('')}</div>
+=======
+    <div class="chips">${['Baixa', 'Baixa a estável', 'Estável', 'Estável a alta', 'Alta'].map((t) => `<button class="chip" data-pe-termo="${t}" aria-pressed="${conteudo().termometro === t}">${t}</button>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  // Termômetro com 5 posições: Fraco · Fraco a estável · Estável · Estável a firme · Firme
+=======
+  // Termômetro (tendência do preço) com 5 posições: Baixa · Baixa a estável · Estável · Estável a alta · Alta
+>>>>>>>
+<<<<<<< public/painel.js
+    <div class="cartao-cab"><span class="rotulo">Exportação · ${esc(e.periodo)}</span><span class="pilula pilula-verde">Fator positivo</span></div>
+=======
+    <div class="cartao-cab"><span class="rotulo">Exportação · ${esc(e.periodo)}</span>${e.efeito === 'baixa' ? '<span class="pilula" style="background:#FCE4E0;color:#9A2F1E">Pesa contra</span>' : e.efeito === 'neutro' ? '<span class="pilula">Neutro</span>' : '<span class="pilula pilula-verde">Fator positivo</span>'}</div>
+>>>>>>>

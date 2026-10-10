@@ -31,6 +31,7 @@ const resp = (req: Request, status: number, corpo: unknown) =>
 function normaliza(bruto: unknown): string | null {
   let d = String(bruto ?? "").replace(/\D/g, "");
   if (d.startsWith("00")) d = d.slice(2);
+  else if (d.startsWith("0")) d = d.slice(1); // 0 de longa distância: "014 99893-1112" vira 14...
   if (d.length === 10 || d.length === 11) d = "55" + d; // DDD + número, sem o 55
   if (d.startsWith("55") && (d.length < 12 || d.length > 13)) return null;
   if (d.length < 10 || d.length > 15) return null;
