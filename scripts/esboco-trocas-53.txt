@@ -1,0 +1,96 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v61';
+=======
+const VERSAO = 'ab-v62';
+>>>>>>>
+<<<<<<< public/painel.js
+    ${m.fato ? `<div class="fato-linha"><a href="#/mercado/hoje"><span class="fato-tag">Fato do dia</span><span>${esc(m.fato.titulo)}</span></a><button class="fato-enviar" data-compartilhar="fato" aria-label="Enviar o fato do dia no WhatsApp">${h.ic(h.I.enviar)}</button></div>` : ''}
+=======
+    ${m.leitura ? `<a class="hoje-leitura" href="#/mercado/termometro" data-ev="leitura-mercado" style="display:flex;flex-direction:column;gap:3px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--fundo);text-decoration:none;color:inherit"><b style="font-size:13px">Por que o mercado está assim</b><span style="font-size:13.5px;line-height:1.45;color:var(--texto-2)">${esc(m.leitura)}</span></a>` : ''}
+    ${m.fato ? `<div class="fato-linha"><a href="#/mercado/hoje"><span class="fato-tag">Fato do dia</span><span>${esc(m.fato.titulo)}</span></a><button class="fato-enviar" data-compartilhar="fato" aria-label="Enviar o fato do dia no WhatsApp">${h.ic(h.I.enviar)}</button></div>` : ''}
+>>>>>>>
+<<<<<<< public/painel.js
+    <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(e.leitura)}</p>
+=======
+    <p style="margin:0;font-size:14px;line-height:1.5;color:var(--texto-2)">${esc(e.leitura)}</p>
+    ${(e.itens || []).length ? `<div class="mini" style="display:flex;gap:14px;flex-wrap:wrap">${e.itens.map((x) => `<span><b>${esc(x.nome)}</b> ${numBr(x.toneladas, 0)} t (${x.variacao > 0 ? '+' : ''}${numBr(x.variacao, 1)}% vs ano passado)</span>`).join('')}</div>` : ''}
+>>>>>>>
+<<<<<<< public/esboco3.js
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Exportação total 9% abaixo de 2025',
+=======
+  if (D.mercado) D.mercado.leitura = 'Mercado de lado. A área menor no Brasil e a oferta curta lá fora seguram o preço, mas a exportação total (grão e óleo) está consumindo menos amendoim que em 2025 e a indústria compra só o necessário. A força de alta deve aparecer mais perto de março.';
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Exportação total 9% abaixo de 2025',
+>>>>>>>
+<<<<<<< public/terminal.js
+const OLEO_EM_GRAO = 2.5; // 1 t de óleo ≈ 2,5 t de grão (rendimento de 40% no esmagamento)
+=======
+const EM_CASCA = { grao: 1 / 0.7, oleo: 1 / 0.38 }; // total em casca: grão ÷ 0,70 + óleo ÷ 0,38 (quanto amendoim da roça a exportação consome)
+>>>>>>>
+<<<<<<< public/terminal.js
+const est = { comex: null, mundo: null, dados: null, carregando: false, erro: '', prod: 'grao', tipoVisao: 'mes', aba: 'exportacao' };
+=======
+const est = { comex: null, mundo: null, dados: null, carregando: false, erro: '', prod: 'total', tipoVisao: 'mes', aba: 'exportacao' };
+>>>>>>>
+<<<<<<< public/terminal.js
+// ---------- Comex: série por produto (óleo convertido em grão para o total) ----------
+=======
+// ---------- Comex: série por produto (o total soma grão e óleo convertidos para casca) ----------
+>>>>>>>
+<<<<<<< public/terminal.js
+  for (const [p, fator] of [['grao', 1], ['oleo', OLEO_EM_GRAO]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+=======
+  for (const [p, fator] of [['grao', EM_CASCA.grao], ['oleo', EM_CASCA.oleo]]) for (const [a, s] of Object.entries(b.series[p] || {})) {
+>>>>>>>
+<<<<<<< public/terminal.js
+  const rot = { grao: 'Grão (NCM 1202)', oleo: 'Óleo (NCM 1508)', total: 'Total em grão' }[est.prod];
+=======
+  const rot = { grao: 'Grão (NCM 1202)', oleo: 'Óleo (NCM 1508)', total: 'Total em casca' }[est.prod];
+>>>>>>>
+<<<<<<< public/terminal.js
+    <div class="chips">${[['grao', 'Grão'], ['oleo', 'Óleo'], ['total', 'Total em grão']].map(([k, t]) => `<button class="chip" data-tm-prod="${k}" aria-pressed="${est.prod === k}">${t}</button>`).join('')}</div>
+=======
+    <div class="chips">${[['total', 'Total em casca'], ['grao', 'Grão'], ['oleo', 'Óleo']].map(([k, t]) => `<button class="chip" data-tm-prod="${k}" aria-pressed="${est.prod === k}">${t}</button>`).join('')}</div>
+>>>>>>>
+<<<<<<< public/terminal.js
+    ${info('Como ler', `<b>Recorde</b> é o maior valor daquele mês entre os anos da tabela. <b>Até ${ate}</b> soma os mesmos meses de cada ano, para comparar igual com igual. <b>Projeção sazonal</b> usa o peso que jan–${ate} teve nos anos fechados; a linear (média × 12) subestima quando o pico de embarque é no segundo semestre. <b>Total em grão</b> converte o óleo em amendoim equivalente (1 t de óleo ≈ ${OLEO_EM_GRAO} t de grão, rendimento de 40%). Fonte: Comex Stat/MDIC, publicado com cerca de um mês de atraso.`)}
+=======
+    ${info('Como ler', `<b>Recorde</b> é o maior valor daquele mês entre os anos da tabela. <b>Até ${ate}</b> soma os mesmos meses de cada ano, para comparar igual com igual. <b>Projeção sazonal</b> usa o peso que jan–${ate} teve nos anos fechados; a linear (média × 12) subestima quando o pico de embarque é no segundo semestre. <b>Total em casca</b> soma grão e óleo convertidos para amendoim em casca (grão ÷ 0,70 + óleo ÷ 0,38): é quanto amendoim da roça a exportação consome. Fonte: Comex Stat/MDIC, publicado com cerca de um mês de atraso.`)}
+>>>>>>>
+<<<<<<< public/esboco.js
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao, htmlExpCasca, htmlBalanco } from '/esboco-dados.js';
+=======
+import { conteudo, sessao, salvarSessao, assinante, producao, emProducao, htmlBalanco } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/esboco.js
+  ${htmlExpCasca(c, XC, h.esc)}
+
+  ${htmlBalanco(c, XC, h.esc)}
+=======
+  ${htmlBalanco(c, XC, h.esc)}
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+  const par = C.find((x) => x.parcial);
+  const cel = (v, p) => (v == null ? '–' : `${nfE(v, 0)}${p ? '*' : ''}`);
+=======
+  const par = C.find((x) => x.parcial);
+  const cel = (v, p) => (v == null ? '–' : `${nfE(v, 0)}${p ? '*' : ''}`);
+  // Leitura em uma frase: quanto sobrou da safra anterior e quanto deve sobrar desta no ritmo atual.
+  const u = C[C.length - 1], a = C.length > 1 ? C[0] : null;
+  const leitura = `${a ? `Da safra ${esc(a.safra)} sobraram cerca de ${nfE(a.sobra, 0)} mil t. ` : ''}${u.parcial ? 'No ritmo atual de exportação, a' : 'A'} safra ${esc(u.safra)} fecha com ${u.sobra < 0 ? `falta de ${nfE(-u.sobra, 0)}` : `sobra de ${nfE(u.sobra, 0)}`} mil t (${nfE((Math.abs(u.sobra) * 40) / 1000, 1)} mi de sacas)${u.sobra < u.producao * 0.05 ? ': oferta apertada até a próxima colheita' : ''}.`;
+>>>>>>>
+<<<<<<< public/esboco-dados.js
+    <span class="es-txt">Conta por exclusão: à produção soma-se o que sobrou da safra anterior; tira-se a exportação (amendoim e óleo), o consumo interno e a semente. O que fica é o estoque de passagem, junto com o óleo consumido no Brasil.</span>
+=======
+    <p class="es-txt" style="margin:0;font-weight:700;color:var(--texto)">${leitura}</p>
+    <span class="es-txt">Conta por exclusão: à produção soma-se o que sobrou da safra anterior; tira-se a exportação (amendoim e óleo), o consumo interno e a semente. O que fica é o estoque de passagem, junto com o óleo consumido no Brasil.</span>
+>>>>>>>
+<<<<<<< public/exportacao.js
+import { conteudo, producao as producaoEst, htmlBalanco } from '/esboco-dados.js';
+=======
+import { conteudo, producao as producaoEst, htmlBalanco, htmlExpCasca } from '/esboco-dados.js';
+>>>>>>>
+<<<<<<< public/exportacao.js
+  if (est.aba === 'balanco') corpo = htmlBalanco(conteudo(), D.config?.exportCasca, esc) + (m ? telaBalanco(m, b) : '');
+=======
+  if (est.aba === 'balanco') corpo = htmlExpCasca(conteudo(), D.config?.exportCasca, esc) + htmlBalanco(conteudo(), D.config?.exportCasca, esc) + (m ? telaBalanco(m, b) : '');
+>>>>>>>
