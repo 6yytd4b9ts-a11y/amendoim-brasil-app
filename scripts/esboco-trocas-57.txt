@@ -1,0 +1,70 @@
+<<<<<<< public/sw.js
+const VERSAO = 'ab-v65';
+=======
+const VERSAO = 'ab-v66';
+>>>>>>>
+<<<<<<< public/esboco3.js
+import { bandeira } from '/bandeiras.js';
+=======
+
+>>>>>>>
+<<<<<<< public/esboco3.js
+// Miniatura da notícia: a foto, se tiver; senão a bandeira do país, um ícone de clima ou o símbolo do app.
+function miniNoticia(n, h) {
+  const caixa = (dentro, fundo = 'var(--fundo)') => `<span aria-hidden="true" style="flex:none;width:42px;height:42px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:${fundo}">${dentro}</span>`;
+  const img = n.imagem || n.capa;
+  if (/^https:\/\//.test(img || '')) return caixa(`<img src="${h.esc(img)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">`);
+  const t = `${n.titulo || ''} ${n.fonte || ''}`;
+  if (/chuva|clima|calor|frio|geada|seca|Climatempo|Cepagri|INMET|previs/i.test(t)) return caixa(h.ic(h.I.chuva, 'style="width:24px;height:24px;stroke:#2F6FA3"'), '#E6F0F8');
+  const pais = /EUA|Estados Unidos|USDA|american/i.test(t) ? 'US' : /Argentin|Córdoba|Cordoba|Maní/i.test(t) ? 'AR' : /Índia|India/i.test(t) ? 'IN' : /China|chin[eê]s/i.test(t) ? 'CN' : /Conab|IEA|Brasil|paulista|SP\b|Comex/i.test(t) ? 'BR' : '';
+  if (pais) return caixa(bandeira(pais, 42));
+  return caixa('<img src="/icons/icon-maskable-512.png" alt="" style="width:100%;height:100%;object-fit:cover">');
+}
+=======
+// Ícone da notícia pelo assunto: clima, exportação, combustível, safra, mercado (ou um jornal, se não for nenhum).
+const ICONE_NOTICIA = [
+  [/chuva|clima|calor|frio|geada|seca|el ni[ñn]o|la ni[ñn]a|climatempo|cepagri|inmet|temperatura|tempo seco/i, '#2F6FA3', '#E6F0F8', '<path d="M17.5 14H7a4 4 0 1 1 .7-7.94A5.5 5.5 0 0 1 18 7.5a3.25 3.25 0 0 1-.5 6.5z"/><path d="M8 18l-1 2M12 18l-1 2M16 18l-1 2"/>'],
+  [/diesel|combust|gasolina|petr[óo]leo|frete/i, '#8A5A12', '#F7EDD9', '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h12"/><path d="M7 8h4"/><path d="M14 10h2a2 2 0 0 1 2 2v4a1.5 1.5 0 0 0 3 0V8l-3-3"/>'],
+  [/export|embarque|porto|navio|comex|importa/i, '#1F4E79', '#E6EEF6', '<path d="M3 17l1.5 3h15L21 17"/><path d="M5 17v-6h14v6"/><path d="M9 11V7h6v4"/><path d="M12 4v3"/>'],
+  [/safra|plant|colheita|semente|produtividade|lavoura|crop progress|[áa]rea/i, '#4F7A1E', '#EDF3E0', '<path d="M12 21v-8"/><path d="M12 13c0-3-2.5-5.5-6-5.5 0 3.5 2.5 5.5 6 5.5z"/><path d="M12 11c0-3 2.5-5.5 6-5.5 0 3.5-2.5 5.5-6 5.5z"/>'],
+  [/pre[çc]o|cota[çc]|mercado|d[óo]lar|bolsa|demanda|compra|venda|m[óo]i|moagem|esmag|ind[úu]stria/i, '#007731', '#E3F1E7', '<path d="M4 19h16"/><path d="M5 15l4-4 3 3 6-6"/><path d="M15 8h3v3"/>']
+];
+function miniNoticia(n, h) {
+  const t = `${n.titulo || ''} ${n.fonte || ''}`;
+  const [, cor, fundo, svg] = ICONE_NOTICIA.find(([re]) => re.test(t)) || [null, '#5F5B52', '#F1EEE7', '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h8M8 16h5"/>'];
+  return `<span aria-hidden="true" style="flex:none;width:30px;height:30px;margin-top:1px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:${fundo}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></span>`;
+}
+>>>>>>>
+<<<<<<< public/esboco3.js
+function previaMercado(D) {
+  const expDet = 'O grão segue acima do ano passado, mas a exportação de óleo caiu forte. Somando os dois, a exportação está tirando menos amendoim do mercado que em 2025.';
+  const FAT = {
+    'Preço internacional': { valor: 'Subindo', efeito: 'alta', detalhe: 'Os preços de exportação estão em tendência de alta, porque a oferta mundial está mais curta.' },
+    'Safra mundial': { valor: 'Menor', efeito: 'alta', detalhe: 'EUA com produção menor, Argentina com estimativa de redução de 8% na área, Índia com quebra perto de 20% na safra atual e Brasil com estimativa de área 25% a 30% menor.' },
+    'Oferta brasileira': { valor: 'Menor', efeito: 'alta', detalhe: 'A venda de sementes indica que a área plantada na safra 26/27 vai ser menor, por falta de crédito e juros altos. A Conab publica a primeira estimativa em 15/10.' },
+    'Exportação': { valor: 'Mais fraca', efeito: 'baixa', detalhe: expDet }
+  };
+  const t = D.config?.termometro;
+  if (t) {
+    t.status = 'Estável';
+    t.resumo = 'O mercado está andando de lado porque as forças se equilibram. Seguram o preço: safra menor no Brasil, nos EUA e na Índia, e preço de exportação firme lá fora. Pesam contra: a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+    (t.fatores || []).forEach((f) => { if (FAT[f.nome]) Object.assign(f, FAT[f.nome]); });
+  }
+  if (D.config?.exportacao) D.config.exportacao.status = 'Mais fraca';
+  (D.mercado?.hoje || []).forEach((x) => { if (x.id === 'exportacao') Object.assign(x, { valor: 'Mais fraca', efeito: 'baixa', nota: 'grão +16% · óleo −22%', detalhe: expDet }); });
+  (D.mercado?.ofertaDemanda || []).forEach((x) => { if (/export/i.test(x.nome)) Object.assign(x, { escala: ['Mais fraca', 'Normal', 'Forte'], nivel: 0, efeito: 'baixa', detalhe: expDet }); });
+  if (D.mercado) D.mercado.leitura = 'O mercado está andando de lado porque as forças se equilibram. Seguram o preço a safra menor no Brasil, nos EUA e na Índia e o preço de exportação firme lá fora. Pesam contra a indústria comprando só o necessário, o dólar perto de R$ 5 e a exportação de óleo bem abaixo do ano passado. Conforme a área menor da safra 26/27 se confirmar, a balança tende a pender para a alta.';
+  if (D.mercado?.exportacao) Object.assign(D.mercado.exportacao, { efeito: 'baixa', titulo: 'Grão sobe, óleo cai',
+    leitura: 'O grão segue acima do ano passado, mas a exportação de óleo caiu forte. Como cada tonelada de óleo leva cerca de 2,6 t de amendoim em casca, a exportação como um todo está tirando menos amendoim do mercado que em 2025. Por isso ela deixou de ajudar o preço.' });
+}
+export function ajustarDados(D) {
+=======
+export function ajustarDados(D) {
+>>>>>>>
+<<<<<<< public/esboco3.js
+  // PRÉVIA (só no link de teste): leitura de mercado nova, para o Helder aprovar. Na publicação estes textos vão para o
+  // banco (config.json e mercado.json) e este bloco sai. No app oficial nada muda até lá.
+  if (/^deploy-preview-\d+--/.test(location.hostname)) previaMercado(D);
+=======
+
+>>>>>>>
